@@ -55,6 +55,8 @@ function stripTagsFromMarkdown(markdown) {
 }
 
 function toID(text) {
+  const match = /^.+(\s*\<#([a-z0-9\-_]+?)\>\s*)$/.exec(text);
+  text = match ? match[2] : text;
   text = stripTagsFromMarkdown(text)
   return text.toLowerCase().replace(/[^\w \-]/g, '').replace(/[ ]/g, '-')
 }
