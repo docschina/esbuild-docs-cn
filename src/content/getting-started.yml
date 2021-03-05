@@ -2,7 +2,7 @@ title: 快速入门
 body:
   - h1: 快速入门
 
-  - h2: 安装 esbuild
+  - h2: 安装 esbuild <#install-esbuild>
 
   - p: >
       首先，下载并本地安装 esbuild， A prebuilt
@@ -19,7 +19,7 @@ body:
   - pre: |
       ./node_modules/.bin/esbuild --version
 
-  - h2: 首次构建
+  - h2: 首次构建 <#your-first-bundle>
 
   - p: >
       这是一个简易的真实案例，用于说明 esbuild 的能力以及如何使用它。
@@ -63,7 +63,7 @@ body:
       来告诉 esbuild 对 js 文件进行 jsx 的编译。
       更多关于可用配置项的说明，请参阅 [API 文档](/api/)。
 
-  - h2: 构建脚本
+  - h2: 构建脚本 <#build-scripts>
 
   - p: >
       构建命令会反复执行，因此，通常我们会简化它。
@@ -113,7 +113,7 @@ body:
       因为[插件](/plugins/)只与异步 API 协同工作。
       你可以在 [API 文档](/api/#build-api) 中了解更多关于构建 API 的配置项。
 
-  - h2: 针对浏览器环境的构建
+  - h2: 针对浏览器环境的构建 <#bundling-for-the-browser>
 
   - p: >
       构建工具默认为浏览器输出代码，
@@ -229,7 +229,7 @@ body:
         }
       }
 
-  - h2: 针对 Node 环境的构建
+  - h2: 针对 Node 环境的构建 <#bundling-for-node>
 
   - p: >
       尽管在使用 Node 时，无需构建，但有时在 Node 代码运行前，
