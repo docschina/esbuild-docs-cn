@@ -1,8 +1,8 @@
 index:
-  title: An extremely fast JavaScript bundler
+  title: 极速 JavaScript 打包器
   body:
     - h1: esbuild
-    - blockquote: An extremely fast JavaScript bundler
+    - blockquote: 极速 JavaScript 打包器
 
     - benchmark.animated:
         '[esbuild](https://github.com/evanw/esbuild)': 0.37
@@ -13,31 +13,32 @@ index:
         '[parcel](https://github.com/parcel-bundler/parcel) 1': 118.51
 
     - figcaption: >
-        Above: the time to do a production bundle of 10 copies of the
-        [three.js](https://github.com/mrdoob/three.js)
-        library from scratch using default settings, including minification and
-        source maps. More info [here](/faq/#benchmark-details).
+        以上数据：采用了默认配置，
+        从 0 开始构建了 10 份 
+        [three.js](https://github.com/mrdoob/three.js) 库的构建时间，
+        其中包括代码压缩以及 source map。
+        更多信息请查阅[此处](/faq/#benchmark-details)了解更多。
 
     - p: >
-        Our current build tools for the web are 10-100x slower than they could
-        be. The main goal of the esbuild bundler project is to bring about a new
-        era of build tool performance, and create an easy-to-use modern bundler
-        along the way.
+        我们目前 web 构建工具的速度大约是上述工具的 10 - 100 倍。
+        esbuild 构建工具的核心目标是开创构建工具性能的新时代，
+        同时创建一个易于使用的现代构建工具。
 
-    - p: 'Major features:'
+
+    - p: '主要特性：'
     - ul:
-      - 'Extreme speed without needing a cache'
-      - 'ES6 and CommonJS modules'
-      - 'Tree shaking of ES6 modules'
-      - 'An [API](/api/) for JavaScript and Go'
-      - '[TypeScript](/content-types/#typescript) and [JSX](/content-types/#jsx) syntax'
-      - '[Source maps](/api/#sourcemap)'
-      - '[Minification](/api/#minify)'
-      - '[Plugins](/plugins/)'
+      - '极快的速度，无需缓存'
+      - '支持 ES6 和 CommonJS 模块'
+      - '支持对 ES6 modules 进行 tree shaking'
+      - '[API](/api/) 可同时用于 JavaScript 和 Go'
+      - '兼容 [TypeScript](/content-types/#typescript) 和 [JSX](/content-types/#jsx) 语法'
+      - '支持 [Source maps](/api/#sourcemap)'
+      - '支持 [Minification](/api/#minify)'
+      - '支持 [plugins](/plugins/)'
 
     - p: >
-        Check out the [getting started](/getting-started/) instructions if you
-        want to give esbuild a try.
+        如想试用 esbuild，请查阅[快速入门](/getting-started/)章节。
+
 
 getting-started: 'getting-started.yml'
 api: 'api.yml'
