@@ -62,6 +62,8 @@ function toID(text) {
 }
 
 function escapeHTML(text) {
+  const match = /^.+(\s*\<#([a-z0-9\-_]+?)\>\s*)$/.exec(text);
+  text = match ? text.replace(match[1], '').trim() : text;
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
