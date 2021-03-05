@@ -54,15 +54,19 @@ function stripTagsFromMarkdown(markdown) {
   return md.renderInline(markdown.trim()).replace(/<[^>]*>/g, '')
 }
 
+function matchAnchor(text) {
+  return /^.+(\s*\<#([a-z0-9\-_]+?)\>\s*)$/.exec(text)
+}
+
 function toID(text) {
-  const match = /^.+(\s*\<#([a-z0-9\-_]+?)\>\s*)$/.exec(text);
-  text = match ? match[2] : text;
+  const match = matchAnchor(text)
+  text = match ? match[2] : text
   text = stripTagsFromMarkdown(text)
   return text.toLowerCase().replace(/[^\w \-]/g, '').replace(/[ ]/g, '-')
 }
 
 function escapeHTML(text) {
-  const match = /^.+(\s*\<#([a-z0-9\-_]+?)\>\s*)$/.exec(text);
+  const match = matchAnchor(text)
   text = match ? text.replace(match[1], '').trim() : text;
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
