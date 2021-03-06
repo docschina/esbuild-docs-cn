@@ -1,7 +1,7 @@
 index:
   title: 极速 JavaScript 打包器
   body:
-    - h1: esbuild
+    - h1: esbuild 中文文档
     - blockquote: 极速 JavaScript 打包器
 
     - benchmark.animated:
