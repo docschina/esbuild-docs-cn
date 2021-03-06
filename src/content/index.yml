@@ -13,8 +13,8 @@ index:
         '[parcel](https://github.com/parcel-bundler/parcel) 1': 118.51
 
     - figcaption: >
-        以上数据：采用了默认配置，
-        从 0 开始构建了 10 份 
+        以上数据：分别是使用各工具的默认配置，
+        并从 0 开始构建 10 份 
         [three.js](https://github.com/mrdoob/three.js) 库的构建时间，
         其中包括代码压缩以及 source map。
         更多信息请查阅[此处](/faq/#benchmark-details)了解更多。
