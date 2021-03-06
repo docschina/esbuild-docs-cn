@@ -357,9 +357,11 @@ function generateMain(key, main) {
       let dataset = ''
       if (tag !== 'h2' && h2) dataset += ` data-h2="${escapeAttribute(h2)}"`
       if (tag === 'h4' && h3) dataset += ` data-h3="${escapeAttribute(h3)}"`
+      // 过滤掉多余的锚点内容
+      let newValue = escapeHTML(value)
       let html = `      <${tag} id="${escapeAttribute(toID(cssID || value))}"${dataset}>
         <a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>
-        ${md.renderInline(value)}
+        ${md.renderInline(newValue)}
       </${tag}>`
       let calls = apiCallsForOption[value]
       if (calls) {
