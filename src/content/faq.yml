@@ -138,11 +138,11 @@ body:
       '[parcel](https://github.com/parcel-bundler/parcel) 1': 118.51
 
   - p: >
-      This benchmark approximates a large JavaScript codebase by duplicating
-      the [three.js](https://github.com/mrdoob/three.js) library 10 times
-      and building a single bundle from scratch, without any caches. The
-      benchmark can be run with `make bench-three` in the
-      [esbuild repo](https://github.com/evanw/esbuild).
+      此 benchmark 通过复制 [three.js](https://github.com/mrdoob/three.js) 库 10 次，
+      来模拟构建一个大型 JavaScript 代码库的情况，
+      并从 0 开始构建了一个单一 bundle，且未使用任何缓存。
+      你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，
+      使用 `make bench-three`。
 
   - table: |
       | Bundler            |    Time | Relative slowdown | Absolute speed | Output size |
@@ -156,22 +156,21 @@ body:
       | parcel 1           | 118.51s |              320x |     4.6 kloc/s |      5.89mb |
 
   - p: >
-      Each time reported is the best of three runs. I'm running esbuild with
-      <code>--bundle <wbr>--minify <wbr>--sourcemap</code> (the
-      single-threaded version uses `GOMAXPROCS=1`). I used the
-      <code>rollup-<wbr>plugin-<wbr>terser</code> plugin because Rollup
-      itself doesn't support minification. Webpack uses
-      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>.
-      Parcel uses the default options. Absolute speed is based on the total
-      line count including comments and blank lines, which is currently 547,441.
-      The tests were done on a 6-core 2019 MacBook Pro with 16gb of RAM.
+      每次报告的数据均为三次中最好的一次。
+      我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap</code> 来运行 esbuild
+      （单线程时则使用 `GOMAXPROCS=1`）。
+      在运行 Rollup 时，我使用了 <code>rollup-<wbr>plugin-<wbr>terser</code> 的 plugin，
+      因为 Rollup 本身并不支持压缩。而在运行 webpack 时，则使用了
+      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code> 的选项。
+      Parcel 则相对简单，使用默认选项即可。数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
+      目前为 547,441 行。测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
 
   - p: >
-      Caveats:
+      注意事项：
 
   - ul:
-      - 'Parcel 1: The bundle crashes at run time with <code>TypeError:
-        <wbr>Cannot <wbr>redefine <wbr>property: <wbr>dynamic</code>'
+      - 'Parcel 1：构建出的 bundle 在运行时会抛出 <code>TypeError:
+        <wbr>Cannot <wbr>redefine <wbr>property: <wbr>dynamic</code> 的错误'
 
   - figcaption: TypeScript benchmark
   - benchmark:
@@ -183,11 +182,11 @@ body:
       '[parcel](https://github.com/parcel-bundler/parcel) 2': 42.32
 
   - p: >
-      This benchmark uses the [Rome](https://github.com/facebookexperimental/rome)
-      build tool to approximate a large TypeScript codebase. All code must be
-      combined into a single minified bundle with source maps and the resulting
-      bundle must work correctly. The benchmark can be run with `make bench-rome`
-      in the [esbuild repo](https://github.com/evanw/esbuild).
+      此 benchmark 则选用 [Rome](https://github.com/facebookexperimental/rome)，
+      来模拟构建一个大型的 TypeScript 代码库。
+      所有代码必须合并成一个带有 source map，
+      且被压缩过的 bundle，并且此 bundle 必须正常运行。
+      你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，使用 `make bench-rome`。
 
   - table: |
       | Bundler            |    Time | Relative slowdown | Absolute speed | Output size |
@@ -200,158 +199,152 @@ body:
       | parcel 2           |  42.32s |              470x |     3.1 kloc/s |      1.68mb |
 
   - p: >
-      Each time reported is the best of three runs. I'm running esbuild with
-      <code>--bundle <wbr>--minify <wbr>--sourcemap
-      <wbr>--platform=<wbr>node</code> (the single-threaded version uses
-      `GOMAXPROCS=1`). Webpack uses `ts-loader` with <code>transpileOnly:
-      <wbr>true</code> and <code>--mode=<wbr>production
-      <wbr>--devtool=<wbr>sourcemap</code>. Parcel 1 uses <code>--target
-      <wbr>node --bundle-<wbr>node-<wbr>modules</code>. Parcel 2 uses
-      <code>"engines": <wbr>"node"</code> in <code>package.json</code> and
-      needs the <code>@parcel/<wbr>transformer-<wbr>typescript-<wbr>tsc</code>
-      transformer to be able to handle the TypeScript code used in the
-      benchmark. Absolute speed is based on the total line count including
-      comments and blank lines, which is currently 131,836. The tests were done
-      on a 6-core 2019 MacBook Pro with 16gb of RAM.
+      每次报告的数据均为三次中最好的一次。
+      我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap
+      <wbr>--platform=<wbr>node</code> 来运行 esbuild（单线程时则使用
+      `GOMAXPROCS=1`）。在运行 webpack 时，则使用了 `ts-loader`，并设置 <code>transpileOnly:
+      <wbr>true</code> 以及其他配置项 <code>--mode=<wbr>production
+      <wbr>--devtool=<wbr>sourcemap</code>。在运行 Parcel 1 时，使用了 <code>--target
+      <wbr>node --bundle-<wbr>node-<wbr>modules</code> 选项。
+      运行 Parcel 2 时，在 <code>package.json</code>
+      中设置了 <code>"engines": <wbr>"node"</code>，同时还需要使用
+      <code>@parcel/<wbr>transformer-<wbr>typescript-<wbr>tsc</code>
+      转换器来处理 benchmark 中使用的 TypeScript 代码。
+      数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
+      目前为 131,836 行。测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
 
   - p: >
-      The results don't include Rollup because I couldn't get it to work. I
-      tried <code>rollup-<wbr>plugin-<wbr>typescript</code>,
-      <code>@rollup/<wbr>plugin-<wbr>typescript</code>, and
-      <code>@rollup/<wbr>plugin-<wbr>sucrase</code> and they all didn't work
-      for different reasons relating to TypeScript compilation.
+      此结果集并未包含 Rollup，因为我没办法让其正常工作。
+      我尝试了 <code>rollup-<wbr>plugin-<wbr>typescript</code>，
+      <code>@rollup/<wbr>plugin-<wbr>typescript</code>，以及
+      <code>@rollup/<wbr>plugin-<wbr>sucrase</code>，
+      但他们都因为与 TypeScript 编译相关的原因而无法正常工作。
 
-  - h2: Upcoming roadmap
+  - h2: 即将发布的路线图
 
   - p: >
-      These features are already in progress and are first priority:
+      这些特性已在进行中，处于第一优先级：
 
   - ul:
-    - 'Code splitting ([#16](https://github.com/evanw/esbuild/issues/16), [docs](/api/#splitting))'
-    - 'CSS content type ([#20](https://github.com/evanw/esbuild/issues/20), [docs](/content-types/#css))'
+    - '代码分割（Code splitting）([#16](https://github.com/evanw/esbuild/issues/16)，[docs](/api/#splitting))'
+    - 'CSS content type ([#20](https://github.com/evanw/esbuild/issues/20)，[docs](/content-types/#css))'
     - 'Plugin API ([#111](https://github.com/evanw/esbuild/issues/111))'
 
   - p: >
-      These are potential future features but may not happen or may happen
-      to a more limited extent:
+      下面这些是未来可能会开发的特性，但也可能不会，
+      亦或是会进行开发，但开发的程度有限：
 
   - ul:
     - 'HTML content type ([#31](https://github.com/evanw/esbuild/issues/31))'
-    - 'Lowering to ES5 ([#297](https://github.com/evanw/esbuild/issues/297))'
-    - 'Bundling top-level await ([#253](https://github.com/evanw/esbuild/issues/253))'
+    - '降级至 ES5 ([#297](https://github.com/evanw/esbuild/issues/297))'
+    - '支持构建 top-level await ([#253](https://github.com/evanw/esbuild/issues/253))'
 
   - p: >
-      After that point, I will consider esbuild to be relatively complete.
-      I'm planning for esbuild to reach a mostly stable state and then stop
-      accumulating more features. This will involve saying "no" to requests
-      for adding major features to esbuild itself. I don't think esbuild
-      should become an all-in-one solution for all frontend needs. In
-      particular, I want to avoid the pain and problems of the "webpack
-      config" model where the underlying tool is too flexible and usability
-      suffers.
+      在这之后，我认为 esbuild 已相对完善。
+      我计划让 esbuild 达到一个基本稳定的状态，
+      然后停止增加更多的特性。
+      这将拒绝对 esbuild 本身增加主要特性的请求。
+      我不认为 esbuild 应该成为满足一切前端需求的一体化解决方案。
+      特别是，我希望避免 ”webpack config“ 模式的麻烦和问题，
+      因为该模式的底层过于灵活，
+      其易用性会受到影响。
 
   - p: >
-      For example, I am _not_ planning to include these features in esbuild's
-      core itself:
+      例如，我并**不打算**在 esbuild 中加入如下特性：
 
   - ul:
-    - 'Support for other frontend languages (e.g. [Elm](https://elm-lang.org/),
-      [Svelte](https://svelte.dev/), [Vue](https://vuejs.org/),
-      [Angular](https://angular.io/))'
-    - TypeScript type checking (just run `tsc` separately)
-    - An API for custom AST manipulation
-    - Hot-module reloading
-    - Module federation
+    - '支持其他前端语言（例如 [Elm](https://elm-lang.org/)，
+      [Svelte](https://svelte.dev/)，[Vue](https://vuejs.org/) 以及
+      [Angular](https://angular.io/) 等）'
+    - TypeScript 的类型检查（单独运行 `tsc` 即可）
+    - 用于自定义 AST 操作的 API
+    - 热更新
+    - 模块联邦（module federation)
 
   - p: >
-      I hope that the extensibility points I'm adding to esbuild
-      ([plugins](/plugins/) and the [API](/api/)) will make esbuild useful to
-      include as part of more customized build workflows, but I'm not
-      intending or expecting these extensibility points to cover all use
-      cases. If you have very custom requirements then you should be using
-      other tools. I also hope esbuild inspires other build tools to
-      dramatically improve performance by overhauling their implementations
-      so that everyone can benefit, not just those that use esbuild.
+      我希望我添加到 esbuild 中的扩展点（[plugins](/plugins/) 和 [API](/api/)）
+      能让 esbuild 成为更多定制化构建工作流的一部分，
+      但我并未期望这些扩展点能覆盖所有的用例。
+      如果你有非常强烈的自定义需求，那么你应使用其他工具。
+      我也希望 esbuild 能激励其他的构建工具，通过彻底改变他们的底层实现来大幅提高他们的性能
+      让每个人都能受益，而不仅仅是那些使用 esbuild 的人。
 
   - p: >
-      I am planning to continue to maintain everything in esbuild's existing
-      scope even after esbuild reaches stability. This means implementing
-      support for newly-released JavaScript and TypeScript syntax features,
-      for example.
+      我计划在 esbuild 达到稳定后，继续维持其现有范围内的一切特性。
+      这意味着将继续实现对后续的 JavaScript 语法和 TypeScript 语法特性的支持。
 
-  - h2: Production readiness
+  - h2: 投入生产环境的准备情况
 
   - p: >
-      This project has not yet hit version 1.0.0 and is still in active
-      development. That said, it is far beyond the alpha stage and is pretty
-      stable. I think of it as a late-stage beta. For some early-adopters
-      that means it's good enough to use for real things. Some other people
-      think this means esbuild isn't ready yet. This section doesn't try to
-      convince you either way. It just tries to give you enough information
-      so you can decide for yourself whether you want to use esbuild as your
-      bundler.
+      此项目尚未达到 1.0.0 版本，仍处于积极开发阶段。
+      就目前而言，它已早已达到 alpha 阶段，并且非常稳定。
+      我认为这是一个后期测试版本。
+      对于早期的参与者来说，它足以用于生产环境。
+      当然还有一些开发者认为 esbuild 还未准备好。
+      本章节并不试图改变你的观点，
+      只是试图给你足够多的信息，
+      让你自行决定是否使用 esbuild 作为你的构建工具。
 
   - p: >
-      Some data points:
+      一些其他信息：
 
   - ul:
     - >
-      **Used by other projects**
+      **被其他项目所使用**
       <p>
-      The API is already being used as a library within some other
-      developer tools. For example, [Vite](https://github.com/vitejs/vite)
-      and [Snowpack](https://github.com/pikapkg/snowpack) are using
-      esbuild's [transform API](/api/#transform-api) to transform
-      TypeScript into JavaScript. And [Hugo](https://github.com/gohugoio/hugo)
-      is using esbuild's bundler to package JavaScript code during a build.
-      I have also heard reports of others using it in production successfully,
-      although I don't know the details. I intend to use esbuild in
-      production myself once it has enough features but haven't done that yet.
+      esbuild 的 API 已被其他开发者工具使用。例如，[Vite](https://github.com/vitejs/vite)
+      和 [Snowpack](https://github.com/pikapkg/snowpack) 使用了
+      esbuild 的 [transform API](/api/#transform-api)，用于将
+      TypeScript 转换为 JavaScript。而 [Hugo](https://github.com/gohugoio/hugo)
+      则在构建过程中使用 esbuild 的构建工具来构建 JavaScript 代码。
+      我也听到有些小伙伴在生产环境成功使用它的消息，但我并不知道细节。
+      一旦 esbuild 有足够的功能，
+      我也会将 esbuild 投入生产中使用，
+      但目前来说，还未这样做。
       </p>
 
     - >
-      **API stability**
+      **API 稳定性**
       <p>
-      Even though esbuild's version is not yet 1.0.0, effort is still made to
-      keep the API stable. Patch versions are intended for backwards-compatible
-      changes and minor versions are intended for backwards-incompatible changes
-      (as [recommended by npm](https://docs.npmjs.com/misc/semver)). If you
-      plan to use esbuild for something real, you should either pin the exact
-      version (maximum safety) or pin the major and minor versions (only accept
-      backwards-compatible upgrades).
+      尽管 esbuild 的版本尚未达到 1.0.0，
+      但我们仍然努力保持着 API 的稳定性。
+      补丁版本的目的是为了向后兼容变化，
+      次要版本的目的是为了向后不兼容的变化
+      （正如 [npm 所推荐的](https://docs.npmjs.com/misc/semver)那样）。
+      如果你计划使用 esbuild 投入生产使用，
+      你应该锁住确切的版本（最安全的方式）或者锁住主要版本和次要版本（只接受向后兼容的升级）。
       </p>
 
     - >
-      **Only one main developer**
+      **仅有一位主要开发者**
       <p>
-      This tool is primarily built by [me](https://github.com/evanw). For
-      some people this is fine, but for others this means esbuild is not a
-      suitable tool for their organization. That's ok with me. I'm building
-      esbuild because I find it fun to build and because it's the tool I'd
-      want to use. I'm sharing it with the world because there are others
-      that want to use it too, because the feedback makes the tool itself
-      better, and because I think it will inspire the ecosystem to make
-      better tools.
+      本工具主要由 [evanw](https://github.com/evanw) 搭建。
+      对于一些人来说，这很友好，
+      但是对另外一些人来说，这意味着 esbuid 可能不是一个适合他们组织的工具。
+      这些对我来说都无所谓。
+      我构建 esbuild 是因为我觉得构建它很有趣，
+      也是因为它是我想要使用的工具。
+      我把它与大家共享，是因为也有其他人想要使用它，
+      并且反馈会让工具本身变得更加美好，
+      而且我认为它将激励生态系统做出更好的工具。
       </p>
 
     - >
-      **Not always open to scope expansion**
+      **并不会一直扩大项目的作用范围**
       <p>
-      I'm not planning on including major features that I'm not interested
-      in building and/or maintaining. I also want to limit the project's
-      scope so it doesn't get too complex and unwieldy, both from an
-      architectural perspective, a testing and correctness perspective, and
-      from a usability perspective. Think of esbuild as a "linker" for the
-      web. It knows how to transform and bundle JavaScript and CSS. But the
-      details of how your source code ends up as plain JavaScript or CSS
-      may need to be 3rd-party code.
+      我不打算引入我对构建/维护不感兴趣的主要特性。
+      无论是从架构的角度、测试和正确性的角度，还是从可用性的角度，
+      我都想限制项目的范围，使它不至于太复杂，或太笨重。
+      你可以把 esbuild 看作是 web 的 "链接器（linker）"
+      它只知道如何转换和构建 JavaScript 和 CSS。
+      但是，你的源码如何成为普通的 JavaScript 或 CSS 代码的细节
+      可能还需要第三方代码来做。
       </p>
       <p>
-      I'm hoping that [plugins](/plugins/) will allow the community to add
-      major features (e.g. WebAssembly import) without needing to contribute
-      to esbuild itself. However, not everything is exposed in the plugin
-      API and it may be the case that it's not possible to add a particular
-      feature to esbuild that you may want to add. This is intentional;
-      esbuild is not meant to be an all-in-one solution for all frontend
-      needs.
+      我希望 [plugins](/plugins/) 系统可以在不对 esbuild 本身做出任何修改的情况下，
+      添加主要功能（例如 WebAssembly 的引入）。
+      然而，并非所有内容都会在 plugin 中暴露出来，
+      可能会出现无法向 esbuild 中添加你所想添加特定功能的情况。
+      这是有意而为，
+      请谨记 esbuild 并不是一个能满足所有前端需求的一体化解决方案。
       </p>
