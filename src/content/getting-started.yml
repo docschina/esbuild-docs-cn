@@ -5,27 +5,16 @@ body:
   - h2: 安装 esbuild <#install-esbuild>
 
   - p: >
-<<<<<<< HEAD
       首先，下载并本地安装 esbuild， A prebuilt
-      可以通过 npm 安装预编译的二进制文件：
-=======
-      First, download and install the esbuild command locally. A prebuilt
-      native executable can be installed using npm:
->>>>>>> 9b4622d4514f8f1847551a391c32895402751075
+      可以通过 npm 安装预编译的原生可执行文件：
 
   - pre: |
       npm install esbuild
 
   - p: >
-<<<<<<< HEAD
       此命令应该会将 esbuild 安装到你本地的 `node_modules` 中。
-      你可以运行如下命令，来检测 esbuild 二进制文件是否正常：
-
-=======
-      This should have installed esbuild in your local `node_modules` folder.
-      You can run the esbuild executable to verify that everything is working
-      correctly:
->>>>>>> 9b4622d4514f8f1847551a391c32895402751075
+      你可以运行如下命令，来检测 esbuild 的原生可执行文件
+      是否正常：
 
   - pre: |
       npx esbuild --version
@@ -100,17 +89,13 @@ body:
       }
 
   - p: >
-<<<<<<< HEAD
-      使用方式如下：
-=======
-      Note that the `npx` command is not needed here. Everything in the
-      `scripts` section should already run with `esbuild` in the path,
-      so `npx` is unnecessary here and will only make your build script
-      slower.
+      注意，这里不需要使用 `npx` 命令。
+      在 `scripts` 部分中的所有内容都应该通过路径来使用 `esbuild`，
+      所以这里无需使用 `npx`，
+      使用它只会让你的构建变慢。
 
   - p: >
-      The build script can be invoked like this:
->>>>>>> 9b4622d4514f8f1847551a391c32895402751075
+      使用方式如下：
 
   - pre: |
       npm run build
@@ -133,19 +118,11 @@ body:
         }).catch(() => process.exit(1))
 
   - p: >
-<<<<<<< HEAD
-      `build` 函数会在子进程中运行 esbuild 的二进制文件，并返回一个 Promise，
+      `build` 函数会在子进程中运行 esbuild 的可执行文件，并返回一个 Promise，
       当构建完成后，该 Promise 将被 resolves。
       上述代码并未打印捕获的异常，
       因为异常中的任何错误信息默认会被打印到控制台（如果你不需要这个功能，
       可以通过修改 [log level](/api/#log-level) 来关闭此功能）。
-=======
-      The `build` function runs the esbuild executable in a child process and
-      returns a promise that resolves when the build is complete. The code above
-      doesn't print out the captured exception because any error messages in
-      the exception will also be printed to the console by default (although
-      you can change the [log level](/api/#log-level) to turn that off if you'd like).
->>>>>>> 9b4622d4514f8f1847551a391c32895402751075
 
   - p: >
       尽管有个同步的 `buildSync` API，
@@ -371,13 +348,13 @@ body:
           }
         }
 
-  - h2: Other ways to install
+  - h2: Other ways to install <#other-ways-to-install>
 
   - p: >
       The recommended way to install esbuild is to [install the native executable using npm](#install-esbuild).
       But you can also install esbuild in these ways:
 
-  - h3: Install the WASM version
+  - h3: Install the WASM version <#install-the-wasm-version>
 
   - p: >
       In addition to the `esbuild` npm package, there is also an `esbuild-wasm`
@@ -400,7 +377,7 @@ body:
       unsupported platform. The WebAssembly package is primarily intended
       to only be used [in the browser](/api/#running-in-the-browser).
 
-  - h3: Build from source
+  - h3: Build from source <#build-from-source>
 
   - p: >
       To build esbuild from source:
@@ -436,7 +413,7 @@ body:
       You will need to write JavaScript or Go code and use [esbuild's API](/api/)
       to use plugins.
 
-  - h3: Download a build
+  - h3: Download a build <#download-a-build>
 
   - p: >
       Although the precompiled native executables are hosted using npm, you don't
