@@ -122,7 +122,7 @@ body:
       但综合起来，
       它们可以使得构建工具的速度比目前其他常用的构建工具快好几个数量级。
 
-  - h2: Benchmark 详情
+  - h2: Benchmark 详情 <#benchmark-details>
 
   - p: >
       以下是每个 benchmark 的详细信息：
@@ -220,7 +220,7 @@ body:
       <code>@rollup/<wbr>plugin-<wbr>sucrase</code>，
       但他们都因为与 TypeScript 编译相关的原因而无法正常工作。
 
-  - h2: 即将发布的路线图
+  - h2: 即将发布的路线图 <#upcoming-roadmap>
 
   - p: >
       这些特性已在进行中，处于第一优先级：
@@ -273,7 +273,7 @@ body:
       我计划在 esbuild 达到稳定后，继续维持其现有范围内的一切特性。
       这意味着将继续实现对后续的 JavaScript 语法和 TypeScript 语法特性的支持。
 
-  - h2: 投入生产环境的准备情况
+  - h2: 投入生产环境的准备情况 <#production-readiness>
 
   - p: >
       此项目尚未达到 1.0.0 版本，仍处于积极开发阶段。
