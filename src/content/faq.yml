@@ -3,129 +3,122 @@ body:
   - h1: FAQ
 
   - p: >
-      This is a collection of common questions about esbuild. You can also
-      ask questions on the [GitHub issue tracker](https://github.com/evanw/esbuild/issues).
+      本文是 esbuild 常见问题的集合。
+      你也可以在 [GitHub issue 上提问](https://github.com/evanw/esbuild/issues)。
 
   - toc: true
 
-  - h2: Why is esbuild fast?
+  - h2: 为何 esbuild 如此之快？<#why-is-esbuild-fast>
 
   - p: >
-      Several reasons:
+      若干原因：
 
   - ul:
     - >
       <p>
-      It's written in [Go](https://golang.org/) and compiles to native code.
+      它由 [Go](https://golang.org/) 编写，并被编译成原生代码。
       </p>
       <p>
-      Most other bundlers are written in JavaScript, but a command-line
-      application is a worst-case performance situation for a JIT-compiled
-      language. Every time you run your bundler, the JavaScript VM is seeing
-      your bundler's code for the first time without any optimization hints.
-      While esbuild is busy parsing your JavaScript, node is busy parsing
-      your bundler's JavaScript. By the time node has finished parsing your
-      bundler's code, esbuild might have already exited and your bundler
-      hasn't even started bundling yet.
+      大多数构建工具都是用 JavaScript 编写的，
+      但对于需要 JIT（即时）编译的语言来说，命令行程序的性能是他们的噩梦。
+      每次运行你的构建工具时，对于 JavaScript 虚拟机来说，都是第一次运行你的代码，
+      没有任何优化提示。
+      当 esbuild 忙着解析你代码的 JavaScript 时，
+      Node 可能还忙着解析你构建工具的 JavaScript。
+      当 Node 解析完你构建工具的代码时，esbuild 可能已经退出了，
+      而你的构建工具还未开始构建。
       </p>
       <p>
-      In addition, Go is designed from the core for parallelism while JavaScript
-      is not. Go has shared memory between threads while JavaScript has to
-      serialize data between threads. Both Go and JavaScript have parallel
-      garbage collectors, but Go's heap is shared between all threads while
-      JavaScript has a separate heap per JavaScript thread. This seems to cut
-      the amount of parallelism that's possible with JavaScript worker threads
-      in half [according to my testing](https://github.com/evanw/esbuild/issues/111#issuecomment-719910381),
-      presumably since half of your CPU cores are busy collecting garbage for
-      the other half.
+      此外，Go 在核心设计上就采用了并行性，而 JavaScript 却没有。
+      Go 在线程间共享内存，而 JavaScript 必须在线程间对数据进行序列化。
+      尽管 Go 和 JavaScript 都有并行的垃圾收集器，但 Go 的堆是所有线程之间共享的，
+      而 JavaScript 则是每个线程都拥有一个单独的堆。
+      根据[我的测试](https://github.com/evanw/esbuild/issues/111#issuecomment-719910381)，
+      这似乎将 JavaScript 工作线程可能的并行量减少了一半。
+      这大概是因为一半 CPU 的核在忙着帮另一半进行垃圾回收。
       </p>
 
     - >
       <p>
-      Parallelism is used heavily.
+      极大的利用了并行性。
       </p>
       <p>
-      The algorithms inside esbuild are carefully designed to fully saturate
-      all available CPU cores when possible. There are roughly three phases:
-      parsing, linking, and code generation. Parsing and code generation are
-      most of the work and are fully parallelizable (linking is an inherently
-      serial task for the most part). Since all threads share memory, work
-      can easily be shared when bundling different entry points that import
-      the same JavaScript libraries. Most modern computers have many cores
-      so parallelism is a big win.
+      esbuild 内部的算法经过了精心设计，在可能的情况下，使得所有可用的 CPU 核完全饱和。
+      这过程中大概分为三个阶段：解析（parse）、链接（link）和代码生成（code generation）。
+      解析和代码生成是占据了大部分的工作，并且完全是可并行的（链接在大部分情况下是一个固有的串行任务）。
+      由于所有线程间共享内存，因此当构建引入相同 JavaScript 库的不同入口点时，可以很容易地共享内存。
+      大多数现代计算机都有许多核，所以并行性是 esbuild 的最大优势之一。
       </p>
 
     - >
       <p>
-      Everything in esbuild is written from scratch.
+      esbuild 中的所有内容都是从 0 开始编写的。
       </p>
       <p>
-      There are a lot of performance benefits with writing everything yourself
-      instead of using 3rd-party libraries. You can have performance in mind
-      from the beginning, you can make sure everything uses consistent data
-      structures to avoid expensive conversions, and you can make wide
-      architectural changes whenever necessary. The drawback is of course that
-      it's a lot of work.
+      完全自己编写而不使用第三方库，会带来很多性能上的好处。
+      从 0 开始就考虑到性能，可以确保所有东西都采用一致的数据结构以避免昂贵的转换过程，
+      在必要时进行完全地架构变更。
+      当然，最大缺点就是相当的耗时。
       </p>
       <p>
-      For example, many bundlers use the official TypeScript compiler as a
-      parser. But it was built to serve the goals of the TypeScript compiler team
-      and they do not have performance as a top priority. Their code makes pretty
-      heavy use of [megamorphic object shapes](https://mrale.ph/blog/2015/01/11/whats-up-with-monomorphism.html)
-      and unnecessary [dynamic property accesses](https://github.com/microsoft/TypeScript/issues/39247)
-      (both well-known JavaScript speed bumps). And the TypeScript parser
-      appears to still run the type checker even when type checking is disabled.
-      None of these are an issue with esbuild's custom TypeScript parser.
+      例如，许多构建工具均使用官方的 TypeScript 编译器作为解析器。
+      但它是为了服务于 TypeScript 编译器团队的目标而被建立，
+      他们并没有将性能作为首要指标。
+      他们的代码中大量使用了 [megamorphic object shapes](https://mrale.ph/blog/2015/01/11/whats-up-with-monomorphism.html) 
+      以及不必要的[动态属性访问](https://github.com/microsoft/TypeScript/issues/39247)
+      (这些都是众所周知的 JavaScript 性能杀手)。
+      而 TypeScript 解析器即便在类型检查被禁用的情况下，
+      仍会运行类型检查器。
+      而使用 esbuild 自定义的 TypeScript 解析器，就不会遇到上述问题。
       </p>
 
     - >
       <p>
-      Memory is used efficiently.
+      内存得到有效的利用。
       </p>
       <p>
-      Compilers are ideally mostly O(n) complexity in the length of the input.
-      So if you are processing a lot of data, memory access speed is likely going
-      to heavily affect performance. The fewer passes you have to make over your
-      data (and also the fewer different representations you need to transform
-      your data into), the faster your compiler will go.
+      理想情况下的编译器，输入内容的长度大多为 O(n) 的复杂度。
+      所以如果要处理大量的数据，内存访问速度很可能会严重影响性能。
+      在数据上进行的访问次数越少（同时数据转化成的不同表现形式也要越少），
+      这样你的编译器就会越快。
       </p>
       <p>
-      For example, esbuild only touches the whole JavaScript AST three times:
+      例如，esbuild 仅访问 JavaScript 的 AST 三次：
       </p>
       <ol>
-      <li>A pass for lexing, parsing, scope setup, and declaring symbols</li>
-      <li>A pass for binding symbols, minifying syntax, JSX/TS to JS, and ESNext-to-ES2015</li>
-      <li>A pass for minifying identifiers, minifying whitespace, generating code, and generating source maps</li>
+      <li>第一次用于词法、解析、作用域设置以及声明符号；</li>
+      <li>第二次用于绑定符号、压缩语法、将 JSX/TS 转为 JS 以及将 ESNext 转为 ES2015；</li>
+      <li>最后一次则用于对标识符进行压缩、压缩空格、生成代码以及生成 source map。</li>
       </ol>
       <p>
-      This maximizes reuse of AST data while it's still hot in the CPU cache.
-      Other bundlers do these steps in separate passes instead of interleaving
-      them. They may also convert between data representations to glue multiple
-      libraries together (e.g. string→TS→JS→string, then string→JS→older JS→string,
-      then string→JS→minified JS→string) which uses more memory and slows
-      things down.
+      当 AST 的数据仍在 CPU 热缓存（译注：术语，CPU 缓存策略分为热缓存和冷缓存）中时，
+      可以最大限度地重复使用 AST 的数据。
+      其他构建工具会将这些步骤分开执行，而不会交错进行。
+      他们还可能会在数据的表现形式间进行转换，将多个库一同使用
+      （例如 string→TS→JS→string，然后 string→JS→older JS→string，
+      再然后 string→JS→minified JS→string）这将使用大量内存并使得构建变慢。
       </p>
       <p>
-      Another benefit of Go is that it can store things as compactly in memory,
-      which enables it to use less memory and fit more in the CPU cache. All
-      object fields have types and fields are packed tightly together so e.g.
-      several boolean flags only take one byte each. Go also has value semantics
-      and can embed one object directly in another so it comes "for free"
-      without another allocation. JavaScript doesn't have these features and
-      also has other drawbacks such as JIT overhead (e.g. hidden class slots)
-      and inefficient representations (e.g. non-integer numbers are
-      heap-allocated with pointers).
+      而 Go 的另外一个好处是，它可以将内容紧凑的存储在内存中，
+      这使得它可以使用更少的内存，更适合 CPU 缓存。
+      所有的对象字段的类型和字段都紧密的包裹在一起，
+      例如，几个布尔类型的标志每个只占一个字节。
+      Go 还具有值语义，可以把一个对象直接嵌入到另一个对象中，
+      而不需要额外分配空间。
+      JavaScript 则没有这些特性，而且还有其他的缺点，
+      比如 JIT 的开销（比如 hidden class slots）
+      和低效的表示方式（比如非整数使用指针进行堆分配）
       </p>
 
   - p: >
-      Each one of these factors is only a somewhat significant speedup, but
-      together they can result in a bundler that is multiple orders of
-      magnitude faster than other bundlers commonly in use today.
+      这些因素中每一点都只是有显著的提速，
+      但综合起来，
+      它们可以使得构建工具的速度比目前其他常用的构建工具快好几个数量级。
 
-  - h2: Benchmark details
+  - h2: Benchmark 详情
 
   - p: >
-      Here are the details about each benchmark:
+      以下是每个 benchmark 的详细信息：
 
   - figcaption: JavaScript benchmark
   - benchmark:
