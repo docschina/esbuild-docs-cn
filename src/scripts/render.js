@@ -11,6 +11,10 @@ const outDir = path.join(repoDir, 'out')
 const linkDir = path.join(scriptsDir, 'link')
 const linkOutDir = path.join(outDir, 'link')
 
+// Replace "CURRENT_ESBUILD_VERSION" with the currently-installed version
+// of esbuild. This should be reasonably up to date.
+const CURRENT_ESBUILD_VERSION = require('../../package.json').dependencies.esbuild;
+
 function copyAndMinify(from, to) {
   esbuild.buildSync({
     entryPoints: [from],
@@ -309,6 +313,7 @@ function renderExample(kind, value) {
     for (let item of value) {
       if (item.$) {
         let html = hljs.highlight(kind === 'cli' ? 'bash' : kind, item.$.trim()).value
+        html = html.replace(/CURRENT_ESBUILD_VERSION/g, CURRENT_ESBUILD_VERSION)
         lines.push(`<span class="repl-in">${html}</span>`)
       } else if (item.expect) {
         lines.push(`<span class="repl-out">${escapeHTML(item.expect.trim())}</span>`)
@@ -329,6 +334,7 @@ function generateMain(key, main) {
 
   return main.body.map(({ tag, value }) => {
     let cssID = ''
+    if (typeof value === 'string') value = value.replace(/CURRENT_ESBUILD_VERSION/g, CURRENT_ESBUILD_VERSION)
 
     // Strip off a trailing CSS id
     if (tag.includes('#')) {
@@ -344,7 +350,7 @@ function generateMain(key, main) {
       if (value.go) elements.push(['go', 'Go'])
       if (elements.length === 1) {
         let [kind] = elements[0]
-        return `      <pre>${renderExample(kind, value[kind])}</pre>`
+        return `      <pre class="${kind + elements.length}">${renderExample(kind, value[kind])}</pre>`
       }
       let switcherContent = elements.map(([kind, name]) => `        <a href="javascript:void 0" class="${kind + elements.length}">${name}</a>`)
       let exampleContent = elements.map(([kind]) => `      <pre class="switchable ${kind + elements.length}">${renderExample(kind, value[kind])}</pre>`)
@@ -433,7 +439,9 @@ function generateMain(key, main) {
     }
 
     if (tag === 'ul' || tag === 'ol') {
-      return `      <${tag}>${value.map(x => `<li>${md.renderInline(x.trim())}</li>`).join('')}</${tag}>`
+      return `      <${tag}>${value.map(x =>
+        `<li>${md.renderInline(x.replace(/CURRENT_ESBUILD_VERSION/g, CURRENT_ESBUILD_VERSION).trim())}</li>`
+      ).join('')}</${tag}>`
     }
 
     if (tag === 'table') {
