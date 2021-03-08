@@ -381,7 +381,10 @@ function generateMain(key, main) {
     if (tag === 'toc') {
       let toc = `      <ul>\n`
       for (let { tag: t, value: v } of main.body) {
-        if (t === 'h2') toc += `        <li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(v.trim())}</a></li>\n`
+        if (t === 'h2') {
+          let newValue = escapeHTML(v)
+          toc += `        <li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(newValue.trim())}</a></li>\n`
+        }
       }
       return toc + `      </ul>`
     }
