@@ -5,7 +5,7 @@ body:
   - h2: 安装 esbuild <#install-esbuild>
 
   - p: >
-      首先，下载并本地安装 esbuild， A prebuilt
+      首先，下载并本地安装 esbuild，
       可以通过 npm 安装预编译的原生可执行文件：
 
   - pre: |
@@ -20,15 +20,15 @@ body:
       npx esbuild --version
 
   - p: >
-      This uses the `npx` command which should have been installed when you
-      installed npm. It provides a cross-platform way to manually run package
-      executables, and is used here for simplicity. However, it adds additional
-      overhead so you shouldn't use it when writing scripts inside `package.json`.
+      此命令使用了 `npx` 命令，它会在你安装 npm 时一起被安装。
+      它提供了一种跨平台的方式来手动运行可执行文件包，而且用在这里比较简单。
+      然而它也带来了额外的开销，
+      不要在 `package.json` 里写脚本的时候使用它。
 
   - p: >
-      The recommended way to install esbuild is to install the native executable
-      using npm. But if you don't want to do that, there are also some
-      [other ways to install](#other-ways-to-install).
+      推荐安装 esbuild 的做法是通过 npm 安装原生可执行文件。
+      但是如果你不想这么做，
+      这里也有一些[其他的安装方式](#other-ways-to-install)。
 
   - h2: 首次构建 <#your-first-bundle>
 
@@ -56,7 +56,7 @@ body:
       npx esbuild app.jsx --bundle --outfile=out.js
 
   - p: >
-      不出意外的话，上述命令执行后悔创建一个名为 `out.js` 的文件，
+      不出意外的话，上述命令执行后会创建一个名为 `out.js` 的文件，
       其中包含你的代码以及 React 库的代码。
       代码完全独立，无需再依赖你的 `node_modules`。
       如果你使用 `node out.js` 运行代码，你应该能看到如下内容：
@@ -90,7 +90,7 @@ body:
 
   - p: >
       注意，这里不需要使用 `npx` 命令。
-      在 `scripts` 部分中的所有内容都应该通过路径来使用 `esbuild`，
+      在 `scripts` 部分中的所有内容都应该通过环境变量来使用 `esbuild`，
       所以这里无需使用 `npx`，
       使用它只会让你的构建变慢。
 
@@ -122,7 +122,7 @@ body:
       当构建完成后，该 Promise 将被 resolves。
       上述代码并未打印捕获的异常，
       因为异常中的任何错误信息默认会被打印到控制台（如果你不需要这个功能，
-      可以通过修改 [log level](/api/#log-level) 来关闭此功能）。
+      可以通过修改 [日志级别](/api/#log-level) 来关闭此功能）。
 
   - p: >
       尽管有个同步的 `buildSync` API，
@@ -137,7 +137,7 @@ body:
       所以无需额外配置就可以完成构建。
       对于开发版本，你可能需要使用 `--sourcemap` 以启用 source map，
       对于生产版本，你可能需要使用 `--minify` 启用压缩。
-      有时，你可能还需要为你支持的浏览器配置 target。
+      有时，你可能还需要为你支持的浏览器配置目标环境。
       所以具体命令会像如下所示：
 
   - example:
@@ -186,10 +186,10 @@ body:
 
   - p: >
       有些你想使用的 npm 包，可能并非被设计成在浏览器中运行的。
-      这时你可以使用 esbuild 的配置项来解决一些问题，并成功构建 bundle。
+      这时你可以使用 esbuild 的配置项来解决一些问题，并成功打包。
       例如，`react` 库中包含了检查 
       <code>process<wbr>.env<wbr>.NODE_ENV</code> 值的代码。
-      在浏览器中崩溃，因为名为 `process` 的变量只存在于 node 中，
+      这会在浏览器中崩溃，因为名为 `process` 的变量只存在于 node 中，
       而非浏览器中。为了解决此问题，
       你可以在构建时为此变量 [define](/api/#define) 一个自定义的值：
 
@@ -254,7 +254,7 @@ body:
       构建工具可以自动剥离 TypeScript 的类型，
       将 ECMAScript 模块语法转换为 CommonJS 语法，
       同时将 JavaScript 语法转换为特定版本 Node 的旧语法。
-      并且这也有利于代码发布前对你的 package 进行构建，
+      并且这也有利于代码发布前对你的包进行构建，
       以保证其下载体积更小，从而保证加载时文件系统读取它的时间更少。
 
   - p: >
@@ -348,80 +348,80 @@ body:
           }
         }
 
-  - h2: Other ways to install <#other-ways-to-install>
+  - h2: 其他安装方式 <#other-ways-to-install>
 
   - p: >
-      The recommended way to install esbuild is to [install the native executable using npm](#install-esbuild).
-      But you can also install esbuild in these ways:
+      推荐安装 esbuild 的方式是[使用 npm 安装原生可执行文件](#install-esbuild)。
+      但你也可以通过如下几种方式安装 esbuild：
 
-  - h3: Install the WASM version <#install-the-wasm-version>
+  - h3: 安装 WASM 版本 <#install-the-wasm-version>
 
   - p: >
-      In addition to the `esbuild` npm package, there is also an `esbuild-wasm`
-      package that functions similarly but that uses WebAssembly instead of
-      native code. Installing it will also install an executable called `esbuild`:
+      除了 `esbuild` 的 npm 包，还有一个 `esbuild-wasm` 包，
+      这个包与 `esbuild` 功能相同，但是使用了 WebAssembly 代替原生代码。
+      安装它也会安装一个叫做 `esbuild` 的可执行文件：
 
   - pre: |
       npm install esbuild-wasm
 
   - p: >
-      **Why this is not recommended:**
-      The WebAssembly version is much, much slower than the native version. In
-      many cases it is an order of magnitude (i.e. 10x) slower. This is for
-      various reasons including a) it's compiled from scratch on every run, b)
-      the WebAssembly compilation approach is single-threaded, and c) node has
-      WebAssembly bugs that can delay the exiting of the process by many seconds.
-      The WebAssembly version also excludes some features such as the local
-      file server. You should only use the WebAssembly package like this if
-      there is no other option, such as when you want to use esbuild on an
-      unsupported platform. The WebAssembly package is primarily intended
-      to only be used [in the browser](/api/#running-in-the-browser).
+      **为什么不推荐这种方式：**
+      WebAssembly 的版本比原生的版本慢很多。
+      在很多情况下会慢一个数量级（10 倍）。
+      这有很多原因，包括：
+      a) 每次运行都被从头开始编译，
+      b) WebAssembly 编译方式是单线程的，
+      c) node 有一个 WebAssembly 的缺陷，该缺陷会导致现有的进程延迟数秒钟。
+      WebAssembly 版本还移除了一些功能，如本地文件服务器。
+      除非别无选择，请不要使用 WebAssembly 版本，
+      比如当你想要在一个不支持的平台使用 esbuild 时。
+      WebAssembly 包应该仅使在[浏览器里](/api/#running-in-the-browser)。
 
-  - h3: Build from source <#build-from-source>
+  - h3: 从源码构建 <#build-from-source>
 
   - p: >
-      To build esbuild from source:
+      从源码构建 esbuild：
 
   - ol:
     - |
-      Install the Go compiler:
+      安装 Go 编译器：
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
 
     - |
-      Download the source code:
+      下载源码：
       <pre>
       git clone --depth 1 --branch vCURRENT_ESBUILD_VERSION https://github.com/evanw/esbuild.git
       cd esbuild
       </pre>
 
     - |
-      Build the `esbuild` executable (it will be `esbuild.exe` on Windows):
+      构建 `esbuild` 可执行文件（在 Windows 中会生成 `esbuild.exe` 文件）：
       <pre>go build ./cmd/esbuild</pre>
 
   - p: >
-      If you want to build for other platforms, you can just prefix the build
-      command with the platform information. For example, you can build the
-      32-bit Linux version using this command:
+      如果你想要构建其他平台的版本，
+      可以在构建命令前添加平台信息。
+      比如，你可以使用如下命令构建 32 位 Linux 版本：
 
   - pre: |
       GOOS=linux GOARCH=386 go build ./cmd/esbuild
 
   - p: >
-      **Why this is not recommended:**
-      The native version can only be used via the command-line interface, which
-      can be unergonomic for complex use cases and which does not support [plugins](/plugins/).
-      You will need to write JavaScript or Go code and use [esbuild's API](/api/)
-      to use plugins.
+      **为什么不推荐这种方式：**
+      原生的版本只能在命令行界面里使用，
+      而且在复杂场景下会比较难用，并且还不支持[插件](/plugins/)。
+      你需要编写 JavaScript 或者 Go 代码，
+      利用 [esbuild 的 API](/api/) 来使用插件。
 
-  - h3: Download a build <#download-a-build>
-
-  - p: >
-      Although the precompiled native executables are hosted using npm, you don't
-      actually need npm installed to download them. The npm package registry is
-      a normal HTTP server and packages are normal gzipped tar files.
+  - h3: 下载构建版本 <#download-a-build>
 
   - p: >
-      Here is an example of downloading a binary executable directly:
+      尽管预编译的原生可执行文件托管在 npm 上，
+      你实际可以不需要安装 npm 也能下载它们。
+      Npm 包管理器（registry）实际上就是一个普通的 HTTP 服务器，而包就是普通的 tar 压缩文件。
+
+  - p: >
+      这里是一个直接下载二进制可执行文件的例子：
 
   - example:
       noCheck: true
@@ -440,12 +440,12 @@ body:
             ...
 
   - p: >
-      The native executable in the `esbuild-darwin-64` package is for the macOS
-      operating system and the x86-64 architecture. As of writing, this is the
-      full list of native executable packages for the platforms esbuild supports:
+      在 `esbuild-darwin-64` 包里的原生可执行文件可以用在 macOS 操作系统和 x86-64 架构上。
+      为了节省空间，将原生可执行文件包 esbuild 支持的对应的平台整理成表格，
+      完整表格如下：
 
   - table: |
-      | Package name             | OS        | Architecture   |
+      | 包名                      | 操作系统   | 架构            |
       |--------------------------|-----------|----------------|
       | `esbuild-darwin-64`      | `darwin`  | `x64`          |
       | `esbuild-darwin-arm64`   | `darwin`  | `arm64`        |
@@ -461,11 +461,11 @@ body:
       | `esbuild-windows-64`     | `win32`   | `x64`          |
 
   - p: >
-      **Why this is not recommended:**
-      This relies on internal implementation details of esbuild's native
-      executable installer. These details may change at some point, in which
-      case this approach will no longer work for new esbuild versions. This
-      is only a minor drawback though since the approach should still work
-      forever for existing esbuild versions since packages published to npm
-      are immutable. An additional drawback is that you cannot use [plugins](/plugins/)
-      with the native version.
+      **为什么不推荐这种方式：**
+      这个方式依赖 esbuild 的原生可执行文件安装器的内部实现细节。
+      这些细节可能会在某些情况改变，
+      这些情况会导致新版本 esbuild 无法运行。
+      这是个小缺点，
+      因为这种方式对现有的 esbuild 版本永久有效，
+      因为发布到 npm 的包是不可变的。
+      另一个缺点是你没法通过原生版本使用[插件](/plugins/)。
