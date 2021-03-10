@@ -436,7 +436,7 @@ body.has-js {
     position: relative;
     max-width: 1000px;
     margin: 0 auto;
-    padding: 50px 50px 500px 250px;
+    padding: 50px 50px 50px 250px;
   }
 
   .index h1 {
