@@ -243,9 +243,15 @@ body:
 
   - h4#isolated-modules: Files are compiled independently
   - p: >
-      You should probably enable the [`isolatedModules`](https://www.typescriptlang.org/tsconfig#isolatedModules)
+      Even when transpiling a single module, the TypeScript compiler actually
+      still parses imported files so it can tell whether an imported name is
+      a type or a value. However, tools like esbuild and Babel (and the
+      TypeScript compiler's `transpileModule` API) compile each file in
+      isolation so they can't tell if an imported name is a type or a value.
+  - p: >
+      Because of this, you should enable the [`isolatedModules`](https://www.typescriptlang.org/tsconfig#isolatedModules)
       TypeScript configuration option if you use TypeScript with esbuild.
-      This prevents you from using features which could cause mis-compilation
+      This option prevents you from using features which could cause mis-compilation
       in environments like esbuild where each file is compiled independently
       without tracing type references across files. For example, it prevents
       you from re-exporting types from another module using <code>export <wbr>{T} <wbr>from <wbr>'./types'</code>
@@ -253,28 +259,96 @@ body:
 
   - h4#es-module-interop: Imports follow ECMAScript module behavior
   - p: >
-      You should probably also enable the [`esModuleInterop`](https://www.typescriptlang.org/tsconfig#esModuleInterop)
+      For historical reasons, the TypeScript compiler compiles ESM
+      (ECMAScript module) syntax to CommonJS syntax by default. For example,
+      <code>import *<wbr> as foo<wbr> from 'foo'</code> is compiled to
+      <code>const foo =<wbr> require('foo')</code>. Presumably this happened
+      because ECMAScript modules were still a proposal when TypeScript adopted
+      the syntax. However, this is legacy behavior that doesn't match how this
+      syntax behaves on real platforms such as node. For example, the `require`
+      function can return any JavaScript value including a string but the
+      `import * as` syntax always results in an object and cannot be a string.
+  - p: >
+      To avoid problems due to this legacy feature, you should enable the
+      [`esModuleInterop`](https://www.typescriptlang.org/tsconfig#esModuleInterop)
       TypeScript configuration option if you use TypeScript with esbuild.
-      Enabling it disables some TypeScript-specific behavior that goes against
-      the ECMAScript language specification and causes compatibility problems
-      with many tools including esbuild. Specifically it means that if a
-      CommonJS module exports a function via <code>module.<wbr>exports =<wbr> fn</code>,
-      you need to use <code>import <wbr>fn <wbr>from <wbr>'path'</code>
-      instead of <code>import *<wbr> as<wbr> <wbr>fn <wbr>from <wbr>'path'</code>.
-      This option is not enabled by default because it would be a breaking change
-      for existing TypeScript projects, but Microsoft
+      Enabling it disables this legacy behavior and makes TypeScript's type
+      system compatible with ESM. This option is not enabled by default because
+      it would be a breaking change for existing TypeScript projects, but Microsoft
       [highly recommends applying it both to new and existing projects](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#support-for-import-d-from-cjs-from-commonjs-modules-with---esmoduleinterop)
       (and then updating your code) for better compatibility with the rest of the ecosystem.
-
-  - h4#emit-decorator-metadata: Features that need a type system are not supported
   - p: >
+      Specifically this means that importing a non-object value from a CommonJS
+      module with ESM import syntax must be done using a default import instead
+      of using `import * as`. So if a CommonJS module exports a function via
+      <code>module.<wbr>exports =<wbr> fn</code>, you need to use
+      <code>import <wbr>fn <wbr>from <wbr>'path'</code> instead of
+      <code>import *<wbr> as<wbr> <wbr>fn <wbr>from <wbr>'path'</code>.
+
+  - h4#no-type-system: Features that need a type system are not supported
+  - p: >
+      TypeScript types are treated as comments and are ignored by esbuild, so
+      TypeScript is treated as "type-checked JavaScript." The interpretation of
+      the type annotations is up to the TypeScript type checker, which you
+      should be running in addition to esbuild if you're using TypeScript. This
+      is the same compilation strategy that Babel's TypeScript implementation
+      uses. However, it means that some TypeScript compilation features which
+      require type interpretation to work do not work with esbuild.
+  - p: >
+      Specifically:
+  - ul:
+    - >
+      <p>
       The [`emitDecoratorMetadata`](https://www.typescriptlang.org/tsconfig#emitDecoratorMetadata)
-      TypeScript configuration option is not supported. It passes type
-      annotations to decorators and is an exception to the "TypeScript
-      is just JavaScript" philosophy that TypeScript started with where
-      type annotations are not supposed to change the output of the
-      compiler. Since esbuild does not replicate TypeScript's type system,
-      it does not have enough information to implement this feature.
+      TypeScript configuration option is not supported. This feature passes a
+      JavaScript representation of the corresponding TypeScript type to the
+      attached decorator function. Since esbuild does not replicate TypeScript's
+      type system, it does not have enough information to implement this feature.
+      </p>
+    - >
+      <p>
+      The [`const enum`](https://www.typescriptlang.org/docs/handbook/enums.html#const-enums)
+      feature in TypeScript defines a set of compile-time constants grouped
+      under a type. Each enum value of that type is replaced by the corresponding
+      constant at compile time. Since esbuild does not replicate TypeScript's
+      type system, `const enum` declarations are compiled as `enum` declarations
+      instead.
+      </p>
+
+  - h4#tsconfig-json: Only certain `tsconfig.json` fields are respected
+  - p: >
+      During bundling, the path resolution algorithm in esbuild will consider
+      the contents of the `tsconfig.json` file in the closest parent directory
+      containing one and will modify its behavior accordingly. It is also
+      possible to explicitly set the `tsconfig.json` path with the build API
+      using esbuild's [`tsconfig`](/api/#tsconfig) setting and to explicitly pass in
+      the contents of a `tsconfig.json` file with the transform API using esbuild's
+      [`tsconfigRaw`](/api/#tsconfig-raw) setting. However, esbuild currently
+      only inspects the following fields in `tsconfig.json` files:
+
+  - ul:
+    - >
+      [`baseUrl`](https://www.typescriptlang.org/tsconfig#baseUrl)
+    - >
+      [`extends`](https://www.typescriptlang.org/tsconfig#extends)
+    - >
+      [`importsNotUsedAsValues`](https://www.typescriptlang.org/tsconfig#importsNotUsedAsValues)
+    - >
+      [`jsxFactory`](https://www.typescriptlang.org/tsconfig#jsxFactory)
+    - >
+      [`jsxFragmentFactory`](https://www.typescriptlang.org/tsconfig#jsxFragmentFactory)
+    - >
+      [`paths`](https://www.typescriptlang.org/tsconfig#paths)
+    - >
+      [`useDefineForClassFields`](https://www.typescriptlang.org/tsconfig#useDefineForClassFields)
+
+  - p: >
+      All other fields will be ignored. Note that this includes TypeScript's
+      [`target`](https://www.typescriptlang.org/tsconfig#target) setting.
+      You'll need to set the compilation target using esbuild's own
+      [`target`](/api/#target) setting instead. Also note that import path
+      transformation requires [`bundling`](/api/#bundle) to be enabled,
+      since path resolution only happens during bundling.
 
   - h4#ts-vs-tsx: You cannot use the `tsx` loader for `*.ts` files
   - p: >
@@ -384,10 +458,12 @@ body:
 
   - pre.js: |
       // react-shim.js
-      export * as React from 'react'
+      import * as React from 'react'
+      export { React }
 
   - p: >
-      Then use esbuild's inject feature to inject this into each file:
+      Then use esbuild's [inject feature](/api/#inject) to inject this into
+      each file:
 
   - example:
       in:
@@ -428,6 +504,29 @@ body:
   - p: >
       Since the inject feature is a general-purpose code injection mechanism,
       it can be used with any JSX transform library, not just with React.
+
+  - p: >
+      **Important:**
+      The `export` statement is required. Do not remove it. The inject feature
+      injects an `import` statement to `react-shim.js` at the top of each file
+      that looks like this:
+
+  - pre.js: |
+      import { /* ... */ } from './react-shim.js'
+
+  - p: >
+      The set of imported names `/* ... */` is automatically generated from
+      the set of unbound references in the file (i.e. `React`) that are equal
+      to the name of an export of the injected file `react-shim.js`. If the
+      injected file doesn't export anything, then the set of imported names
+      stays empty and all unbound references all stay unbound. Code with
+      unbound references to `React` will crash at run-time if there is no
+      variable called `React` in the global scope. This is by design, and
+      happens because of to how ECMAScript modules work. Imports in one module
+      are local to that module and cannot be read from other modules unless
+      they have been exported by that module and imported into the other module.
+      Using `export` in `react-shim.js` with the local variable `React` allows
+      it to be imported into and used by other modules.
 
   - h3: Using JSX without React
 

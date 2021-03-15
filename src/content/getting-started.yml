@@ -16,14 +16,20 @@ body:
       你可以运行如下命令，来检测 esbuild 的原生可执行文件
       是否正常：
 
-  - pre: |
-      npx esbuild --version
+  - example:
+      unix: |
+        ./node_modules/.bin/esbuild --version
 
+<<<<<<< HEAD
   - p: >
       此命令使用了 `npx` 命令，它会在你安装 npm 时一起被安装。
       它提供了一种跨平台的方式来手动运行可执行文件包，而且用在这里比较简单。
       然而它也带来了额外的开销，
       不要在 `package.json` 里写脚本的时候使用它。
+=======
+      windows: |
+        .\node_modules\.bin\esbuild --version
+>>>>>>> a0ccfc6032603bdedaa839fd2caacac361b815cc
 
   - p: >
       推荐安装 esbuild 的做法是通过 npm 安装原生可执行文件。
@@ -52,8 +58,12 @@ body:
   - p: >
       最后，运行 esbuild 打包此文件：
 
-  - pre: |
-      npx esbuild app.jsx --bundle --outfile=out.js
+  - example:
+      unix: |
+        ./node_modules/.bin/esbuild app.jsx --bundle --outfile=out.js
+
+      windows: |
+        .\node_modules\.bin\esbuild app.jsx --bundle --outfile=out.js
 
   - p: >
       不出意外的话，上述命令执行后会创建一个名为 `out.js` 的文件，
@@ -89,10 +99,17 @@ body:
       }
 
   - p: >
+<<<<<<< HEAD
       注意，这里不需要使用 `npx` 命令。
       在 `scripts` 部分中的所有内容都应该通过环境变量来使用 `esbuild`，
       所以这里无需使用 `npx`，
       使用它只会让你的构建变慢。
+=======
+      Notice that this uses the `esbuild` command directly without a relative
+      path. This works because everything in the `scripts` section is run with
+      the `esbuild` command already in the path (as long as you have
+      [installed the package](#install-esbuild)).
+>>>>>>> a0ccfc6032603bdedaa839fd2caacac361b815cc
 
   - p: >
       使用方式如下：
@@ -365,6 +382,7 @@ body:
       npm install esbuild-wasm
 
   - p: >
+<<<<<<< HEAD
       **为什么不推荐这种方式：**
       WebAssembly 的版本比原生的版本慢很多。
       在很多情况下会慢一个数量级（10 倍）。
@@ -376,6 +394,19 @@ body:
       除非别无选择，请不要使用 WebAssembly 版本，
       比如当你想要在一个不支持的平台使用 esbuild 时。
       WebAssembly 包应该仅使在[浏览器里](/api/#running-in-the-browser)。
+=======
+      **Why this is not recommended:**
+      The WebAssembly version is much, much slower than the native version. In
+      many cases it is an order of magnitude (i.e. 10x) slower. This is for
+      various reasons including a) node re-compiles the WebAssembly code from
+      scratch on every run, b) Go's WebAssembly compilation approach is
+      single-threaded, and c) node has WebAssembly bugs that can delay the
+      exiting of the process by many seconds. The WebAssembly version also
+      excludes some features such as the local file server. You should only
+      use the WebAssembly package like this if there is no other option, such
+      as when you want to use esbuild on an unsupported platform. The WebAssembly
+      package is primarily intended to only be used [in the browser](/api/#running-in-the-browser).
+>>>>>>> a0ccfc6032603bdedaa839fd2caacac361b815cc
 
   - h3: 从源码构建 <#build-from-source>
 

@@ -77,7 +77,12 @@ async function checkCli(text, value) {
           stdio: 'pipe',
           env: { PATH: `${path.join(testDir, 'node_modules', '.bin')}:${process.env.PATH}` }
         })
-        assert.strictEqual(result.stderr, '')
+
+        // Ignore the build success message since it contains the build time which is non-deterministic
+        if (!result.stderr.includes('⚡')) {
+          assert.strictEqual(result.stderr, '')
+        }
+
         stdout = result.stdout
       }
 
@@ -187,7 +192,23 @@ async function main() {
   // Load nested pages from other files
   for (let i = 0; i < pages.length; i++) {
     if (typeof pages[i][1] === 'string') {
-      pages[i][1] = yaml.safeLoad(await fs.readFile(path.join(contentDir, pages[i][1]), 'utf8'))
+      const contents = await fs.readFile(path.join(contentDir, pages[i][1]), 'utf8')
+
+      // Make sure there aren't accidental links to "http://localhost" URLs
+      // (can happen when copying and pasting links from a local dev server)
+      let markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+      let match
+      while (match = markdownLinkRegex.exec(contents)) {
+        if (match[2].startsWith('http://localhost:') && !match[1].replace(/<wbr>/g, '').startsWith('http://localhost:')) {
+          const lines = contents.split('\n')
+          const linesBefore = contents.slice(0, match.index).split('\n')
+          const line = linesBefore.length
+          throw new Error(`Link to localhost on line ${line} of ${pages[i][1]} is not permitted:\n\n` +
+            `${lines[line - 1]}\n${' '.repeat(linesBefore.pop().length)}^`)
+        }
+      }
+
+      pages[i][1] = yaml.safeLoad(contents)
     }
   }
 
