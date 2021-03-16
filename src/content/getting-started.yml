@@ -16,14 +16,12 @@ body:
       你可以运行如下命令，来检测 esbuild 的原生可执行文件
       是否正常：
 
-  - pre: |
-      npx esbuild --version
+  - example:
+      unix: |
+        ./node_modules/.bin/esbuild --version
 
-  - p: >
-      此命令使用了 `npx` 命令，它会在你安装 npm 时一起被安装。
-      它提供了一种跨平台的方式来手动运行可执行文件包，而且用在这里比较简单。
-      然而它也带来了额外的开销，
-      不要在 `package.json` 里写脚本的时候使用它。
+      windows: |
+        .\node_modules\.bin\esbuild --version
 
   - p: >
       推荐安装 esbuild 的做法是通过 npm 安装原生可执行文件。
@@ -52,8 +50,12 @@ body:
   - p: >
       最后，运行 esbuild 打包此文件：
 
-  - pre: |
-      npx esbuild app.jsx --bundle --outfile=out.js
+  - example:
+      unix: |
+        ./node_modules/.bin/esbuild app.jsx --bundle --outfile=out.js
+
+      windows: |
+        .\node_modules\.bin\esbuild app.jsx --bundle --outfile=out.js
 
   - p: >
       不出意外的话，上述命令执行后会创建一个名为 `out.js` 的文件，
@@ -89,10 +91,10 @@ body:
       }
 
   - p: >
-      注意，这里不需要使用 `npx` 命令。
-      在 `scripts` 部分中的所有内容都应该通过环境变量来使用 `esbuild`，
-      所以这里无需使用 `npx`，
-      使用它只会让你的构建变慢。
+      注意，这里直接使用 `esbuild`，没有相对路径
+      之所以会生效，是因为 "scripts" 中执行的内容，
+      会去寻找当前环境下的 `esbuild` 命令并执行。
+      （前提是，你已经安装了 [esbuild](#install-esbuild)）
 
   - p: >
       使用方式如下：
@@ -369,9 +371,9 @@ body:
       WebAssembly 的版本比原生的版本慢很多。
       在很多情况下会慢一个数量级（10 倍）。
       这有很多原因，包括：
-      a) 每次运行都被从头开始编译，
-      b) WebAssembly 编译方式是单线程的，
-      c) node 有一个 WebAssembly 的缺陷，该缺陷会导致现有的进程延迟数秒钟。
+      a) Node 会在每次运行事从头开始编译 WebAssembly 代码，
+      b) Go 的 WebAssembly 编译方式是单线程的，
+      c) Node 的 WebAssembly 存在缺陷，该缺陷会导致延迟数秒退出进程。
       WebAssembly 版本还移除了一些功能，如本地文件服务器。
       除非别无选择，请不要使用 WebAssembly 版本，
       比如当你想要在一个不支持的平台使用 esbuild 时。
