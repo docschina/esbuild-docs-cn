@@ -106,8 +106,7 @@ body:
       再然后 string→JS→minified JS→string）这将使用大量内存并使得构建变慢。
       </p>
       <p>
-<<<<<<< HEAD
-      而 Go 的另外一个好处是，它可以将内容紧凑的存储在内存中，
+      而 Go 的另外一个好处是，它可以将内容紧密的存储在内存中，
       这使得它可以使用更少的内存，更适合 CPU 缓存。
       所有的对象字段的类型和字段都紧密的包裹在一起，
       例如，几个布尔类型的标志每个只占一个字节。
@@ -116,17 +115,6 @@ body:
       JavaScript 则没有这些特性，而且还有其他的缺点，
       比如 JIT 的开销（比如 hidden class slots）
       和低效的表示方式（比如非整数使用指针进行堆分配）
-=======
-      Another benefit of Go is that it can store things compactly in memory,
-      which enables it to use less memory and fit more in the CPU cache. All
-      object fields have types and fields are packed tightly together so e.g.
-      several boolean flags only take one byte each. Go also has value semantics
-      and can embed one object directly in another so it comes "for free"
-      without another allocation. JavaScript doesn't have these features and
-      also has other drawbacks such as JIT overhead (e.g. hidden class slots)
-      and inefficient representations (e.g. non-integer numbers are
-      heap-allocated with pointers).
->>>>>>> 0e80493553b948781b26bccb61c623131db16f1e
       </p>
 
   - p: >
