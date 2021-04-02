@@ -2,30 +2,27 @@ title: API
 body:
   - h1: API
   - p: >
-      The API can be accessed in one of three ways: on the command line, in
-      JavaScript, and in Go. The concepts and parameters are largely identical
-      between the three languages so they will be presented together here
-      instead of having separate documentation for each language.
+      API 可以以三种方式使用：在命令行中、在 JavaScript 中以及在 Go 中。
+      在这三种语言中，概念与参数几乎是一模一样的，因此他们可以一起出现在这里，
+      而不是针对每一种语言淡出出一份文档。
 
   - p: >
-      There are two main API calls in esbuild's API: [transform](#transform-api)
-      and [build](#build-api). It's important to understand which one you should
-      be using because they work differently.
+      在 esbuild 中有两个比较主要的 API：[transform](#transform-api)
+      与 [build](#build-api)。理解你应该使用哪一个是非常重要的，
+      因为他们的工作方式不同。
 
   - p: >
-      If you are using JavaScript be sure to check out the
-      [JS-specific details](#js-specific-details) section below. You may also
-      find the [TypeScript type definitions](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
-      for esbuild helpful as a reference. If you are using Go be sure to check
-      out the automatically generated [Go documentation](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api).
+      如果你是用的是 JavaScript，请务必阅读下面的 [JS-specific details](#js-specific-details) 章节。
+      你也可以找到 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
+      for esbuild helpful 作为参考。如果正在使用 Go 语言，请务必阅读自动生成的
+       [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。If you are using Go be sure to check
 
   - h2: Transform API
 
   - p: >
-      The transform API call operates on a single string without access to a
-      file system. This makes it ideal for use in environments without a file
-      system (such as a browser) or as part of another tool chain. Here is
-      what a simple transform looks like:
+      transform API 操作单个字符串，而不访问文件系统。
+      这使其能够比较理想地在没有文件系统的环境中使用（比如浏览器）或者作为另一个工具链的一部分。
+      以下是一个比较简单的 transform 示例：
 
   - example:
       cli:
@@ -63,10 +60,9 @@ body:
         }
 
   - p: >
-      This API call is used by the command-line interface if no input files
-      are provided and the `--bundle` flag is not present. In this case the
-      input string comes from stdin and the output string goes to stdout.
-      The transform API can take the following options:
+      如果没有提供输入的文件并且没有 `--bundle` 标志的话，命令行接口就会调用此 API。
+      在这个用例中，输入的字符串来自标准输入（stdin），并且输出字符串转到标准输出（stdout）。
+      transform API 可以使用以下配置项：
 
   - available-options:
     - Banner
@@ -95,9 +91,9 @@ body:
   - h2: Build API
 
   - p: >
-      The build API call operates on one or more files in the file system.
-      This allows the files to reference each other and be bundled together.
-      Here is what a simple build looks like:
+      调用 build API 操作文件系统中的一个或多个文件。
+      它允许文件互相引用并且打包在一起。
+      这里是一个简单的 build 用例：
 
   - example:
       cli:
@@ -147,12 +143,9 @@ body:
         }
 
   - p: >
-      This API call is used by the command-line interface if there is at
-      least one input file provided or the `--bundle` flag is present.
-      Note that esbuild does _not_ bundle by default. You have to explicitly
-      pass the `--bundle` flag to enable bundling. If no input files are
-      provided then a single input file is read from stdin. The build API can
-      take the following options:
+      如果至少提供一个输入文件或者存在 `--bundle` 标志，那么命令行接口会调用该 API。
+      请注意 esbuild _不会_ 默认打包。你必须传递 `--bundle` 标志启用打包。
+      如果没有提供输入文件，则从标准化输入（stdin）读取单个输入文件。build API 可以使用以下配置项：
 
   - available-options:
     - Asset names
@@ -203,15 +196,15 @@ body:
     - Working Directory
     - Write
 
-  - h2: Simple options
+  - h2: 一般配置项
 
   - h3: Bundle
 
   - p: >
-      To bundle a file means to inline any imported dependencies into the
-      file itself. This process is recursive so dependencies of dependencies
-      (and so on) will also be inlined. By default esbuild will _not_ bundle
-      the input files. Bundling must be explicitly enabled like this:
+      打包一个文件意味着将任何导入的依赖项内联到文件中。
+      这个过程是递归的，因为依赖的依赖（等等）也将被内联。
+      默认情况下，esbuild 将 _不会_ 打包输入的文件。
+      打包必须想这样显式启用：
 
   - example:
       in:
@@ -248,22 +241,19 @@ body:
         }
 
   - p: >
-      Refer to the [getting started guide](/getting-started/#your-first-bundle)
-      for an example of bundling with real-world code.
+      点击 [快速开始指引](/getting-started/#your-first-bundle)
+      查看打包实际代码的例子。
 
   - p: >
-      Note that bundling is different than file concatenation. Passing
-      esbuild multiple input files with bundling enabled will create two
-      separate bundles instead of joining the input files together. To join
-      a set of files together with esbuild, import them all into a single
-      entry point file and bundle just that one file with esbuild.
+      请注意打包与文件连接不同。在启用打包时向 esbuild 传递多个输入文件将创建两个单独的
+      bundle 而不是将输入文件连接在一起。为了使用 esbuild 将一系列文件打包在一起，
+      在一个入口起点文件中引入所有文件，然后就像打包一个文件那样将它们打包。
 
   - h3: Define
 
   - p: >
-      This feature provides a way to replace global identifiers with
-      constant expressions. It can be a way to change the behavior some code
-      between builds without changing the code itself:
+      该特性提供了一种用常量表达式替换全局标识符的方法。
+      它可以在不改变代码本身的情况下改变某些构建之间代码的行为:
 
   - example:
       cli:
@@ -329,19 +319,14 @@ body:
         }
 
   - p: >
-      Replacement expressions must either be a JSON object (null, boolean,
-      number, string, array, or object) or a single identifier. Replacement
-      expressions other than arrays and objects are substituted inline, which
-      means that they can participate in constant folding. Array and object
-      replacement expressions are stored in a variable and then referenced
-      using an identifier instead of being substituted inline, which avoids
-      substituting repeated copies of the value but means that the values don't
-      participate in constant folding.
+      替换表达式必须是一个 JSON 对象（null、boolean、number、string、array 或者 object）
+      或者一个标识符。除了数组和对象之外，替换表达式是内联替换的，这意味着他们可以参与常数折叠。
+      数组与对象替换表达式会被存储在一个变量中，然后被标识符引用而不是内联替换，
+      这避免了替换重复复制一个值，但也意味着该值不能参与常数折叠。
 
   - p: >
-      If you want to replace something with a string literal, keep in mind that
-      the replacement value passed to esbuild must itself contain quotes.
-      Omitting the quotes means the replacement value is an identifier instead:
+      如果你想用字符串字面值替换某些东西，记住，传递给esbuild的替换值本身必须包含引号。
+      省略引号意味着替换的值是一个标识符：
 
   - example:
       cli:
@@ -382,15 +367,11 @@ body:
         }
 
   - p: >
-      If you're using the CLI, keep in mind that different shells have different
-      rules for how to escape double-quote characters (which are necessary when
-      the replacement value is a string). Use a `\"` backslash escape because it
-      works in both bash and Windows command prompt. Other methods of escaping
-      double quotes that work in bash such as surrounding them with single
-      quotes will not work on Windows, since Windows command prompt does not
-      remove the single quotes. This is relevant when using the CLI from a npm
-      script in your `package.json` file, which people will expect to work on
-      all platforms:
+      如果你在使用 CLI 工具，请记住，不同的 shell 对于如何转义双引号字符有不同的规则
+      （当替换的值为一个字符串时会非常必要）。使用 `\"` 反斜杠转义，因为它可以在 bash
+      以及 Windows 命令提示符中生效。其他在 bash 中有效的转义双引号的方法，比如用单引号括起来，
+      在Windows上不起作用，因为 Windows 命令提示符不会删除单引号。这和你在 `package.json` 的
+      npm script 中使用 CLI 工具是相关的，人们期望在所有平台上工作：
 
   - pre.json: |
       {
@@ -400,28 +381,22 @@ body:
       }
 
   - p: >
-      If you still run into cross-platform quote escaping issues with different
-      shells, you will probably want to switch to using the [JavaScript API](/api/)
-      instead. There you can use regular JavaScript syntax to eliminate
-      cross-platform differences.
+      如果你仍然在不同的 shell 中遇到跨平台引号转义问题，你讲可能会选择使用 [JavaScript API](/api/)。
+      There you can use regular JavaScript syntax to eliminate
+      你可以使用常规的 JavaScript 语法来消除跨平台差异。
 
   - h3: External
 
   - p: >
-      You can mark a file or a package as external to exclude it from your
-      build. Instead of being bundled, the import will be preserved (using
-      `require` for the `iife` and `cjs` formats and using `import` for the
-      `esm` format) and will be evaluated at run time instead.
+      你可以标记一个文件或者包为外部（external），从而将其从你的打包结果中移除。
+      导入将被保留（对于 `iife` 以及 `cjs` 格式使用 `require`，对于 `esm` 格式使用 `import`），而不是被打包，
+      并将在运行时进行计算。
 
   - p: >
-      This has several uses. First of all, it can be used to trim unnecessary
-      code from your bundle for a code path that you know will never be
-      executed. For example, a package may contain code that only runs in node
-      but you will only be using that package in the browser. It can also be
-      used to import code in node at run time from a package that cannot be
-      bundled. For example, the `fsevents` package contains a native extension,
-      which esbuild doesn't support. Marking something as external looks like
-      this:
+      这里有几个用法。首先，它可以用于去除你的 bundle 中你知道将永远不会被执行的代码路径中的无用代码。
+      例如，一个 package 可以会包含值运行在 node 端的代码，但是你只会将其用在浏览器中。
+      它还可以用于在运行时从不能打包的包导入 node 中的代码。例如，`fsevents` 包含 esbuild 不支持的本地拓展，
+      像这样将某些内容标记为外部（external）：
 
   - example:
       cli:
@@ -472,14 +447,11 @@ body:
         }
 
   - p: >
-      You can also use the `*` wildcard character in an external path to mark
-      all files matching that pattern as external. For example, you can use
-      `*.png` to remove all `.png` files or `/images/*` to remove all paths
-      starting with `/images/`. When a `*` wildcard character is present in an
-      external path, that pattern will be applied to the original path in the
-      source code instead of to the path after it has been resolved to a real
-      file system path. This lets you match on paths that aren't real file
-      system paths.
+      你也可以在外部（external）路径中使用 `*` 通配符标记所有符合该模式的为外部（external）。
+      例如，你可以使用 `*.png` 移除所有的 `.png` 文件或者使用 `/images/*` 移除所有路径以
+      `/images/` 开头的路径。当在 外部（external）路径中使用 `*` 通配符时，
+      该模式将应用于源代码中的原始路径，而不是解析为实际文件系统路径后的路径。
+      这允许你匹配不是真实文件系统路径的路径。
 
   - h3: Format
 
