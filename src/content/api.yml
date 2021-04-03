@@ -456,20 +456,16 @@ body:
   - h3: Format
 
   - p: >
-      This sets the output format for the generated JavaScript files. There are
-      currently three possible values: `iife`, `cjs`, and `esm`.
+      为生成的 JavaScript 文件设置输出格式。有三个可能的值：`iife`、`cjs` 与 `esm`。
 
   - h4#format-iife: IIFE
 
   - p: >
-      The `iife` format stands for "immediately-invoked function expression" and
-      is intended to be run in the browser. Wrapping your code in a function
-      expression ensures that any variables in your code don't accidentally
-      conflict with variables in the global scope. If your entry point has
-      exports that you want to expose as a global in the browser, you can
-      configure that global's name using the [global name](#global-name)
-      setting. The `iife` format is the default format unless you set
-      [platform](#platform) to `node`. Using it looks like this:
+      `iife` 格式代表“立即调用函数表达式（immediately-invoked function expression）”并且在浏览器中运行。
+      将你的代码包裹在一个函数表达式中，以确保代码中的所有变量不会与全局作用域中的变量冲突。
+      如果你的入口起点有你想要暴露在浏览器全局环境中的导出，你可以使用 [global name](#global-name)
+      设置 global `iife` 为默认格式，除非你设置 [platform](#platform) 为 `node`。
+      像这样使用它：
 
   - example:
       cli:
@@ -508,12 +504,10 @@ body:
   - h4#format-commonjs: CommonJS
 
   - p: >
-      The `cjs` format stands for "CommonJS" and is intended to be run in node.
-      It assumes the environment contains `exports`, `require`, and `module`.
-      Entry points with exports in ECMAScript module syntax will be converted
-      to a module with a getter on `exports` for each export name. The `cjs`
-      format is the default format when you set [platform](#platform) to `node`.
-      Using it looks like this:
+      `cjs` 格式打包代表"CommonJS" 并且在 node 环境中运行。它假设环境包括 `exports`、
+      `require` 与 `module`。在 ECMAScript 模块语法中带有导出的入口点将被转换为一个模块，
+      每个导出名称的 “exports” 上都有一个 getter。当你设置 [platform](#platform) 为 `node` 时，
+      `cjs` 为默认格式。像这样使用它：
 
   - example:
       cli:
@@ -554,10 +548,9 @@ body:
   - h4#format-esm: ESM
 
   - p: >
-      The `esm` format stands for "ECMAScript module". It assumes the environment
-      supports `import` and `export` syntax. Entry points with exports in CommonJS
-      module syntax will be converted to a single `default` export of the value
-      of `module.exports`. Using it looks like this:
+      `esm` 格式代表 "ECMAScript module"。它假设环境支持 `import` 与 `export` 语法。
+      在 CommonJS 模块语法中带有导出的入口点将被转换为 `module.exports` 值的单个 `default` 导出。
+      像这样使用它：
 
   - example:
       cli:
@@ -596,30 +589,26 @@ body:
         }
 
   - p: >
-      The `esm` format can be used either in the browser or in node, but you
-      have to explicitly load it as a module. This happens automatically if you
-      `import` it from another module. Otherwise:
+      `esm` 格式可以在浏览器或者 node 中使用。但是你必须显式地以模块加载它。
+      如果你从其他模块 `import`，那么这是自动进行的。否则：
 
   - ul:
     - >
-      In the browser, you can load a module using <code>&lt;script <wbr>src="<wbr>file.js" <wbr>type="<wbr>module"&gt;<wbr>&lt;/script&gt;</code>.
-      <br>&nbsp;
+      在浏览器中，你可以使用 <code>&lt;script <wbr>src="<wbr>file.js" <wbr>type="<wbr>module"&gt;<wbr>&lt;/script&gt;</code> 加载模块。
+      <br>&nbsp; 
 
     - >
-      In node, you can load a module using <code>node <wbr>--experimental-<wbr>modules <wbr>file.mjs</code>.
-      Note that node requires the `.mjs` extension unless you have configured
-      <code>"type": <wbr>"module"</code> in your `package.json` file.
-      You can use the [out extension](#out-extension) setting in esbuild to
-      customize the output extension for the files esbuild generates. You can
-      read more about using ECMAScript modules in node [here](https://nodejs.org/api/esm.html).
+      在 node 环境中，你可以使用 <code>node <wbr>--experimental-<wbr>modules <wbr>file.mjs</code> 加载模块。
+      请注意 node 需要 `.mjs` 拓展名，除非你在 `package.json` 文件中配置了 <code>"type": <wbr>"module"</code> 。
+      你可以使用 esbuild 中的 [out extension](#out-extension) 设置来自定义生成文件的拓展名。
+      你可以点击 [这里](https://nodejs.org/api/esm.html) 获取更多关于使用 ECMAScript modules 的内容。
 
   - h3: Inject
 
   - p: >
-      This option allows you to automatically replace a global variable with an
-      import from another file. This can be a useful tool for adapting code that
-      you don't control to a new environment. For example, assume you have a
-      file called `process-shim.js` that exports a variable named `process`:
+      这个配置项可以自动替换从另一个文件引入的全局变量。
+      当你为无法控制的代码适配新环境时是非常有用的。
+      例如，假定你有一个叫做 `process-shim.js` 的文件，该文件导出了 `process` 变量：
 
   - pre.js: |
       // process-shim.js
@@ -632,10 +621,8 @@ body:
       console.log(process.cwd())
 
   - p: >
-      This is intended to replace uses of node's `process.cwd()` function to
-      prevent packages that call it from crashing when run in the browser.
-      You can use the inject feature to replace all uses of the global identifier
-      `process` with an import to that file:
+      这尝试替换 node 的 `process.cwd()` 函数的使用，以阻止包在浏览器中运行它而导致崩溃。
+      你可以使用 inject 特性将一个 import 置于文件中以替换所有的全局标识符 `process`。
 
   - example:
       in:
@@ -674,18 +661,17 @@ body:
         }
 
   - p: >
-      That results in something like this:
+      结果是这样的：
 
   - pre.js: |
       // out.js
       let process = {cwd: () => ""};
       console.log(process.cwd());
 
-  - h4: Using inject with [define](#define)
+  - h4: inject 与 [define](#define) 一起使用
 
   - p: >
-      You can also combine this with the [define](#define) feature to be more
-      selective about what you import. For example:
+      你可以与 [define](#define) 特性结合使用，这样你的导入会更具可选择性。例如：
 
   - pre.js: |
       // process-shim.js
@@ -743,7 +729,7 @@ body:
         }
 
   - p: >
-      That results in the following output:
+      结果如下：
 
   - pre.js: |
       // out.js
@@ -752,49 +738,41 @@ body:
       }
       console.log(dummy_process_cwd());
 
-  - h4: Auto-import for [JSX](/content-types/#jsx)
+  - h4: [JSX](/content-types/#jsx) 自动导入
 
   - p: >
-      You can use the inject feature to automatically provide the implementation
-      for JSX expressions. For example, you can auto-import the `react` package
-      to provide functions such as `React.createElement`. See the
-      [JSX documentation](/content-types/#auto-import-for-jsx) for details.
+      你可以使用 inject 特性以自动提供 JSX 表达式的执行环境。例如，你可以自动导入 `react`
+      包以执行诸如 `React.createElement` 的函数。查看
+      [JSX 文档](/content-types/#auto-import-for-jsx) 获取更多。
 
-  - h4: Injecting files without imports
-
-  - p: >
-      You can also use this feature with files that have no exports. In that
-      case the injected file just comes first before the rest of the output
-      as if every input file contained <code>import <wbr>"./file.js"</code>.
-      Because of the way ECMAScript modules work, this injection is still
-      "hygienic" in that symbols with the same name in different files are
-      renamed so they don't collide with each other.
-
-  - h4: Conditionally injecting a file
+  - h4: 不使用 import 注入文件
 
   - p: >
-      If you want to _conditionally_ import a file only if the export is
-      actually used, you should mark the injected file as not having side
-      effects by putting it in a package and adding <code>"sideEffects": <wbr>false</code>
-      in that package's `package.json` file. This setting is a
-      [convention from Webpack](https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free)
-      that esbuild respects for any imported file, not just files used with inject.
+      你可以对不包含 exports 的文件使用该特性。在这种情况下，注入的文件就像每个输入文件都包含
+      <code>import <wbr>"./file.js"</code> 一样出现在输出的前面。
+      由于 ECMAScript 模块的工作方式，这个注入仍然是 “卫生的”，因为在不同文件中具有相同名称的符号会被重命名，
+      这样它们就不会相互冲突。
+
+  - h4: 选择性注入文件
+
+  - p: >
+      如果你仅想当导出被实际使用的情况下 _有条件_ 的引入一个文件，你应该通过将其置于 package 中并且
+      在 `package.json` 中添加 <code>"sideEffects": <wbr>false</code> 以标记被注入的文件没有副作用。
+      该设置为
+      [Webpack 公约](https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free)，
+      esbuild 中该公约对所有的导入文件生效，而不仅仅是注入文件。
 
   - h3: Loader
 
   - p: >
-      This option changes how a given input file is interpreted. For example,
-      the [`js`](/content-types/#javascript) loader interprets the file as
-      JavaScript and the [`css`](/content-types/#css) loader interprets the
-      file as CSS. See the [content types](/content-types/) page for a
-      complete list of all built-in loaders.
+      该配置项改变了输入文件解析的方式。例如， [`js`](/content-types/#javascript) loader 将文件解析为 JavaScript，
+      [`css`](/content-types/#css) loader 将文件解析为 CSS。查看 [content types](/content-types/) 获取内置
+      loader 的完整列表。
 
   - p: >
-      Configuring a loader for a given file type lets you load that file type
-      with an `import` statement or a `require` call. For example, configuring
-      the `.png` file extension to use the [data URL](/content-types/#data-url)
-      loader means importing a `.png` file gives you a data URL containing the
-      contents of that image:
+      配置一个给定文件类型的 loader 可以让你使用 `import` 声明或者 `require` 调用来加载该文件类型。
+      例如，使用 [data URL](/content-types/#data-url) loader 配置 `.png` 文件拓展名，
+      这意味着导入 `.png` 文件会给你一个包含该图像内容的数据 URL：
 
   - pre.js: |
       import url from './example.png'
@@ -808,8 +786,7 @@ body:
       document.body.appendChild(node)
 
   - p: >
-      The above code can be bundled using the [build API](#build-api) call like
-      this:
+      以上代码可以使用 [build API](#build-api) 调用进行打包，就像这样：
 
   - example:
       in:
@@ -867,9 +844,9 @@ body:
         }
 
   - p: >
-      This option is specified differently if you are using the build API with
-      input from [stdin](#stdin), since stdin does not have a file extension.
-      Configuring a loader for stdin with the build API looks like this:
+      如果你在 [标准化输入（stdin）](#stdin) 中使用 build API，该配置项就会变的不同，
+      因为标准化输入（stdin）没有文件拓展名。使用 build API 为标准化输入（stdin）配置一个 loader，
+      就像这样：
 
   - example:
       in:
@@ -918,11 +895,9 @@ body:
         }
 
   - p: >
-      The [transform API](#transform-api) call just takes a single loader since
-      it doesn't involve interacting with the file system, and therefore doesn't
-      deal with file extensions. Configuring a loader (in this case the
-      [`ts`](/content-types/#typescript) loader) for the transform API looks
-      like this:
+      [transform API](#transform-api) 调用仅使用一个 loader，因为它不涉及与文件系统的交互，
+      因此不需要处理文件拓展名。为 transform API 配置一个 loader（在这里是
+      [`ts`](/content-types/#typescript) loader），就像这样：
 
   - example:
       cli:
