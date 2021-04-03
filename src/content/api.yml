@@ -738,7 +738,7 @@ body:
       }
       console.log(dummy_process_cwd());
 
-  - h4: [JSX](/content-types/#jsx) 自动导入
+  - h4: 自动导入 [JSX](/content-types/#jsx)
 
   - p: >
       你可以使用 inject 特性以自动提供 JSX 表达式的执行环境。例如，你可以自动导入 `react`
@@ -941,13 +941,12 @@ body:
   - h3: Minify
 
   - p: >
-      When enabled, the generated code will be minified instead of
-      pretty-printed. Minified code is generally equivalent to non-minified
-      code but is smaller, which means it downloads faster but is harder to
-      debug. Usually you minify code in production but not in development.
+      启用该配置时，生成的代码会被压缩而不是格式化输出。
+      压缩后的代码与未压缩代码是相等的，但是会更小。这意味着下载更快但是更难调试。
+      一般情况下在生产环境而不是开发环境压缩代码。
 
   - p: >
-      Enabling minification in esbuild looks like this:
+      在 esbuild 中这样启用压缩：
 
   - example:
       cli:
@@ -991,10 +990,8 @@ body:
         }
 
   - p: >
-      This option does three separate things in combination: it removes
-      whitespace, it rewrites your syntax to be more compact, and it renames
-      local variables to be shorter. Usually you want to do all of these
-      things, but these options can also be enabled individually if necessary:
+      该配置项结合起来做三件独立的事情：移除空格、重写语法使其更体积更小、重命名变量为更短的名称。
+      一般情况下这三件事情你都想做，但是如果有必要的话，这些配置项可以单独启用：
 
   - example:
       cli:
@@ -1090,7 +1087,7 @@ body:
         }
 
   - p: >
-      These same concepts also apply to CSS, not just to JavaScript:
+      这些概念同样适用于 CSS，而不仅仅是 JavaScript：
 
   - example:
       cli:
@@ -1136,119 +1133,96 @@ body:
         }
 
   - p: >
-      The JavaScript minification algorithm in esbuild usually generates output
-      that is very close to the minified output size of industry-standard
-      JavaScript minification tools. [This benchmark](https://github.com/privatenumber/minification-benchmarks/tree/cd3e5acb8d38da5f86426d44ac95974812559683#readme)
-      has an example comparison of output sizes between different minifiers.
-      While esbuild is not the optimal JavaScript minifier in all cases (and
-      doesn't try to be), it strives to generate minified output within a few
-      percent of the size of dedicated minification tools for most code, and
-      of course to do so much faster than other tools.
+      esbuild 中的 JavaScript 压缩算法生成的输出通常与行业标准 JavaScript 压缩工具生成的输出大小相近。
+      [benchmark](https://github.com/privatenumber/minification-benchmarks/tree/cd3e5acb8d38da5f86426d44ac95974812559683#readme)
+      有一个不同压缩工具之间的样例对比。尽管 esbuild 不是所有场景下的最优 JavaScript 压缩工具，
+      它努力在专用缩小工具的几个百分点内为大多数代码生成缩小的输出，当然也比其他工具快得多。
 
-  - h4#minify-considerations: Considerations
+  - h4#minify-considerations: 思考
 
   - p: >
-      Here are some things to keep in mind when using esbuild as a minifier:
+      当时用 esbuild 作为压缩器时需要记住以下几点：
 
   - ul:
     - >
       <p>
-      You should probably also set the [target](#target) option when
-      minification is enabled. By default esbuild takes advantage of modern
-      JavaScript features to make your code smaller. For example,
+      当启用压缩时也可能也需要设置 [target](#target) 配置项 。默认情况下，
+      esbuild 利用现代 JavaScript 特性使你的代码变得更小。例如，
       <code>a ===<wbr> undefined<wbr> || a ===<wbr> null<wbr> ? 1 : a</code>
-      could be minified to <code>a ?? 1</code>. If you do not want esbuild
-      to take advantage of modern JavaScript features when minifying, you
-      should use an older language target such as <code>--target=es6</code>.
+      可以被压缩为 <code>a ?? 1</code>。如果你不想让 esbuild 在压缩是利用现代 JavaScript 特性，
+      你应该使用一个更老的语言目标，例如 <code>--target=es6</code>。
       </p>
 
     - >
       <p>
-      Minification is not safe for 100% of all JavaScript code. This is true
-      for esbuild as well as for other popular JavaScript minifiers such as
-      [terser](https://github.com/terser/terser). In particular, esbuild is
-      not designed to preserve the value of calling `.toString()` on a
-      function. The reason for this is because if all code inside all
-      functions had to be preserved verbatim, minification would hardly do
-      anything at all and would be virtually useless. However, this means that
-      JavaScript code relying on the return value of `.toString()` will likely
-      break when minified. For example, some patterns in the [Angular](https://angular.io/)
-      framework break when code is minified because Angular uses `.toString()`
-      to read the argument names of functions. A workaround is to not use
-      those patterns.
+      对于所有的 JavaScript 代码，压缩不是 100% 安全的。这对 esbuild 和其他流行的
+      JavaScript 压缩器例如[terser](https://github.com/terser/terser) 是真实存在的。
+      特别地，esbuild 并不是为了保存函数上调用 `.toString()` 的值而设计的。
+      原因是如果所有函数中的所有代码都要逐字保存的话，压缩会变得非常困难并且实际上是没有用的。
+      然而，这意味着依赖于 `.toString()` 返回值的 JavaScript 代码在压缩过程中可能会中断。
+      例如，在 [Angular](https://angular.io/) 框架中一些模式在代码压缩时会中断，因为 Angular
+      使用 `.toString()` 来读取函数的参数名称。一个解决方案是不要使用这些模式。
       </p>
 
     - >
       <p>
-      By default esbuild does not preserve the value of `.name` on function
-      and class objects. This is because most code doesn't rely on this property
-      and using shorter names is an important size optimization. However, some
-      code does rely on the `.name` property for registration and binding
-      purposes. If you need to rely on this you should enable the
-      [keep names](#keep-names) option.
+      默认情况下，esbuild 不会在函数和类对象上保留 `.name` 的值。这是因为大多数代码不会依赖该属性，
+      并且使用更短的名称是一个重要的大小优化。然而，一些代码确实依赖 `.name` 属性来注册和绑定。
+      如果你需要依赖该属性，你应该启用 [keep names](#keep-names) 配置项。
       </p>
 
     - |
       <p>
-      Use of certain JavaScript features can disable many of esbuild's
-      optimizations including minification. Specifically, using direct `eval`
-      and/or the `with` statement prevent esbuild from renaming identifiers
-      to smaller names since these features cause identifier binding to happen
-      at run time instead of compile time. This is almost always unintentional,
-      and only happens because people are unaware of what direct `eval` is and
-      why it's bad.
+      使用某些 JavaScript 特性可以禁用 esbuild 的许多优化，包括压缩。
+      具体来说，直接使用 `eval` 和/或 `with` 语句可以阻止 esbuild 将标识符重命名为更小的名称，
+      因为这些特性会导致标识符绑定在运行时而不是编译时发生。
+      这几乎总是无意的，而且只发生在人们不知道什么是直接 eval 以及它为什么不好的情况下。
       </p>
       <p>
-      If you are thinking about writing some code like this:
+      如果你正在考虑像这样写一段代码：
       </p>
       <pre>
-      // Direct eval (will disable minification for the whole file)
+      // 直接使用 eval （将会禁用整个文件的压缩）
       let result = eval(something)
       </pre>
       <p>
-      You should probably write your code like this instead so your code can be minified:
+      你应该这样写，你的代码才能被压缩：
       </p>
       <pre>
-      // Indirect eval (has no effect on the surrounding code)
+      // 间接使用 eval （对周围的代码没有副作用）
       let result = (0, eval)(something)
       </pre>
       <p>
-      There is more information about the consequences of direct `eval` and the
-      available alternatives [here](/content-types/#direct-eval).
+      [这里](/content-types/#direct-eval) 可以获取关于直接使用 `eval` 以及可用选择的更多信息。
       </p>
 
     - >
       <p>
-      The minification algorithm in esbuild does not yet do advanced code
-      optimizations. In particular, the following code optimizations are
-      possible for JavaScript code but are not done by esbuild (not an
-      exhaustive list):
+      esbuild 中的压缩算法还没有进行高级代码优化。特别是，下面的代码优化对 JavaScript 是
+      有可能的，但不是由 esbuild 完成的（不是一个详尽的列表）：
       </p>
       <ul>
-        <li>Dead-code elimination within function bodies</li>
-        <li>Function inlining</li>
-        <li>Cross-statement constant propagation</li>
-        <li>Object shape modeling</li>
+        <li>消除函数体中的 dead-code</li>
+        <li>函数内联</li>
+        <li>Cross-statement 常数传播</li>
+        <li>对象形状建模</li>
         <li>Allocation sinking</li>
         <li>Method devirtualization</li>
         <li>Symbolic execution</li>
-        <li>JSX expression hoisting</li>
-        <li>TypeScript enum detection and inlining</li>
+        <li>JSX 表达式提升</li>
+        <li>TypeScript 枚举检测和内联</li>
       </ul>
       <p>
-      If your code makes use of patterns that require some of these forms of
-      code optimization to be compact, or if you are searching for the optimal
-      JavaScript minification algorithm for your use case, you should consider
-      using other tools. Some examples of tools that implement some of these
-      advanced code optimizations include [Terser](https://github.com/terser/terser#readme)
-      and [Google Closure Compiler](https://github.com/google/closure-compiler#readme).
+      如果你的代码使用的模式要求某些形式的代码优化是紧凑的，或者如果你正在为你的用例搜索最佳的
+      JavaScript 压缩算法，您应该考虑使用其他工具。实现这些高级代码优化的一些工具示例包括
+      [Terser](https://github.com/terser/terser#readme) 和
+      [Google Closure Compiler](https://github.com/google/closure-compiler#readme)。
       </p>
 
   - h3: Outdir
 
   - p: >
-      This option sets the output directory for the build operation. For
-      example, this command will generate a directory called `out`:
+      该配置项为 build 操作设置输出文件夹。例如，该命令会生成一个名为 `out` 的目录：
 
   - example:
       in:
@@ -1283,31 +1257,24 @@ body:
         }
 
   - p: >
-      The output directory will be generated if it does not already exist, but
-      it will not be cleared if it already contains some files. Any generated
-      files will silently overwrite existing files with the same name. You
-      should clear the output directory yourself before running esbuild if you
-      want the output directory to only contain files from the current run of
-      esbuild.
+      输出文件夹如果不存在的话将会创建该文件夹，但是当其包含一些文件时不会被清除。
+      生成的文件遇到同名文件会进行静默覆盖。如果你想要输出文件夹只包含当前 esbuild 运行生成的文件，
+      你应该在运行 esbuild 之前清除输出文件夹。
 
   - p: >
-      If your build contains multiple entry points in separate directories, the
-      directory structure will be replicated into the output directory starting
-      from the [lowest common ancestor](https://en.wikipedia.org/wiki/Lowest_common_ancestor)
-      directory among all input entry point paths. For example, if there are
-      two entry points <code>src/<wbr>home/<wbr>index.ts</code> and
-      <code>src/<wbr>about/<wbr>index.ts</code>, the output directory will
-      contain <code>home/<wbr>index.js</code> and <code>about/<wbr>index.js</code>.
-      If you want to customize this behavior, you should change the
-      [outbase directory](#outbase).
+      如果你的构建有多个入口，且多个入口在单独的文件夹内，目录结构将从所有输入入口点路径中
+      [最低的公共祖先](https://en.wikipedia.org/wiki/Lowest_common_ancestor) 目录开始复制到输出目录中。If your build contains multiple entry points in separate directories, the
+      例如，这里有两个入口起点 <code>src/<wbr>home/<wbr>index.ts</code> 与
+      <code>src/<wbr>about/<wbr>index.ts</code>，输出文件夹将会包含
+      <code>home/<wbr>index.js</code> 与 <code>about/<wbr>index.js</code>。
+      如果你想要自定义该行为，你应该改变 [outbase directory](#outbase)。
 
   - h3: Outfile
 
   - p: >
-      This option sets the output file name for the build operation. This is
-      only applicable if there is a single entry point. If there are multiple
-      entry points, you must use the [outdir](#outdir) option instead to
-      specify an output directory. Using outfile looks like this:
+      该配置项为 build 操作设置输出文件名。这仅在单个入口点时适用。
+      如果有多个入口点，你必须适用 [outdir](#outdir) 配置项来制定输出文件夹。
+      像这样使用outfile：
 
   - example:
       in:
@@ -1344,9 +1311,8 @@ body:
   - h3: Platform
 
   - p: >
-      By default, esbuild's bundler is configured to generate code intended for
-      the browser. If your bundled code is intended to run in node instead, you
-      should set the platform to `node`:
+      默认情况下，esbuild 的打包器为浏览器生成代码。
+      如果你打包好的代码想要在 node 环境中运行，你应该设置 platform 为 `node`：
 
   - example:
       in:
@@ -1383,158 +1349,130 @@ body:
         }
 
   - p: >
-      When the platform is set to `browser` (the default value):
+      当 platform 设置为 `browser`（默认值）时：
 
   - ul:
     - >
       <p>
-      The default output [format](#format) is set to `iife`, which wraps the
-      generated JavaScript code in an immediately-invoked function expression
-      to prevent variables from leaking into the global scope.
+      默认的输出 [格式](#format) 为 `iife`，将生成的 JavaScript 代码包裹在立即执行函数表达式中，
+      以阻止变量泄露到全局作用域中。 
       </p>
     - >
       <p>
-      If a package specifies a map for the
-      [`browser`](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)
-      field in its `package.json` file, esbuild will use that map to replace
-      specific files or modules with their browser-friendly versions. For
-      example, a package might contain a substitution of [`path`](https://nodejs.org/api/path.html)
-      with [`path-browserify`](https://www.npmjs.com/package/path-browserify).
+      如果一个包在 `package.json` 文件中
+      的[`browser`](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)
+      配置配置了一个 map，esbuild 将会使用该 map 替换指定的文件或模块为对浏览器友好的版本。
+      例如，例如，一个包可能会用 [`path-browserify`](https://www.npmjs.com/package/path-browserify) 替换
+      [`path`](https://nodejs.org/api/path.html)。
       </p>
     - >
       <p>
-      The [main fields](#main-fields) setting is set to <code>browser,<wbr>module,<wbr>main</code>
-      but with some additional special behavior. If a package supports `module`
-      and `main` but not `browser` then `main` is used instead of `module` if
-      that package is ever imported using `require()`. This behavior improves
-      compatibility with CommonJS modules that export a function by assigning
-      it to `module.exports`.
+      [main fields](#main-fields) 设置为 <code>browser,<wbr>module,<wbr>main</code>，
+      但是会有一些额外的特殊行为。如果你个包支持 `module` 与 `main`，但是不支持 `browser`，
+      那么当使用 `require()` 导入时，将使用 `main` 而不是 `module`。
+      此行为通过将函数赋值给 `module.exports` 来改善与导出函数的 CommonJS 模块的兼容性。
       </p>
     - >
       <p>
-      The [conditions](#conditions) setting automatically includes the `browser`
-      condition. This changes how the `exports` field in `package.json` files
-      is interpreted to prefer browser-specific code.
+      [conditions](#conditions) 设置自动包含了 `browser` 情况。
+      这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于浏览器代码的方式。
       </p>
     - >
       <p>
-      To avoid warning about the use of `require` in code generated by Browserify,
-      the specific expression <code>typeof <wbr>require <wbr>== <wbr>'function' <wbr>&& <wbr>require</code>
-      is substituted with `false`. This code is present in some packages that
-      have been published to npm.
+      为了避免在通过 Browserify 生成的代码中使用 `require` 产生警告，
+      特定表达式 <code>typeof <wbr>require <wbr>== <wbr>'function' <wbr>&& <wbr>require</code>
+      会被替换为 `false`。这段代码会在已经发布到 npm 的一些包中出现。
       </p>
 
   - p: >
-      When the platform is set to `node`:
+      当 platform 设置为 `node` 时：
 
   - ul:
     - >
       <p>
-      The default output [format](#format) is set to `cjs`, which stands for
-      CommonJS (the module format used by node). ES6-style exports using
-      `export` statements will be converted into getters on the CommonJS
-      `exports` object.
+      默认输出 [格式](#format) 为 `cjs`，代表 CommonJS（node 使用的模块格式）。
+      ES6-风格的导出使用的 `export` 语句将会被转换为 CommonJS `exports` 对象中的 getters。
       </p>
     - >
       <p>
-      All [built-in node modules](https://nodejs.org/docs/latest/api/) such
-      as `fs` are automatically marked as [external](#external) so they don't
-      cause errors when the bundler tries to bundle them.
+      所有诸如 `fs` 的 [内置 node 模块](https://nodejs.org/docs/latest/api/) 会被自动标记为
+      [external](#external)，因此在打包器尝试打包他们时不会导致错误。
       </p>
     - >
       <p>
-      The [main fields](#main-fields) setting is set to <code>main,<wbr>module</code>. This
-      means tree shaking will likely not happen for packages that provide both
-      `module` and `main` since tree shaking works with ECMAScript modules but
-      not with CommonJS modules.
+      [main 字段](#main-fields) 设置为 <code>main,<wbr>module</code>。
+      这意味着 tree shaking 操作可能不会发生在同时提供 `module` 和 `main` 的包中，
+      因为 tree shaking 操作只适用于 ECMAScript 模块，而不适用于 CommonJS 模块。
       </p>
       <p>
-      Unfortunately some packages incorrectly treat `module` as meaning "browser
-      code" instead of "ECMAScript module code" so this default behavior is
-      required for compatibility. You can manually configure the [main fields](#main-fields)
-      setting to <code>module,<wbr>main</code> if you want to enable tree shaking and know it
-      is safe to do so.
+      不幸的是，一些包将 `module` 视为 "browser code" 而不是 "ECMAScript module code"，
+      因此，这种默认行为是兼容性所必需的。如果你想要启用 tree shaking 并且知道这样做是安全的，
+      那么你可以手动将 [main 字段](#main-fields) 设置为 <code>module,<wbr>main</code>。
       </p>
     - >
       <p>
-      The [conditions](#conditions) setting automatically includes the `node`
-      condition. This changes how the `exports` field in `package.json` files
-      is interpreted to prefer node-specific code.
+      [conditions](#conditions) 设置自动包含 `node` 情况。
+      这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于 node 端代码的方式。
       </p>
 
   - p: >
-      When the platform is set to `neutral`:
+      当 platform 设置为 `neutral` 时：
 
   - ul:
     - >
       <p>
-      The default output [format](#format) is set to `esm`, which uses the
-      `export` syntax introduced with ECMAScript 2015 (i.e. ES6). You can change
-      the output format if this default is not appropriate.
+      默认输出 [格式](#format) 为 `esm`，使用 ECMAScript 2015 (即 ES6) 中引入的 `export` 语法。
+      如果默认值不合适的话你可以改变输出格式。
       </p>
     - >
       <p>
-      The [main fields](#main-fields) setting is empty by default. If you want
-      to use npm-style packages, you will likely have to configure this to be
-      something else such as `main` for the standard main field used by node.
+      [main 字段](#main-fields) 默认设置为空。如果你想使用 npm 风格的包，
+      你可能需要将其配置为其他内容，比如将 node 使用的 main 字段配置为 `main`。
       </p>
     - >
       <p>
-      The [conditions](#conditions) setting does not automatically include any
-      platform-specific values.
+      [conditions](#conditions) 设置不会自动包含任何平台特定值。
       </p>
 
   - p: >
-      See also [bundling for the browser](/getting-started/#bundling-for-the-browser)
-      and [bundling for node](/getting-started/#bundling-for-node).
+      可以查看 [为浏览器打包](/getting-started/#bundling-for-the-browser)
+      与 [为 node 打包](/getting-started/#bundling-for-node)。
 
   - h3: Serve
 
   - p: >
-      During development, it's common to switch back and forth between a text
-      editor and a browser while making changes. It's inconvenient to manually
-      re-run esbuild before reloading your code in the browser. There are
-      several methods to automate this:
+      在开发过程中，当发生更改时在文本编辑器与浏览器之间来回切换是很正常的事。
+      在浏览器中重新加载代码之前手动重新运行 esbuild 是很不方便的。有几种方法可以自动完成：
 
   - ul:
-    - Use [watch mode](#watch) to re-run esbuild when a file is changed
-    - Configure your text editor to run esbuild every time you save
-    - Serve your code with a web server that rebuilds on every request
+    - 当一个文件发生更改时使用 [监听模式](#watch) 重新运行 esbuild
+    - 将你的文本编辑器配置为每次保存代码重新运行 esbuild
+    - 使用一个对于每次请求都会重新构建的 web 服务器来为你的代码提供服务
 
   - p: >
-      This API call implements the last method. The serve API is similar to the
-      [build API](#build-api) call but instead of writing the generated files
-      to the file system, it starts a long-lived local HTTP web server that
-      serves the generated files from the latest build. Each new batch of
-      requests causes esbuild to re-run the build command before responding to
-      the requests so your files are always up to date.
+      此 API 调用使用的是最后一种方法。serve API 与 [build API](#build-api) 调用很相似，
+      但是它不会将生成的代码写入到文件系统中，它启动一个 long-lived 本地 web 服务器来为最新构建生成的代码提供服务。
+      每批新的请求都会导致 esbuild 在响应请求之前重新运行构建命令，这样你的文件就总是最新的。
 
   - p: >
-      The advantage of this method over the other methods is that the web server
-      can delay the browser's request until the build has finished. That way
-      reloading your code in the browser before the latest build has finished
-      will never run code from a previous build. The files are served from memory
-      and are not written to the file system to ensure that the outdated files
-      cannot be observed.
+      此方法对于其他方法的优势在于 web 服务器可以延迟浏览器请求，知道构建完成。
+      在最新构建完成之前重新加载你的代码，将永远不会运行上一次构建生成的代码。
+      这些文件在内存中提供服务，并且没有写入到文件系统中，以确保过时的文件不会被监听。
 
   - p: >
-      Note that this is intended to only be used in development. _Do not use
-      this in production._ In production you should be serving static files
-      without using esbuild as a web server.
+      请注意，这仅会在开发环境中使用。_不要将其用在生产环境中。_
+      在生产环境中你不应该使用 esbuild 作为一个 web 服务器来服务静态资源。、
 
   - p: >
-      There are two different approaches for using the serve API:
+      有两个不同的方法来使用 serve API：
 
-  - h4#serve-everything: 'Approach 1: Serve everything with esbuild'
+  - h4#serve-everything: '方法 1：为 esbuild 构建出的所有内容提供服务'
 
   - p: >
-      With this approach, you give esbuild a directory called `servedir` with
-      extra content to serve in addition to the files that esbuild generates.
-      This works well for simple situations where you are creating some static
-      HTML pages and want to use esbuild to bundle the JavaScript and/or CSS.
-      You can put your HTML files in the `servedir` and your other source code
-      outside of the `servedir`, then set the [`outdir`](#outdir) somewhere
-      inside the `servedir`:
+      通过这种方法，你为 esbuild 提供一个名为 servedir 的目录，除了 esbuild 生成的文件之外，还提供了额外的内容。
+      这对于创建一些静态 HTML 页面并希望使用 esbuild 打包 JavaScript 和/或 CSS 的简单情况非常有用。
+      你可以把你的 HTML 文件置于 servedir 中，你的其他源代码置于 servedir 之外，
+      然后将 [`outdir`](#outdir) 设置为在某处的 servedir：
 
   - example:
       noCheck: true
@@ -1567,47 +1505,34 @@ body:
         server.Stop()
 
   - p: >
-      In the above example, your `www/index.html` page could reference the
-      compiled code in `src/app.js` like this:
+      在上面的例子中，你的 `www/index.html` 页面可以像这样引用打包好的 `src/app.js` 文件：
 
   - pre.html: |
       <script src="js/app.js"></script>
 
   - p: >
-      When you do this, every HTTP request will cause esbuild to rebuild your
-      code and serve you the latest version. So `js/app.js` will always be up
-      to date every time you reload the page. Note that although the generated
-      code appears to be inside the `outdir` directory, it's never actually
-      written to the file system with the serve API. Instead the paths for
-      generated code shadow (i.e. takes precedence over) other paths inside the
-      `servedir` and generated files are served directly from memory.
+      当你这样做时，每一个 HTTP 请求都会导致 esbuild 重新构建你的代码，并且为你提供最新版本的代码。
+      因此每次刷新页面，`js/app.js` 文件总是最新的。请注意尽管生成的出现在了 `outdir` 目录中，
+      但是它从来没有使用 serve API 真正写入过文件系统。相反，生成的代码映射的路径（即优先于其他路径）
+      在 `servedir` 和生成的文件直接从内存提供服务。
 
   - p: >
-      The benefit of doing things this way is that you can use the exact same
-      HTML pages in development and production. In development you can run
-      esbuild with `--servedir=` and esbuild will serve the generated output
-      files directly. For production you can omit that flag and esbuild will
-      write the generated files to the file system. In both cases you should
-      be getting the exact same result in the browser with the exact same code
-      in both development and production.
+      这样做的好处是，你可以使用在开发环境与生产环境使用完全相同的 HTML 页面。
+      在开发环境中你可以使用 `--servedir=` 运行 esbuild，esbuild 将会直接为生成的输出文件提供服务。
+      在生产环境中，你可以设置该标志，esbuild 将会把生成的文件写入到文件系统中。
+      这两种情况下你应该能够在浏览器中得到完全一样的结果，其在开发环境与生产环境中拥有完全相同的代码。
 
   - p: >
-      The port is automatically chosen by default as the first open port
-      equal to or greater than 8000. The port number is returned from the API
-      call (or printed to the terminal for the CLI) so you can know which URL
-      to visit. The port can be set to something specific if necessary
-      (described further down below).
+      端口号默认自动设置为大于等于 8000 的一个开放端口。端口号会在 API 调用时返回（或者使用 CLI 时会打印在终端中），
+      这样你就可以知道应该访问哪一个 URL。如果有必要的话，端口号可以被指定（下面会详细描述）。
 
-  - h4#serve-generated: 'Approach 2: Only serve generated files with esbuild'
+  - h4#serve-generated: '方法 2: 仅为 esbuild 生成的文件提供服务'
 
   - p: >
-      With this approach, you just tell esbuild to serve the contents of the
-      [`outdir`](#outdir) without giving it any additional content to serve.
-      This works well for more complex development setups. For example, you
-      might want to use NGINX as a reverse proxy to route different paths to
-      separate backend services during development (e.g. `/static/` to NGINX,
-      `/api/` to node, `/js/` to esbuild, etc.). Using esbuild with this
-      approach looks like this:
+      使用该方法，你只需要告诉 esbuild 为 [`outdir`](#outdir) 中的内容提供服务，而不会让其为额外的内容提供服务。
+      对比更复杂的开发环境配置是比较有用的。例如，你可能想要在开发环境中使用 NGINX 作为反向代理来路由不同的路径到不同的后端服务
+      （例如 `/static/` 转向 NGINX、`/api/` 转向 node、`/js/` 转向 esbuild 等）。
+      可以向这样使用 esbuild 的该方法：
 
   - example:
       noCheck: true
@@ -1640,41 +1565,31 @@ body:
         server.Stop()
 
   - p: >
-      The API call in the above example would serve the compiled contents of
-      `src/app.js` at [http://localhost:8000/out.js](http://localhost:8000/out.js).
-      Just like with the first approach, every HTTP request will cause esbuild
-      to rebuild your code and serve you the latest version so `out.js` will
-      always be up to date. Your HTML file (served by another web server on
-      another port) could then reference the compiled file from your HTML like
-      this:
+      上面示例中的 API 调用会在 [http://localhost:8000/out.js](http://localhost:8000/out.js) 为
+      编译好的 `src/app.js` 提供服务。就像是第一个方法，每个 HTTP 请求都会导致 esbuild 重新构建你的代码，
+      并且为你提供最新版本的代码。因此 `out.js` 将一直是最新的。你的 HTML 文件（被其他 web 服务器在其他端口上提供服务）
+      可以在你的 HTML 文件中像这样关联编译好的文件：
 
   - pre.html: |
       <script src="http://localhost:8000/out.js"></script>
 
   - p: >
-      The URL structure of the web server exactly mirrors the URL structure of
-      the [output directory](#outdir) when using the normal build command
-      without the web server enabled. For example, if the output directory
-      normally contains a file called <code>./pages/<wbr>about.js</code>, the
-      web server will have a corresponding <code>/pages/<wbr>about.js</code>
-      path.
+      在没有启用 web 服务器的情况下，使用正常的构建命令时，web 服务器的 URL 结构与 [输出目录](#outdir) 的URL结构完全相同。
+      例如，如果输出输出文件夹包含一个叫做 <code>./pages/<wbr>about.js</code> 的文件，web 服务器将会有一个相应的
+      <code>/pages/<wbr>about.js</code> 路径。
 
   - p: >
-      If you would like to browse the web server to see what URLs are available,
-      you can use the built-in directory listing by visiting a directory name
-      instead of a file name. For example, if you're running esbuild's web
-      server on port 8000 you can visit [http://<wbr>localhost:<wbr>8000/](http://localhost:8000/)
-      in your browser to view the web server's root directory. From there you
-      can click on links to browse to different files and directories on the
-      web server.
+      如果你想要浏览 web 服务器以查看哪些 URL 是有效的，你可以通过访问文件夹名称而不是文件名称来使用内置文件夹列表。
+      例如，如果你正在 8000 端口运行 esbuild 的 web 服务器，你可以在浏览器中访问
+      [http://<wbr>localhost:<wbr>8000/](http://localhost:8000/) 来查看 web 服务器的根目录。
+      在这里你可以点击链接在 web 服务器中打开不同的文件或链接。
 
-  - h4#serve-arguments: Arguments
+  - h4#serve-arguments: 参数
 
   - p: >
-      Notice that the serve API is a different API call than the [build API](#build-api).
-      This is because starting a long-running web server is different enough to
-      warrant different arguments and return values. The first argument to the
-      serve API call is an options object with serve-specific options:
+      请注意 serve API 是与 [build API](#build-api) 不同的 API 调用。
+      这是因为启动一个长时间运行的 web 服务器是完全不同的，因此需要不同的参数和返回值。
+      serve API 调用的第一个参数是一个带有特定于 serve 的配置项的配置项对象：
 
   - example:
       noCheck: true
@@ -1715,65 +1630,50 @@ body:
     - >
       `port`
       <p>
-      The HTTP port can optionally be configured here. If omitted, it will
-      default to an open port with a preference for port 8000. You can set the
-      port on the command line by using `--serve=8000` instead of just `--serve`.
+      可以选择在这里配置 HTTP 端口。如果省略，它将默认使用一个开放端口，优先级为 8000 端口。
+      你可以在命令行中通过使用 `--serve=8000` 而不仅仅是 `--serve` 来设置端口。
       </p>
 
     - >
       `host`
       <p>
-      By default, esbuild makes the web server available on all IPv4 network
-      interfaces. This corresponds to a host address of `0.0.0.0`. If you would
-      like to configure a different host (for example, to only serve on the
-      `127.0.0.1` loopback interface without exposing anything to the network),
-      you can specify the host using this argument. You can set the host on the
-      command line by using <code>--serve=<wbr>127.0.0.1:<wbr>8000</code>
-      instead of just `--serve`.
+      默认情况下，esbuild 在所有的 IPv4 网络接口中有效。
+      这对应着 `0.0.0.0` 的 host。如果你想要配置一个不同的 host（例如，仅在 `127.0.0.1` 回路中提供服务而不向网络公开任何信息），
+      你可以使用该参数指定 host。你可以在命令行中通过使用 <code>--serve=<wbr>127.0.0.1:<wbr>8000</code>
+      而不仅仅是 `--serve` 来设置 host。
       </p>
       <p>
-      If you need to use IPv6 instead of IPv4, you just need to specify an IPv6
-      host address. The equivalent to the `127.0.0.1` loopback interface in IPv6
-      is `::1` and the equivalent to the `0.0.0.0` universal interface in IPv6 is
-      `::`. If you are setting the host to an IPv6 address on the command line,
-      you need to surround the IPv6 address with square brackets to distinguish
-      the colons in the address from the colon separating the host and port
-      like this: <code>--serve=<wbr>[::]:<wbr>8000</code>.
+      如果你需要使用 IPv6 而不是 IPv4，你仅需要指定一个 IPv6 host 地址。
+      在 IPv6 中与 `127.0.0.1` 回路接口等效的是 `::1`，并且与 `0.0.0.0` 通用接口等效的是 `::`。
+      如果你正在使用命令行将 host 设置为 IPv6 地址，您需要用方括号将 IPv6 地址括起来，以区别地址中
+      的冒号和分隔主机和端口的冒号，就像这样： <code>--serve=<wbr>[::]:<wbr>8000</code>。
       </p>
 
     - >
       `servedir`
       <p>
-      This is a directory of extra content for esbuild's HTTP server to serve
-      instead of a 404 when incoming requests don't match any of the generated
-      output file paths. This lets you use esbuild as a general-purpose local
-      web server. For example, using <code>esbuild <wbr>--servedir=.</code>
-      serves the current directory on `localhost`. Using `servedir` is described
-      in more detail above in the previous section about different approaches.
+      这是 esbuild 的 HTTP 服务器提供的额外内容目录，当传入的请求与生成的任何输出文件路径不匹配时，它将代替 404。
+      这使你可以将 esbuild 用作通用的本地 web 服务器。例如，使用 <code>esbuild <wbr>--servedir=.</code>
+      在 `localhost` 为当前文件夹提供服务。在前面关于不同方法的部分中，对使用 `servedir` 进行了更详细的描述。
       </p>
 
     - >
       `onRequest`
       <p>
-      This is called once for each incoming request with some information about
-      the request. This callback is used by the CLI to print out a log message
-      for each request. The time field is the time to generate the data for the
-      request, but it does not include the time to stream the request to the
-      client.
+      对每个传入的请求调用一次，并提供有关请求的一些信息。
+      CLI 使用该回调为每一个请求打印日志信息。time 字段是为该请求生成数据的时间，
+      但是它不包括向客户端发送请求流的时间。
       </p>
       <p>
-      Note that this is called after the request has completed. It's not possible
-      to use this callback to modify the request in any way. If you want to do
-      this, you should [put a proxy in front of esbuild](#customizing-server-behavior) instead.
+      请注意这会在请求完成后调用。使用该回调以任何形式修改请求是不可能的。
+      如果你想要这样做，你应该 [在 esbuild 之前设置一个代理](#customizing-server-behavior)。
       </p>
 
   - p: >
-      The second argument to the serve API call is the normal set of options
-      for the underlying build API that is called on every request. See the
-      documentation for the [build API](#build-api) for more information about
-      these options.
+      serve API 调用的第二个参数是每个请求都会调用的底层构建 API 的常规配置项集合。
+      查看 [build API](#build-api) 文档获取更多关于这些配置项的信息。
 
-  - h4#serve-return-values: Return values
+  - h4#serve-return-values: 返回值
 
   - example:
       noCheck: true
@@ -1798,49 +1698,41 @@ body:
     - >
       `port`
       <p>
-      This is the port that ended up being used by the web server. You'll want to
-      use this if you don't specify a port since esbuild will end up picking
-      an arbitrary open port, and you need to know which port it picked to be
-      able to connect to it. If you're using the CLI, this port number will be
-      printed to stderr in the terminal.
+      这个是最终被 web 服务器使用的端口。如果你没有指定一个端口的话你将想要使用它，因为 esbuild
+      将最终挑选一个随机开放端口，并且你需要知道它选择了那个段扩才能连接到它。
+      如果你正在使用 CLI，这个端口号将会被打印在终端的 stderr 中。
       </p>
 
     - >
       `host`
       <p>
-      This is the port that ended up being used by the web server. It will be
-      `0.0.0.0` (i.e. serving on all available network interfaces) unless a
-      custom host was configured.
+      这个是最终被 web 服务器使用的 host。它将是
+      `0.0.0.0`（即 服务所有可用的网络接口），除非配置了一个自定义 host。
       </p>
 
     - >
       `wait`
       <p>
-      The serve API call returns immediately as long as the socket was able to
-      be opened. The `wait` return value provides a way to be informed when the
-      web server is terminated, either due to a network error or due to `stop`
-      being called at some point in the future.
+      只要 socket 打开，serve API 调用会立即返回。这个 `wait` 返回值提供了一种方法，可以在 web 服务器
+      由于网络错误或者由于将来某个时间点停止调用而终止是通知它。
       </p>
 
     - >
       `stop`
       <p>
-      Call this callback to stop the web server, which you should do when you no
-      longer need it to clean up resources. This will immediately terminate
-      all open connections and wake up any code waiting on the `wait` return
-      value.
+      当你不需要它清理资源时，你可以调用该回调以停止 web 服务器。
+      这将会立即终止所有打开的链接，并且唤醒所有等待 `wait` 返回值的代码。
       </p>
 
-  - h4: Customizing server behavior
+  - h4: 自定义服务器行为
 
   - p: >
-      It's not possible to hook into esbuild's local server to customize the
-      behavior of the server itself. Instead, behavior should be customized
-      by putting a proxy in front of esbuild.
+      不可能 hook 到 esbuild 的本地服务器来定制服务器本身的行为。
+      相反，应该通过在 esbuild 前设置代理来定制行为。
 
   - p: >
-      Here's a simple example of a proxy server to get you started. It adds a
-      custom 404 page instead of esbuild's default 404 page:
+      下面是一个代理服务器的简单示例。
+      他添加了自定义 404 页面而不使用 esbuild 的默认 404 页面：
 
   - pre.js: |
       const esbuild = require('esbuild');
@@ -1885,39 +1777,33 @@ body:
       });
 
   - p: >
-      This code starts esbuild's server on random local port and then starts a
-      proxy server on port 3000. During development you would load [http://localhost:3000](http://localhost:3000)
-      in your browser, which talks to the proxy. This example demonstrates
-      modifying a response after esbuild has handled the request, but you can
-      also modify or replace the request before esbuild has handled it.
+      该代码在一个随机本地端口启动了 esbuild 服务器，然后在 3000 端口启动了一个代理服务器。
+      在开发环境中你可以在浏览器中加载 [http://localhost:3000](http://localhost:3000)，
+      这将会走向代理。该示例示范了在 esbuild 已经处理请求之后修改相应信息，但你也可以在 esbuild 处理它之前
+      修改或替换请求信息。
 
   - p: >
-      You can do many things with a proxy like this including:
+      你可以使用代理做很多事情，就像下面的举例：
 
   - ul:
-    - Injecting your own 404 page (the example above)
-    - Customizing the mapping of routes to files on the file system
-    - Redirecting some routes to an API server instead of to esbuild
-    - Adding support for HTTPS using your own self-signed certificates
+    - 插入你自己的 404 页面（上面的示例）
+    - 自定义路由与文件系统中文件之间的映射关系
+    - 重定向一些路由到 API 服务器而不是到 esbuild
+    - 使用自签名证书添加 HTTPS 支持
 
   - p: >
-      You can also use a real proxy such as [NGINX](https://nginx.org/en/docs/beginners_guide.html#proxy)
-      if you have more advanced needs.
+      如果你有更高级的需求的话，你也可以使用诸如 [NGINX](https://nginx.org/en/docs/beginners_guide.html#proxy) 一样真正的代理。
 
   - h3: Sourcemap
 
   - p: >
-      Source maps can make it easier to debug your code. They encode the
-      information necessary to translate from a line/column offset in a
-      generated output file back to a line/column offset in the corresponding
-      original input file. This is useful if your generated code is
-      sufficiently different from your original code (e.g. your original code
-      is TypeScript or you enabled [minification](#minify)).
+      Source map 可以使调试代码更容易。它们编码从生成的输出文件中的行/列偏移量转换回对应的
+      原始输入文件中的行/列偏移量所需的信息。如果生成的代码与原始代码有很大的不同，这是很有用的
+      （例如 你的源代码为 Typescript 或者你启用了 [压缩](#minify)）
 
   - p: >
-      Enabling source map generation will generate a `.js.map` file alongside
-      any generated `.js` file and add a special `//# sourceMappingURL=` comment
-      to the bottom of the `.js` file pointing to the `.js.map` file:
+      启用 source map 将会伴随着任何一个生成的 `.js` 文件生成一个 `.js.map` 文件，并且在
+      `.js` 文件底部添加特殊的 `//# sourceMappingURL=` 注释以指向 `.js.map` 文件。
 
   - example:
       in:
@@ -1953,15 +1839,12 @@ body:
         }
 
   - p: >
-      If the input file itself contains a special `//# sourceMappingURL=`
-      comment, esbuild will automatically try to parse the linked source map.
-      If successful, the mappings in the generated source map will map all the
-      way back to the original source code referenced in the input source map.
+      如果输入的文件本身包含特殊 `//# sourceMappingURL=` 注释，esbuild 将会自动尝试解析
+      链接的 source map。如果成功的话，生成的源映射中的映射将一路映射回输入源映射中引用的原始源代码。
 
   - p: >
-      If you want to omit the special `//# sourceMappingURL=` comment from the
-      generated `.js` file but you still want to generate the `.js.map` files,
-      you should set the source map mode to `external`:
+      如果你想在生成的 `.js` 中省略特殊 `//# sourceMappingURL=` 注释，但是你仍想生成 `.js.map` 文件，
+      你应该设置 source map 模式为 `external`：
 
   - example:
       in:
@@ -1997,9 +1880,8 @@ body:
         }
 
   - p: >
-      If you want to insert the entire source map into the `.js` file instead
-      of generating a separate `.js.map` file, you should set the source map
-      mode to `inline`:
+      如果你想插入整个 source map 到 `.js` 文件中而不是单独生成一个 `.js.map` 文件，你应该设置
+      source map 模式为 `inline`：
 
   - example:
       in:
@@ -2035,15 +1917,12 @@ body:
         }
 
   - p: >
-      Keep in mind that source maps are usually very big because they contain
-      all of your original source code, so you usually do not want to ship code
-      containing `inline` source maps. To remove the source code from the source
-      map (keeping only the file names and the line/column mappings), use the
-      [sources content](#sources-content) option.
+      请记住 source map 通常是比较大的，因为他们包含所有的源代码，因此你通常不会想让代码中包含
+      `inline` source maps。为了移除 source map 中的源代码（只保存文件名以及行/列映射关系），
+      请使用 [sources content](#sources-content) 配置项。
 
   - p: >
-      If you want to have the effect of both `inline` and `external`
-      simultaneously, you should set the source map mode to `both`:
+      如果你想同时设置 `inline` 与 `external` 的话，你应该设置 source map 模式为 `both`：
 
   - example:
       in:
@@ -2078,16 +1957,13 @@ body:
           }
         }
 
-  - h4: Using source maps
+  - h4: 使用 source maps
 
   - p: >
-      In the browser, source maps should be automatically picked up by the
-      browser's developer tools as long as the source map setting is enabled.
-      Note that the browser only uses the source maps to alter the display of
-      stack traces when they are logged to the console. The stack traces
-      themselves are not modified so inspecting <code>error.<wbr>stack</code>
-      in your code will still give the unmapped stack trace containing compiled
-      code. Here's how to enable this setting in your browser's developer tools:
+      在浏览器中，source maps 应该会自动被浏览器开发者工具选中，只要其启用了 source map 设置。
+      请注意浏览器仅在堆栈跟踪打印在控制台后才会使用 source maps。堆栈跟踪本身没有修改，所以检查 <code>error.<wbr>stack</code>。
+      你代码中的堆栈仍然会给出包含已编译代码的未映射堆栈跟踪。
+      这里是如何启用浏览器开发者工具中 source map 设置的方式：
 
   - ul:
       - 'Chrome: ⚙ → Enable JavaScript source maps'
@@ -2095,59 +1971,47 @@ body:
       - 'Firefox: ··· → Enable Source Maps'
 
   - p: >
-      In node, source maps are supported natively starting with [version v12.12.0](https://nodejs.org/en/blog/release/v12.12.0/).
-      This feature is disabled by default but can be enabled with a flag. Unlike
-      in the browser, the actual stack traces are also modified in node so
-      inspecting <code>error.<wbr>stack</code> in your code will give the mapped
-      stack trace containing your original source code. Here's how to enable this
-      setting in node (the <code>--enable-<wbr>source-<wbr>maps</code> flag must
-      come before the script file name):
+      在 node 环境中，source map 在 [version v12.12.0](https://nodejs.org/en/blog/release/v12.12.0/) 版本之后原生支持。
+      此特性是默认关闭的，但是可以通过一个标志启用。不向在浏览器中，实际的堆栈跟踪也被修改了，所以检查你代码中的 <code>error.<wbr>stack</code>
+      将会给出包含源代码的堆栈跟踪。这是如何在 node 中启用该设置（<code>--enable-<wbr>source-<wbr>maps</code> 标志
+      必须在文件名之前）：
 
   - pre.sh: |
       node --enable-source-maps app.js
 
-  - h3: Splitting
+  - h3: 代码分割
 
   - warning: >
-      Code splitting is still a work in progress. It currently only works with
-      the `esm` output [format](#format). There is also a known
-      [ordering issue](https://github.com/evanw/esbuild/issues/399) with
-      `import` statements across code splitting chunks. You can follow
-      [the tracking issue](https://github.com/evanw/esbuild/issues/16) for
-      updates about this feature.
+      代码分隔仍然处于开发状态。它现在仅支持 `esm` 输出 [格式](#format)。
+      使用 `import` 语句来分割代码块也有一个已知的
+      [排序问题](https://github.com/evanw/esbuild/issues/399) 。你可以关注
+      [跟踪问题](https://github.com/evanw/esbuild/issues/16) 获取此特性的更新。
 
   - p: >
-      This enables "code splitting" which serves two purposes:
+      启用 "代码分隔" 有两个目的：
 
   - ul:
       - >
         <p>
-        Code shared between multiple entry points is split off into a separate
-        shared file that both entry points import. That way if the user first
-        browses to one page and then to another page, they don't have to
-        download all of the JavaScript for the second page from scratch if the
-        shared part has already been downloaded and cached by their browser.
+        多个入口点之间共享的代码被分割成两个入口点都导入的单独共享文件。
+        这样，如果用户先浏览一个页面，然后再浏览另一个页面，如果共享部分已经被浏览器下载并缓存，
+        他们就不必从头下载第二个页面的所有 JavaScript。
         </p>
 
       - >
         <p>
-        Code referenced through an asynchronous `import()` expression will be
-        split off into a separate file and only loaded when that expression is
-        evaluated. This allows you to improve the initial download time of your
-        app by only downloading the code you need at startup, and then lazily
-        downloading additional code if needed later.
+        通过异步 `import()` 表达式引用的代码将被分割到一个单独的文件中，
+        仅在求值该表达式时才加载。这允许你通过在启动时只下载你需要的代码来改善应用程序的初始下载时间，
+        然后在以后需要时延迟下载额外的代码。
         </p>
         <p>
-        Without code splitting enabled, an `import()` expression becomes
-        <code>Promise<wbr>.resolve()<wbr>.then(() =&gt; <wbr>require())</code>
-        instead. This still preserves the asynchronous semantics of the
-        expression but it means the imported code is included in the same
-        bundle instead of being split off into a separate file.
+        如果不启用代码分割，`import()` 表达式会变成
+        <code>Promise<wbr>.resolve()<wbr>.then(() =&gt; <wbr>require())</code>。
+        这仍然保留了表达式的异步语义，但这意味着导入的代码包含在同一个包中，而不是分离到单独的文件中。
         </p>
 
   - p: >
-      When you enable code splitting you must also configure the output
-      directory using the [outdir](#outdir) setting:
+      当期启用代码分割时，你必须使用 [outdir](#outdir) 配置输出文件夹。
 
   - example:
       in:
