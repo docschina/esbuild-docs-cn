@@ -2054,20 +2054,16 @@ body:
   - h3: Target
 
   - p: >
-      This sets the target environment for the generated JavaScript code. For
-      example, you can configure esbuild to not generate any newer JavaScript
-      that node version 10 can't handle. The target can either be set to a
-      JavaScript language version such as `es2020` or to a list of versions of
-      individual engines (currently either `chrome`, `firefox`, `safari`, `edge`,
-      or `node`). The default target is `esnext` which means that by default,
-      esbuild will assume all of the latest JavaScript features are supported.
+      此配置项设置生成 JavaScript 代码的目标环境。例如，你可以配置 esbuild 不要生成任何
+      v10 版本的 node 不能处理的新的 JavaScript 代码。target 可以设置为类似于 `es2020`
+      的 JavaScript 语言版本，或者一个引擎列表（目前可以是 `chrome`、`firefox`、`safari`、`edge`
+      或者 `node`）。默认的 target 为 `esnext`，这意味着默认情况下，esbuild 将假设所有最新的 JavaScript
+      特性都是受支持的。
 
   - p: >
-      Here is an example that uses all of the available target environment names
-      in esbuild. Note that you don't need to specify all of them; you can just
-      specify the subset of target environments that your project cares about.
-      You can also be more precise about version numbers if you'd like (e.g.
-      `node12.19.0` instead of just `node12`):
+      这里是在 esbuild 中使用所有可用 target 环境名称的例子。请注意你不需要指定所有这些；
+      你可以仅仅指定你的项目关心的目标环境的子集。如果你愿意的话，你也可以更精确地描述版本号
+      （例如 设置为 `node12.19.0` 而不仅仅是 `node12`）：
 
   - example:
       in:
@@ -2116,26 +2112,21 @@ body:
         }
 
   - p: >
-      You can refer to the [JavaScript loader](/content-types/#javascript) for
-      the details about which syntax features were introduced with which language
-      versions. Keep in mind that while JavaScript language versions such as
-      `es2020` are identified by year, that is the year the specification is
-      approved. It has nothing to do with the year all major browsers implement
-      that specification which often happens earlier or later than that year.
+      你可以参考 [JavaScript loader](/content-types/#javascript) 获取更多关于哪个
+      语言版本引入了哪些语法特性。请记住尽管像 `es2020` 的 JavaScript 语言版本是以年定义的，
+      这是该规范被批准的年份。这与所有主流浏览器实现该规范的年份无关，因为实现该规范的时间往往
+      早于或晚于那一年。
 
   - p: >
-      Note that if you use a syntax feature that esbuild doesn't yet have
-      support for transforming to your current language target, esbuild will
-      generate an error where the unsupported syntax is used. This is often the
-      case when targeting the `es5` language version, for example, since esbuild
-      only supports transforming most newer JavaScript syntax features to `es6`.
+      请注意如果你使用了一个语法特性，esbuild 还不支持将其转为目标语言 target，esbuild 将会
+      在不支持的语法位置生成一个错误。例如，当目标是 `es5` 语言版本时，经常会出现这种情况，
+      因为 esbuild 只支持将大多数较新的 JavaScript 语法特性转换为 `es6`。
 
   - h3: Watch
 
   - p: >
-      Enabling watch mode on the build API tells esbuild to listen for changes
-      on the file system and to rebuild whenever a file changes that could
-      invalidate the build. Using it looks like this:
+      在 build API 中启用监听模式，告诉 esbuild 监听文件系统中的变化，并在可能导致构建失效的
+      文件更改时重新构建。像这样使用它：
 
   - example:
       noCheck: true
@@ -2166,10 +2157,8 @@ body:
         result.Stop()
 
   - p: >
-      If you are using the JavaScript or Go API, you can optionally provide a
-      callback that will be called whenever an incremental build has completed.
-      This can be used to do something once the build is complete (e.g. to
-      reload your app in the browser):
+      如果你正在使用 JavaScript 或者 Go API，你可以选择性地提供一个回调函数，该函数将会在
+      增量构建完成后调用。一旦构建完成，就可以使用它来做一些事情（例如 重新加载浏览器中的应用）：
 
   - example:
       noCheck: true
@@ -2210,34 +2199,25 @@ body:
         result.Stop()
 
   - p: >
-      Watch mode in esbuild is implemented using polling instead of OS-specific
-      file system APIs for portability. The polling system is designed to use
-      relatively little CPU vs. a more traditional polling system that scans
-      the whole directory tree at once. The file system is still scanned
-      regularly but each scan only checks a random subset of your files, which
-      means a change to a file will be picked up soon after the change is made
-      but not necessarily instantly.
+      为了实现可移植性，esbuild 中的监视模式使用轮询而不是特定于操作系统的文件系统 api 来实现的。
+      与一次扫描整个目录树的更传统的轮询系统相比，轮询系统被设计为使用相对较少的 CPU。
+      仍然会定期扫描文件系统，但每次扫描只检查文件的随机子集，这意味着在更改之后，文件的更改将很
+      快被发现，但不一定是立即发现。
 
   - p: >
-      With the current heuristics, large projects should be completely scanned
-      around every 2 seconds so in the worst case it could take up to 2 seconds
-      for a change to be noticed. However, after a change has been noticed the
-      change's path goes on a short list of recently changed paths which are
-      checked on every scan, so further changes to recently changed files
-      should be noticed almost instantly.
+      使用当前的启发式方法，大型项目应该每 2 秒完全扫描一次，因此在最坏的情况下，可能需要 2 秒才能注意到变化。
+      然而，在注意到变更后，变更的路径会出现在最近变更的路径的短列表中，每次扫描都会检查这些路径，所以对最近
+      变更的文件的进一步变更应该几乎立即被注意到。
 
   - p: >
-      Note that it is still possible to implement watch mode yourself using
-      esbuild's [incremental build API](#incremental) and a file watcher library
-      of your choice if you don't want to use a polling-based approach.
+      请注意，如果你不想使用基于轮询的方法，你可以使用 esbuild 的 [增量构建 API](#incremental) 跟一个
+      你选择的文件监听器来实现监听模式。
 
   - h3: Write
 
   - p: >
-      The build API call can either write to the file system directly or return
-      the files that would have been written as in-memory buffers. By default
-      the CLI and JavaScript APIs write to the file system and the Go API
-      doesn't. To use the in-memory buffers:
+      build API 可以写入文件系统中，也可以返回本应作为内存缓冲区写入的文件。默认情况下 CLI 与 JavaScript API
+      写入到文件系统，GO API 不是。使用内存缓冲区：
 
   - example:
       in:
@@ -2279,19 +2259,16 @@ body:
           }
         }
 
-  - h2: Advanced options
+  - h2: 高级配置
 
-  - h3: Asset names
+  - h3: 资源名称
 
   - p: >
-      This option controls the file names of the additional output files generated
-      when the [loader](#loader) is set to [`file`](/content-types/#external-file).
-      It configures the output paths using a template with placeholders that will
-      be substituted with values specific to the file when the output path is
-      generated. For example, specifying an asset name template of
-      <code>assets/<wbr>[name]-<wbr>[hash]</code> puts all assets into a
-      subdirectory called `assets` inside of the output directory and includes
-      the content hash of the asset in the file name. Doing that looks like this:
+      当 [loader](#loader) 设置为 [`file`](/content-types/#external-file) 时，该配置项
+      控制额外生成的文件名称。它使用带有占位符的模板来配置输出路径，当生成输出路径时，占位符将被特定
+      于文件的值替换。例如，例如，指定 <code>assets/<wbr>[name]-<wbr>[hash]</code> 的资源名
+      称模板，将所有资源放入输出目录内名为 `assets` 的子目录中，并在文件名中包含资产的内容哈希。
+      像这样使用它：
 
   - example:
       in:
@@ -2333,43 +2310,35 @@ body:
         }
 
   - p: >
-      There are two placeholders that can be used in asset path templates:
+      在资源路径模板中有两个可用占位符：
 
   - ul:
     - >
       `[name]`
       <p>
-      This is the original file name of the asset without the extension. For
-      example, if the asset was originally named `image.png` then `[name]` will
-      be substituted with `image` in the template. It is not necessary to use
-      this placeholder; it only exists to provide human-friendly asset names to
-      make debugging easier.
+      这是不带拓展名的原始资源文件名称。例如，如果一个资源原来名为 `image.png`，然后模板中的
+      `[name]` 就会被 `image` 替换。没有必要使用该占位符；它的存在只是为了提供对人类友好的资源
+      名称，使调试更容易。
       </p>
 
     - >
       `[hash]`
       <p>
-      This is the content hash of the asset, which is useful to avoid name
-      collisions. For example, your code may import <code>components/<wbr>button/<wbr>icon.png</code>
-      and <code>components/<wbr>select/<wbr>icon.png</code> in which case
-      you'll need the hash to distinguish between the two assets that are both
-      named `icon`.
+      这是资源的内容哈希，可以避免命名冲突。例如，你的代码可能会导入 <code>components/<wbr>button/<wbr>icon.png</code>
+      和 <code>components/<wbr>select/<wbr>icon.png</code> ，在这种情况下，
+      你需要使用哈希值来区分这两个都命名为 icon 的资源。
       </p>
 
   - p: >
-      Asset path templates do not need to include a file extension. The original
-      file extension of the asset will be automatically added to the end of the
-      output path after template substitution.
+      资源路径模板不需要包含文件拓展名。资源的原始拓展名将会在模板替换完成后添加到输出路径尾部。
 
   - p: >
-      This option is similar to the [chunk names](#chunk-names) and
-      [entry names](#entry-names) options.
+      该配置项与 [chunk 名称](#chunk-names) 与 [入口名称](#entry-names) 相似。
 
   - h3: Banner
 
   - p: >
-      Use this to insert an arbitrary string at the beginning of generated
-      JavaScript and CSS files. This is commonly used to insert comments:
+      使用它可以在生成的 JavaScript 和 CSS 文件的开头插入任意字符串。这一般被用来插入注释：
 
   - example:
       in:
@@ -2409,33 +2378,24 @@ body:
         }
 
   - p: >
-      This is similar to [footer](#footer) which inserts at the end instead
-      of the beginning.
+      这与 [footer](#footer) 很相似，只不过它是在末尾插入而不是开头。
 
   - p: >
-      Note that if you are inserting non-comment code into a CSS file, be aware
-      that CSS ignores all `@import` rules that come after a non-`@import` rule
-      (other than a `@charset` rule), so using a banner to inject CSS rules may
-      accidentally disable imports of external stylesheets.
+      请注意如果你在 CSS 文件中插入了一段非注释代码，CSS 会忽略 non-`@import` 规则后面的 `@import`
+      规则（`@charset` 规则除外），所以使用 Banner 来注入 CSS 规则可能会意外地禁用外部样式表的导入。
 
   - h3: Charset
 
   - p: >
-      By default esbuild's output is ASCII-only. Any non-ASCII characters are
-      escaped using backslash escape sequences. One reason is because non-ASCII
-      characters are misinterpreted by the browser by default, which causes
-      confusion. You have to explicitly add <code>&lt;meta <wbr>charset=<wbr>"utf-8"&gt;</code> to your
-      HTML or serve it with the correct <code>Content-<wbr>Type</code> header for the browser
-      to not mangle your code. Another reason is that non-ASCII characters can
-      significantly [slow down the browser's parser](https://v8.dev/blog/scanner).
-      However, using escape sequences makes the generated output slightly bigger,
-      and also makes it harder to read.
+      默认情况下 esbuild 的输出是 ASCII-only。任何非 ASCII 字符都使用反斜杠转义序列进行转义。
+      原因是默认情况下，非 ASCII 字符会被浏览器误读，导致混淆。你必须在你的 HTML 文件中明确添加
+      <code>&lt;meta <wbr>charset=<wbr>"utf-8"&gt;</code>，或者为他提供正确的 <code>Content-<wbr>Type</code>
+      头，以便浏览器不会损坏代码。另一个原因是，非 ASCII 字符会显著 [降低浏览器解析器的速度](https://v8.dev/blog/scanner)。
+      然而，使用转义序列会使生成的输出稍微大一些，也会使其更难阅读。
 
   - p: >
-      If you would like for esbuild to print the original characters without
-      using escape sequences and you have ensured that the browser will
-      interpret your code as UTF-8, you can disable character escaping by
-      setting the charset:
+      如果你想让 esbuild 在不使用转义序列的情况下打印原始字符，并且你已经确保浏览器将你的代码解释为 UTF-8，
+      你可以通过设置字符集来禁用字符转义：
 
   - example:
       cli:
@@ -2495,46 +2455,35 @@ body:
         }
 
   - p: >
-      Some caveats:
+      一些警告：
 
   - ul:
     - >
       <p>
-      This does not yet escape non-ASCII characters embedded in regular
-      expressions. This is because esbuild does not currently parse the contents
-      of regular expressions at all. The flag was added despite this limitation
-      because it's still useful for code that doesn't contain cases like this.
+      这还不会转义嵌入在正则表达式中的非 ASCII 字符。这是因为 esbuild 目前根本不解析正则表达式的内容。
+      尽管有这个限制，但还是添加了这个标志，因为它对于不包含这种情况的代码仍然有用。
       </p>
     - >
       <p>
-      This flag does not apply to comments. I believe preserving non-ASCII data
-      in comments should be fine because even if the encoding is wrong, the run
-      time environment should completely ignore the contents of all comments.
-      For example, the [V8 blog post](https://v8.dev/blog/scanner) mentions an
-      optimization that avoids decoding comment contents completely. And all
-      comments other than license-related comments are stripped out by esbuild
-      anyway.
+      此标志不适用于注释。我认为在注释中保留非 ASCII 数据应该没有问题，因为即使编码是错误的，
+      运行时环境也应该完全忽略所有注释的内容。例如，[V8 的博文](https://v8.dev/blog/scanner) 
+      提到了一种优化，可以完全避免对评论内容进行解码。esbuild 会剔除除与许可相关的所有注释。
       </p>
     - >
       <p>
-      This option simultaneously applies to all output file types (JavaScript,
-      CSS, and JSON). So if you configure your web server to send the correct
-      <code>Content-<wbr>Type</code> header and want to use the UTF-8 charset,
-      make sure your web server is configured to treat both `.js` and `.css`
-      files as UTF-8.
+      此选项同时适用于所有输出文件类型（JavaScript、CSS 和 JSON）。因此，如果你配置你的 web 
+      服务器发送正确的 <code>Content-<wbr>Type</code> 头，并希望使用 UTF-8 字符集，
+      请确保你的 web 服务器配置为将 `.js` 和 `.css`文件都作为 UTF-8 处理。
       </p>
 
-  - h3: Chunk names
+  - h3: Chunk 名称
 
   - p: >
-      This option controls the file names of the chunks of shared code that are
-      automatically generated when [code splitting](#splitting) is enabled.
-      It configures the output paths using a template with placeholders that will
-      be substituted with values specific to the chunk when the output path is
-      generated. For example, specifying a chunk name template of
-      <code>chunks/<wbr>[name]-<wbr>[hash]</code> puts all generated chunks into
-      a subdirectory called `chunks` inside of the output directory and includes
-      the content hash of the chunk in the file name. Doing that looks like this:
+      此选项控制在启用 [代码分割](#splitting) 时自动生成的共享代码块的文件名。
+      它使用带有占位符的模板来配置输出路径，当生成输出路径时，占位符将被特定于 chunk 的值替换。
+      例如，指定 <code>chunks/<wbr>[name]-<wbr>[hash]</code> 的 chunk 名称模板，
+      将所有生成的块放入输出目录内的名为 `chunks` 的子目录中，并在文件名中包含 chunk 的内容哈希。
+      像这样使用它：
 
   - example:
       in:
@@ -2575,50 +2524,39 @@ body:
         }
 
   - p: >
-      There are two placeholders that can be used in chunk path templates:
+      在 chunk 路径模板中有两个可用占位符：
 
   - ul:
     - >
       `[name]`
       <p>
-      This will currently always be the text `chunk`, although this placeholder
-      may take on additional values in future releases.
+      目前这将始终是 `chunk`，尽管这个占位符在将来的版本中可能会有额外的值。
       </p>
 
     - >
       `[hash]`
       <p>
-      This is the content hash of the chunk. Including this is necessary to
-      distinguish different chunks from each other in the case where multiple
-      chunks of shared code are generated.
+      这是 chunk 的内容哈希。在生成多个共享代码块的情况下，内容哈希是区分不同 chunk 的必要条件。
       </p>
 
   - p: >
-      Chunk path templates do not need to include a file extension. The
-      configured [out extension](#out-extension) for the appropriate content
-      type will be automatically added to the end of the output path after
-      template substitution.
+      chunk 路径模板不需要包括一个文件拓展名。在模板替换之后，为适当内容类型配置的 
+      [out extension](#out-extension) 将自动添加到输出路径的末尾。
 
   - p: >
-      Note that this option only controls the names for automatically-generated
-      chunks of shared code. It does _not_ control the names for output files
-      related to entry points. The names of these are currently determined from
-      the path of the original entry point file relative to the [outbase](#outbase)
-      directory, and this behavior cannot be changed. An additional API option
-      will be added in the future to let you change the file names of entry
-      point output files.
+      注意，这个配置项只控制自动生成的共享代码块的名称。它 _不_ 控制与入口点相关的输出文件的名称。
+      它们的名称目前是从相对于 [outbase](#outbase) 目录的原始入口点文件的路径确定的，且无法更改此行为。
+      将来会添加一个额外的API选项，允许你更改入口点输出文件的文件名。
 
   - p: >
-      This option is similar to the [asset names](#asset-names) and
-      [entry names](#entry-names) options.
+      该配置项与 [资源名称](#asset-names) 和 [入口名称](#entry-names) 相似。
 
-  - h3: Color
+  - h3: 颜色
 
   - p: >
-      This option enables or disables colors in the error and warning messages
-      that esbuild writes to stderr file descriptor in the terminal. By
-      default, color is automatically enabled if stderr is a TTY session and
-      automatically disabled otherwise. Colored output in esbuild looks like this:
+      该配置项启用或禁用 esbuild 写入终端中的 stderr 文件描述符中的错误和警告消息中的颜色。
+      默认情况下，如果 stderr 是一个 TTY 会话，颜色将自动启用，否则将自动禁用。
+      esbuild 中有颜色的输出就像是这样：
 
   - pre.raw: |
       <b> &gt; example.js: <span class="color-red">error:</span> Could not resolve "logger" (mark it as external to exclude it from the bundle)</b>
@@ -2632,8 +2570,8 @@ body:
       1 warning and 1 error
 
   - p: >
-      Colored output can be force-enabled by setting color to `true`. This is
-      useful if you are piping esbuild's stderr output into a TTY yourself:
+      将 color 设置为 `true` 可以强制启用有颜色的输出。
+      如果你自己把 esbuild 的 stderr 输出管道到 TTY 中，这是很有用的：
 
   - example:
       cli: |
@@ -2664,17 +2602,14 @@ body:
         }
 
   - p: >
-      Colored output can also be set to `false` to disable colors.
+      可以将 color 设置为 `false` 以禁用。
 
   - h3: Conditions
 
   - p: >
-      This feature controls how the `exports` field in `package.json` is
-      interpreted. Custom conditions can be added using the conditions setting.
-      You can specify as many of these as you want and the meaning of these is
-      entirely up to package authors. Node has currently only endorsed the
-      `development` and `production` custom conditions for recommended use.
-      Here is an example of adding the custom conditions `custom1` and `custom2`:
+      此特性控制 `package.json` 中的 `exports` 字段是如何被解析的。通过 conditions 设置可以添加自定义条件。
+      您可以指定任意数量的包，这些包的含义完全取决于包的作者。Node 目前只认可了推荐使用的 `development` 和
+      `production` 定制条件。下面是一个添加自定义条件 `custom1` 和 `custom2` 的示例：
 
   - example:
       in:
@@ -2710,15 +2645,13 @@ body:
           }
         }
 
-  - h4: How conditions work
+  - h4: conditions 是如何工作的
 
   - p: >
-      Conditions allow you to redirect the same import path to different file
-      locations in different situations. The redirect map containing the
-      conditions and paths is stored in the `exports` field in the package's
-      `package.json` file. For example, this would remap `require('pkg/foo')`
-      to `pkg/required.cjs` and `import 'pkg/foo'` to `pkg/imported.mjs`
-      using the `import` and `require` conditions:
+      Conditions 允许你在不同的情况下将相同的导入路径重定向到不同的文件位置。
+      包含条件和路径的重定向映射存储在包的 `package.json` 的 exports 字段中。
+      例如，在使用 `import` 与 `require` 条件下会重新映射 `require('pkg/foo')` 到 `pkg/required.cjs`，
+      `import 'pkg/foo'` 到 `pkg/imported.mjs`：
 
   - pre.json: |
       {
@@ -2733,8 +2666,8 @@ body:
       }
 
   - p: >
-      Conditions are checked in the order that they appear within the JSON file.
-      So the example above behaves sort of like this:
+      Conditions 按照它们在 JSON 文件中出现的顺序进行检查。
+      所以上面的例子有点像这样：
 
   - pre.js: |
       if (importPath === './foo') {
@@ -2744,54 +2677,46 @@ body:
       }
 
   - p: >
-      By default there are five conditions with special behavior that are built
-      in to esbuild, and cannot be disabled:
-
+      默认情况下，esbuild 有五种内置特定行为，并且不能被禁用：
   - ul:
     - >
       `default`
       <p>
-      This condition is always active. It is intended to come last and lets you
-      provide a fallback for when no other condition applies.
+      该条件总处于激活状态。它的目的是放在最后，让你在没有其他条件应用时提供兜底。
       </p>
     - >
       `import`
       <p>
-      This condition is only active when the import path is from an ESM `import`
-      statement or `import()` expression. It can be used to provide ESM-specific
-      code.
+      该条件仅在通过 ESM `import` 声明或者 `import()` 表达式导入路径时生效。
+      可以用来提供特定于 ESM 的代码。
       </p>
     - >
       `require`
       <p>
-      This condition is only active when the import path is from a CommonJS
-      `require()` call. It can be used to provide CommonJS-specific code.
+      该条件仅在通过 CommonJS `require()` 调用导入路径时生效。
+      可以用来提供特定于 CommonJS 的代码。
       </p>
     - >
       `browser`
       <p>
-      This condition is only active when esbuild's [platform](#platform) setting
-      is set to `browser`. It can be used to provide browser-specific code.
+      该条件仅在 esbuild 的 [platform](#platform) 设置为 `browser` 有效。
+      可以用来提供特定于浏览器的代码。
       </p>
     - >
       `node`
       <p>
-      This condition is only active when esbuild's [platform](#platform) setting
-      is set to `node`. It can be used to provide node-specific code.
+      该条件仅在 esbuild 的 [platform](#platform) 设置为 `node` 有效。
+      可以用来提供特定于 node 的代码。
       </p>
 
   - p: >
-      Note that when you use the `require` and `import` conditions, _your
-      package may end up in the bundle multiple times!_ This is a subtle issue
-      that can cause bugs due to duplicate copies of your code's state in
-      addition to bloating the resulting bundle. This is commonly known as the
-      [dual package hazard](https://nodejs.org/docs/latest/api/packages.html#packages_dual_package_hazard).
-      The primary way of avoiding this is to put all of your code in the
-      `require` condition and have the `import` condition just be a light
-      wrapper that calls `require` on your package and re-exports the package
-      using ESM syntax.
+      请注意当你使用 `require` 与 `import` 条件时，_你的包可能会在 bundle 过程中多次终止！_
+      这是一个微妙的问题，它可能会由于代码状态的重复副本而导致 bug，此外还会使结果包膨胀。
+      这通常被称为 [dual package hazard](https://nodejs.org/docs/latest/api/packages.html#packages_dual_package_hazard)。
+      避免这种情况的主要方法是将所有代码都放在 `require` 条件中，而 `import` 条件只是一个轻包装器，
+      它调用包上的 `require` ，并使用 ESM 语法重新导出包。
 
-  - h3: Entry names
+  - h3: 入口名称
 
   - p: >
       This option controls the file names of the output files corresponding to each
