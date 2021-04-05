@@ -187,6 +187,7 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       有些你想使用的 npm 包，可能并非被设计成在浏览器中运行的。
       这时你可以使用 esbuild 的配置项来解决一些问题，并成功打包。
       例如，`react` 库中包含了检查 
@@ -240,6 +241,13 @@ body:
       当发生这种情况时，你可以通过在 `package.json` 中使用 
       [browser 字段](https://github.com/defunctzombie/package-browser-field-spec)
       来将此包替换成对浏览器友好的包，具体如下：
+=======
+      Sometimes a package you want to use may import another package that is
+      only available on node, such as the built-in `path` package. When that
+      happens you can substitute the package for a browser-friendly alternative
+      by using the [browser field](https://github.com/defunctzombie/package-browser-field-spec)
+      in your `package.json` file like this:
+>>>>>>> a09f5c2d2255d257b76c47b970e81946d50e0498
 
   - pre.json: |
       {
@@ -248,7 +256,19 @@ body:
         }
       }
 
+<<<<<<< HEAD
   - h2: 针对 Node 环境的构建 <#bundling-for-node>
+=======
+  - p: >
+      Some npm packages you want to use may not be designed to be run in the
+      browser. Sometimes you can use esbuild's configuration options to
+      work around certain issues and successfully bundle the package anyway.
+      Undefined globals can be replaced with either the [define](/api/#define)
+      feature in simple cases or the [inject](/api/#inject) feature in more
+      complex cases.
+
+  - h2: Bundling for node
+>>>>>>> a09f5c2d2255d257b76c47b970e81946d50e0498
 
   - p: >
       尽管在使用 Node 时，无需构建，但有时在 Node 代码运行前，
