@@ -187,54 +187,6 @@ body:
         }
 
   - p: >
-      有些你想使用的 npm 包，可能并非被设计成在浏览器中运行的。
-      这时你可以使用 esbuild 的配置项来解决一些问题，并成功打包。
-      例如，`react` 库中包含了检查 
-      <code>process<wbr>.env<wbr>.NODE_ENV</code> 值的代码。
-      这会在浏览器中崩溃，因为名为 `process` 的变量只存在于 node 中，
-      而非浏览器中。为了解决此问题，
-      你可以在构建时为此变量 [define](/api/#define) 一个自定义的值：
-
-  - example:
-      in:
-        app.jsx: '<div/>'
-
-      cli: |
-        esbuild app.jsx --bundle --define:process.env.NODE_ENV=\"production\"
-
-      js: |
-        require('esbuild').buildSync({
-          entryPoints: ['app.jsx'],
-          bundle: true,
-          outfile: 'out.js',
-          define: {
-            'process.env.NODE_ENV': '"production"',
-          },
-        })
-
-      go: |
-        package main
-
-        import "github.com/evanw/esbuild/pkg/api"
-        import "os"
-
-        func main() {
-          result := api.Build(api.BuildOptions{
-            EntryPoints: []string{"app.jsx"},
-            Outfile:     "out.js",
-            Bundle:      true,
-            Define: map[string]string{
-              "process.env.NODE_ENV": `"production"`,
-            },
-            Write: true,
-          })
-
-          if len(result.Errors) > 0 {
-            os.Exit(1)
-          }
-        }
-
-  - p: >
       有时，你使用的包可能会引入另一个仅允许在 node 上的可用包，
       例如 node 内置的 `path` 包。
       当发生这种情况时，你可以通过在 `package.json` 中使用 
@@ -247,6 +199,13 @@ body:
           "path": "path-browserify"
         }
       }
+
+  - p: >
+      有些你想使用的 npm 包可能并非是被设计为在浏览器中运行的。
+      有时你可以使用 esbuild 的配置项来解决这些问题，
+      并成功地构建 bundle 包。
+      未定义的 globals 在简单情况下可以用 [define](/api/#define) 功能代替，
+      如遇到更复杂的情况，可以用 [inject](/api/#inject) 功能代替。
 
   - h2: 针对 Node 环境的构建 <#bundling-for-node>
 
