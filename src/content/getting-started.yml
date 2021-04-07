@@ -68,12 +68,12 @@ body:
       <h1 data-reactroot="">Hello, world!</h1>
 
   - p: >
-      注意，esbuild 除了识别 `jsx` 扩展名之外，
-      未进行任何配置就将 JSX 语法转换为 JavaScript。
-      虽然 esbuild 可以进行配置，
+      注意，esbuild 除了 `jsx` 扩展名，
+      无需任何配置就能够将 JSX 语法转换为 JavaScript。
+      尽管 esbuild 可以进行配置，
       但它试图提供合理的默认值，以便在常见的情况下自动完成构建。
       如果你想在 `.js` 文件中使用 JSX 语法，你可以通过设置 `--loader:.js=jsx` 选项，
-      来告诉 esbuild 对 js 文件进行 jsx 的编译。
+      来告诉 esbuild 对 js 文件进行 JSX 的编译。
       更多关于可用配置项的说明，请参阅 [API 文档](/api/)。
 
   - h2: 构建脚本 <#build-scripts>
@@ -91,8 +91,8 @@ body:
       }
 
   - p: >
-      注意，这里直接使用 `esbuild`，没有相对路径
-      之所以会生效，是因为 "scripts" 中执行的内容，
+      注意，这里直接使用 `esbuild`，没用相对路径。
+      这能够生效的原因是 "scripts" 中执行的内容
       会去寻找当前环境下的 `esbuild` 命令并执行。
       （前提是，你已经安装了 [esbuild](#install-esbuild)）
 
@@ -121,10 +121,10 @@ body:
 
   - p: >
       `build` 函数会在子进程中运行 esbuild 的可执行文件，并返回一个 Promise，
-      当构建完成后，该 Promise 将被 resolves。
+      当构建完成后，该 Promise 将被 resolve。
       上述代码并未打印捕获的异常，
-      因为异常中的任何错误信息默认会被打印到控制台（如果你不需要这个功能，
-      可以通过修改 [日志级别](/api/#log-level) 来关闭此功能）。
+      因为异常中的任何错误信息默认会被打印到控制台（你
+      可以通过修改 [日志级别](/api/#log-level) 来按需关闭此功能）。
 
   - p: >
       尽管有个同步的 `buildSync` API，
@@ -187,7 +187,7 @@ body:
         }
 
   - p: >
-      有时，你使用的包可能会引入另一个仅允许在 node 上的可用包，
+      有时，你使用的包可能会引入另一个只能在 node 上运行的包，
       例如 node 内置的 `path` 包。
       当发生这种情况时，你可以通过在 `package.json` 中使用 
       [browser 字段](https://github.com/defunctzombie/package-browser-field-spec)
@@ -201,33 +201,33 @@ body:
       }
 
   - p: >
-      有些你想使用的 npm 包可能并非是被设计为在浏览器中运行的。
+      有些你想使用的 npm 包可能并不是为在浏览器中运行设计的。
       有时你可以使用 esbuild 的配置项来解决这些问题，
-      并成功地构建 bundle 包。
-      未定义的 globals 在简单情况下可以用 [define](/api/#define) 功能代替，
+      并成功打包。
+      未定义的全局变量在简单情况下可以用 [define](/api/#define) 功能代替，
       如遇到更复杂的情况，可以用 [inject](/api/#inject) 功能代替。
 
-  - h2: 针对 Node 环境的构建 <#bundling-for-node>
+  - h2: 针对 Node 环境的打包 <#bundling-for-node>
 
   - p: >
-      尽管在使用 Node 时，无需构建，但有时在 Node 代码运行前，
+      尽管在使用 Node 时，无需打包，但有时在 Node 代码运行前，
       用 esbuild 处理下代码还是有好处的。
-      构建工具可以自动剥离 TypeScript 的类型，
+      通过打包可以自动剥离 TypeScript 的类型，
       将 ECMAScript 模块语法转换为 CommonJS 语法，
       同时将 JavaScript 语法转换为特定版本 Node 的旧语法。
-      并且这也有利于代码发布前对你的包进行构建，
-      以保证其下载体积更小，从而保证加载时文件系统读取它的时间更少。
+      在包发布前打包也是有好处的，
+      它可以让包的下载体积更小，从而保证加载时文件系统读取它的时间更少。
 
   - p: >
-      如果你正在构建需要运行于 Node 环境的代码，
-      你需要通过将 <code>--platform=<wbr>node</code> 传递给 esbuild 以为其配置 [platform](/api/#platform)。
-      这同时会将一些不同的配置，统一改为对 Node 更为友好的默认值。
-      例如，所有 node 的内置包，如 `fs`，都会自动标记为外部（external）包，这样 esbuild 就不会尝试对它们进行构建。
-      此设置也会禁用 `package.json` 中的浏览器字段。
+      如果你要打包运行在 node 环境的代码，
+      你需要配置 [platform](/api/#platform) 设置，将 <code>--platform=<wbr>node</code> 传递给 esbuild。
+      这会将几个配置同时改为对 node 友好的默认值。
+      例如，所有 node 的内置包，如 `fs`，都会自动标记为外部（external）包，这样 esbuild 就不会尝试对它们打包。
+      此设置也会禁用 `package.json` 中的 browser 字段。
 
   - p: >
-      如果你在代码中使用了较新的 JavaScript 语法，而这些语法在你的 Node 版本中并不适用，
-      你将需要配置 Node 的目标版本：
+      如果你在代码中使用了较新的 JavaScript 语法，而这些语法在你的 node 版本中无法运行，
+      你会需要配置 node 的目标版本：
 
   - example:
       in:
@@ -268,8 +268,8 @@ body:
         }
 
   - p: >
-      有时，你所使用的包中包含的代码由于某些原因的关系不能参与构建。
-      常见的情况是对原生包进行扩展的包，比如 `fsevents`。
+      有时由于某些原因，你所使用的包中的代码无法被打包。
+      一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
       此时可以通过将该包设置为外部（external）包来实现：
 
