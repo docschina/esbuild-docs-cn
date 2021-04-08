@@ -1214,7 +1214,7 @@ body:
       </ul>
       <p>
       如果你的代码使用的模式要求某些形式的代码优化是紧凑的，或者如果你正在为你的用例搜索最佳的
-      JavaScript 压缩算法，您应该考虑使用其他工具。实现这些高级代码优化的一些工具示例包括
+      JavaScript 压缩算法，你应该考虑使用其他工具。实现这些高级代码优化的一些工具示例包括
       [Terser](https://github.com/terser/terser#readme) 和
       [Google Closure Compiler](https://github.com/google/closure-compiler#readme)。
       </p>
@@ -1645,7 +1645,7 @@ body:
       <p>
       如果你需要使用 IPv6 而不是 IPv4，你仅需要指定一个 IPv6 host 地址。
       在 IPv6 中与 `127.0.0.1` 回路接口等效的是 `::1`，并且与 `0.0.0.0` 通用接口等效的是 `::`。
-      如果你正在使用命令行将 host 设置为 IPv6 地址，您需要用方括号将 IPv6 地址括起来，以区别地址中
+      如果你正在使用命令行将 host 设置为 IPv6 地址，你需要用方括号将 IPv6 地址括起来，以区别地址中
       的冒号和分隔主机和端口的冒号，就像这样： <code>--serve=<wbr>[::]:<wbr>8000</code>。
       </p>
 
@@ -2608,7 +2608,7 @@ body:
 
   - p: >
       此特性控制 `package.json` 中的 `exports` 字段是如何被解析的。通过 conditions 设置可以添加自定义条件。
-      您可以指定任意数量的包，这些包的含义完全取决于包的作者。Node 目前只认可了推荐使用的 `development` 和
+      你可以指定任意数量的包，这些包的含义完全取决于包的作者。Node 目前只认可了推荐使用的 `development` 和
       `production` 定制条件。下面是一个添加自定义条件 `custom1` 和 `custom2` 的示例：
 
   - example:
@@ -4121,7 +4121,7 @@ body:
       通过这种方式，esbuild 将只打包你实际使用的部分库，这有时可以节省大量的大小。
       注意，esbuild的 tree shaking 实现依赖于使用 ECMAScript 模块 `import`和 `export` 语句。
       它不能与 CommonJS 模块一起工作。npm 上的许多库都包含了这两种格式，esbuild 会在默认情况下选择适合 tree shaking 
-      的格式。您可以使用 [main fields](#main-fields) 配置项自定义 esbuild 选择的格式。
+      的格式。你可以使用 [main fields](#main-fields) 配置项自定义 esbuild 选择的格式。
 
   - h4: Manual tree shaking annotations
 
