@@ -2,19 +2,20 @@ title: API
 body:
   - h1: API
   - p: >
-      API 可以以三种方式使用：在命令行中、在 JavaScript 中以及在 Go 中。
-      在这三种语言中，概念与参数几乎是一模一样的，因此他们可以一起出现在这里，
-      而不是针对每一种语言淡出出一份文档。
+      可以通过如下三种方式调用 API：在命令行中调用，在 JavaScript 中调用，
+      在 Go 中调用。
+      概念和参数在这三种方式中基本相同，因此本文档将三种方式的 API 文档合并显示，
+      不再按照不同的使用方式来拆分文档。
 
   - p: >
-      在 esbuild 中有两个比较主要的 API：[transform](#transform-api)
-      与 [build](#build-api)。理解你应该使用哪一个是非常重要的，
+      在 esbuild 的 API 中有两种主要的 API 调用：[transform](#transform-api)
+      与 [build](#build-api)。理解使用哪一个 API 对你而言十分重要，
       因为他们的工作方式不同。
 
   - p: >
-      如果你是用的是 JavaScript，请务必阅读下面的 [JS-specific details](#js-specific-details) 章节。
-      你也可以找到 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
-      for esbuild helpful 作为参考。如果正在使用 Go 语言，请务必阅读自动生成的
+      如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
+      你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
+      作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。If you are using Go be sure to check
 
   - h2: Transform API
