@@ -16,7 +16,7 @@ body:
       如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
       你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
-       [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。If you are using Go be sure to check
+       [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
 
   - h2: Transform API
 
@@ -4322,7 +4322,7 @@ body:
           }
         }
 
-  - h2: JS-specific details
+  - h2: JS 特殊细节
 
   - p: >
       由于 JavaScript 是单线程的，因此有几种不同的方法来调用 API，这些方法具有不同的性能和方便性。
