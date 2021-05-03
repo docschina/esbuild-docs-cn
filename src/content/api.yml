@@ -79,6 +79,7 @@ body:
     - JSX factory
     - JSX fragment
     - Keep names
+    - Legal comments
     - Loader
     - Log level
     - Log limit
@@ -119,7 +120,7 @@ body:
               outfile: 'out.js',
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
         - $: |
             require('fs').readFileSync('out.js', 'utf8')
         - expect: |
@@ -174,6 +175,7 @@ body:
     - JSX factory
     - JSX fragment
     - Keep names
+    - Legal comments
     - Loader
     - Log level
     - Log limit
@@ -229,7 +231,7 @@ body:
               outfile: 'out.js',
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
 
       go: |
         package main
@@ -577,7 +579,7 @@ body:
               external: ['fsevents'],
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
 
       go: |
         package main
@@ -3658,17 +3660,98 @@ body:
           }
         }
 
+  - h3: Legal comments
+
+  - p: >
+      A "legal comment" is considered to be any statement-level comment that
+      contains `@license` or `@preserve` or that starts with `//!` or `/*!`.
+      These comments are preserved in output files by default since that
+      follows the intent of the original authors of the code. However, this
+      behavior can be configured by using one of the following options:
+
+  - ul:
+    - >
+      <p>`none`<br>Do not preserve any legal comments.</p>
+
+    - >
+      <p>`inline`<br>Preserve all legal comments.</p>
+
+    - >
+      <p>`eof`<br>Move all legal comments to the end of the file.</p>
+
+    - >
+      <p>`linked`<br>Move all legal comments to a `.LEGAL.txt` file and link to them with a comment.</p>
+
+    - >
+      <p>`external`<br>Move all legal comments to a `.LEGAL.txt` file but to not link to them.</p>
+
+  - p: >
+      The default behavior is `eof` when [bundle](#bundle) is enabled and
+      `inline` otherwise. Setting the legal comment mode looks like this:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --legal-comments=eof
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          legalComments: 'eof',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:   []string{"app.js"},
+            LegalComments: api.LegalCommentsEndOfFile,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Note that "statement-level" means the comment must appear in a context
+      where multiple statements are allowed such as in the top-level scope or
+      in a statement block. So comments inside expressions are not considered
+      license comments.
+
   - h3: Log level
 
   - p: >
       The log level can be changed to prevent esbuild from printing warning
-      and/or error messages to the terminal. The four log levels are `info`
-      (show everything), `warning` (show warnings and errors), `error`
-      (just show errors), and `silent` (show nothing).
+      and/or error messages to the terminal. The six log levels are:
+
+  - ul:
+    - >
+      <p>`silent`<br>Do not show any log output.</p>
+    - >
+      <p>`error`<br>Only show errors.</p>
+    - >
+      <p>`warning`<br>Only show warnings and errors.</p>
+    - >
+      <p>`info`<br>Show warnings, errors, and an output file summary. This is
+      the default log level.</p>
+    - >
+      <p>`debug`<br>Log everything from `info` and some additional messages
+      that may help you debug a broken bundle. This log level has a performance
+      impact and some of the messages may be false positives, so this information
+      is not shown by default.</p>
+    - >
+      <p>`verbose`<br>This generates a torrent of log messages and was added to
+      debug issues with file system drivers. It's not intended for general use.</p>
 
   - p: >
-      For example, you can hide all warnings by setting the log level to
-      `error`:
+      The log level can be set like this:
 
   - example:
       cli: |
