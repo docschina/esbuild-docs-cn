@@ -315,11 +315,7 @@ body:
       推荐安装 esbuild 的方式是[使用 npm 安装原生可执行文件](#install-esbuild)。
       但你也可以通过如下几种方式安装 esbuild：
 
-<<<<<<< HEAD
-  - h3: 安装 WASM 版本 <#install-the-wasm-version>
-=======
-  - h3#wasm: Install the WASM version
->>>>>>> 36cf49e7377006be61f734c49b0239b4e74b074f
+  - h3#wasm: 安装 WASM 版本
 
   - p: >
       除了 `esbuild` 的 npm 包，还有一个 `esbuild-wasm` 包，
@@ -330,7 +326,6 @@ body:
       npm install esbuild-wasm
 
   - p: >
-<<<<<<< HEAD
       **为什么不推荐这种方式：**
       WebAssembly 的版本比原生的版本慢很多。
       在很多情况下会慢一个数量级（10 倍）。
@@ -342,20 +337,6 @@ body:
       除非别无选择，请不要使用 WebAssembly 版本，
       比如当你想要在一个不支持的平台使用 esbuild 时。
       WebAssembly 包应该仅使在[浏览器里](/api/#running-in-the-browser)。
-
-  - h3: 从源码构建 <#build-from-source>
-=======
-      **Why this is not recommended:**
-      The WebAssembly version is much, much slower than the native version. In
-      many cases it is an order of magnitude (i.e. 10x) slower. This is for
-      various reasons including a) node re-compiles the WebAssembly code from
-      scratch on every run, b) Go's WebAssembly compilation approach is
-      single-threaded, and c) node has WebAssembly bugs that can delay the
-      exiting of the process by many seconds. The WebAssembly version also
-      excludes some features such as the local file server. You should only
-      use the WebAssembly package like this if there is no other option, such
-      as when you want to use esbuild on an unsupported platform. The WebAssembly
-      package is primarily intended to only be used [in the browser](/api/#running-in-the-browser).
 
   - h3#deno: Use Deno instead of node
 
@@ -391,8 +372,7 @@ body:
       use esbuild with Deno, but you will need a plugin if you would like to
       be able to bundle HTTP URLs.
 
-  - h3: Build from source
->>>>>>> 36cf49e7377006be61f734c49b0239b4e74b074f
+  - h3: 从源码构建 <#build-from-source>
 
   - p: >
       从源码构建 esbuild：
