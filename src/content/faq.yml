@@ -154,7 +154,6 @@ body:
       | webpack 5          |  55.25s |              149x |     9.9 kloc/s |      5.84mb |
 
   - p: >
-<<<<<<< HEAD
       每次报告的数据均为三次中最好的一次。
       我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap</code> 来运行 esbuild
       （单线程时则使用 `GOMAXPROCS=1`）。
@@ -165,26 +164,6 @@ body:
       目前为 547,441 行。
       测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
 
-  - p: >
-      注意事项：
-
-  - ul:
-      - 'Parcel 1：构建出的 bundle 在运行时会抛出 <code>TypeError:
-        <wbr>Cannot <wbr>redefine <wbr>property: <wbr>dynamic</code> 的错误'
-
-=======
-      Each time reported is the best of three runs. I'm running esbuild with
-      <code>--bundle <wbr>--minify <wbr>--sourcemap</code> (the
-      single-threaded version uses `GOMAXPROCS=1`). I used the
-      <code>rollup-<wbr>plugin-<wbr>terser</code> plugin because Rollup
-      itself doesn't support minification. Webpack uses
-      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>.
-      Parcel 2 uses the default options (Parcel 1 isn't included because the
-      generated code crashes on startup). Absolute speed is based on the total
-      line count including comments and blank lines, which is currently 547,441.
-      The tests were done on a 6-core 2019 MacBook Pro with 16gb of RAM.
-
->>>>>>> 7bf7f6eacf716dbeb6be3914efad5d9aa8ec627a
   - figcaption: TypeScript benchmark
   - benchmark:
       '[esbuild](https://github.com/evanw/esbuild)': 0.11
