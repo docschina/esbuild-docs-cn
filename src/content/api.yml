@@ -73,6 +73,7 @@ body:
     - Footer
     - Format
     - Global name
+    - JSX
     - JSX factory
     - JSX fragment
     - Keep names
@@ -166,6 +167,7 @@ body:
     - Global name
     - Incremental
     - Inject
+    - JSX
     - JSX factory
     - JSX fragment
     - Keep names
@@ -537,12 +539,10 @@ body:
         - $: |
             echo 'require("fsevents")' > app.js
         - $: |
-            esbuild app.js --bundle --external:fsevents
+            esbuild app.js --bundle --external:fsevents --platform=node
         - expect: |
-            (() => {
-              // app.js
-              require("fsevents");
-            })();
+            // app.js
+            require("fsevents");
 
       js:
         - $: |
@@ -552,6 +552,7 @@ body:
               entryPoints: ['app.js'],
               outfile: 'out.js',
               bundle: true,
+              platform: 'node',
               external: ['fsevents'],
             })
         - expect: |
@@ -572,6 +573,7 @@ body:
             Outfile:     "out.js",
             Bundle:      true,
             Write:       true,
+            Platform:    api.PlatformNode,
             External:    []string{"fsevents"},
           })
 
@@ -692,8 +694,10 @@ body:
             echo 'module.exports = "test"' | esbuild --format=esm
         - expect: |
             ...
-            var require_stdin = __commonJS((exports, module) => {
-              module.exports = "test";
+            var require_stdin = __commonJS({
+              "<stdin>"(exports, module) {
+                module.exports = "test";
+              }
             });
             export default require_stdin();
 
@@ -2453,9 +2457,18 @@ body:
         }
 
   - p: >
-      在资源路径模板中有两个可用占位符：
+      在资源路径模板中有三个可用占位符：
 
   - ul:
+    - >
+      `[dir]`
+      <p>
+      This is the relative path from the directory containing the asset file to
+      the [outbase](#outbase) directory. Its purpose is to help asset output
+      paths look more aesthetically pleasing by mirroring the input directory
+      structure inside of the output directory.
+      </p>
+
     - >
       `[name]`
       <p>
@@ -2892,7 +2905,7 @@ body:
         func main() {
           result := api.Build(api.BuildOptions{
             EntryPoints: []string{"src/main-app/app.js"},
-            AssetNames:  "[dir]/[name]-[hash]",
+            EntryNames:  "[dir]/[name]-[hash]",
             Outbase:     "src",
             Bundle:      true,
             Outdir:      "out",
@@ -3165,6 +3178,57 @@ body:
             }
           }
         }
+
+  - h3: JSX
+
+  - p: >
+      This option tells esbuild what to do about JSX syntax. You can either have
+      esbuild transform JSX to JS (the default) or preserve the JSX syntax in the
+      output. To preserve JSX syntax:
+
+  - example:
+      cli:
+        - $: |
+            echo '<div/>' | esbuild --jsx=preserve --loader=jsx
+        - expect: |
+            <div />;
+
+      js:
+        - $: |
+            require('esbuild').transformSync('<div/>', {
+              jsx: 'preserve',
+              loader: 'jsx',
+            })
+        - expect: |
+            {
+              code: '<div />;\n',
+              map: '',
+              warnings: []
+            }
+
+      go: |
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+
+        func main() {
+          result := api.Transform("<div/>", api.TransformOptions{
+            JSXMode: api.JSXModePreserve,
+            Loader:  api.LoaderJSX,
+          })
+
+          if len(result.Errors) == 0 {
+            fmt.Printf("%s", result.Code)
+          }
+        }
+
+  - p: >
+      Note that if you preserve JSX syntax, the output files are no longer valid
+      JavaScript code. This feature is intended to be used when you want to
+      transform the JSX syntax in esbuild's output files by another tool after
+      bundling, usually one with a different JSX-to-JS transform than the one
+      esbuild implements.
 
   - h3: JSX factory
 
