@@ -76,6 +76,7 @@ body:
     - JSX factory
     - JSX fragment
     - Keep names
+    - Legal comments
     - Loader
     - Log level
     - Log limit
@@ -116,7 +117,7 @@ body:
               outfile: 'out.js',
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
         - $: |
             require('fs').readFileSync('out.js', 'utf8')
         - expect: |
@@ -158,6 +159,7 @@ body:
     - Conditions
     - Define
     - Entry names
+    - Entry points
     - External
     - Footer
     - Format
@@ -167,6 +169,7 @@ body:
     - JSX factory
     - JSX fragment
     - Keep names
+    - Legal comments
     - Loader
     - Log level
     - Log limit
@@ -194,7 +197,7 @@ body:
     - Tree shaking
     - Tsconfig
     - Watch
-    - Working Directory
+    - Working directory
     - Write
 
   - h2: 一般配置项
@@ -222,7 +225,7 @@ body:
               outfile: 'out.js',
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
 
       go: |
         package main
@@ -386,6 +389,136 @@ body:
       There you can use regular JavaScript syntax to eliminate
       你可以使用常规的 JavaScript 语法来消除跨平台差异。
 
+  - h3: Entry points
+
+  - p: >
+      This is an array of files that each serve as an input to the bundling
+      algorithm. They are called "entry points" because each one is meant to
+      be the initial script that is evaluated which then loads all other aspects
+      of the code that it represents. Instead of loading many libraries in your
+      page with `<script>` tags, you would instead use `import` statements to
+      import them into your entry point (or into another file that is then
+      imported into your entry point).
+
+  - p: >
+      Simple apps only need one entry point but additional entry points can be
+      useful if there are multiple logically-independent groups of code such as
+      a main thread and a worker thread, or an app with separate relatively
+      unrelated areas such as a landing page, an editor page, and a settings page.
+      Separate entry points helps introduce separation of concerns and helps
+      reduce the amount of unnecessary code that the browser needs to download.
+      If applicable, enabling [code splitting](#splitting) can further reduce
+      download sizes when browsing to a second page whose entry point shares
+      some already-downloaded code with a first page that has already been
+      visited.
+
+  - p: >
+      The simple way to specify entry points is to just pass an array of file
+      paths:
+
+  - example:
+      in:
+        home.ts: '1 + 2'
+        settings.ts: '1 + 2'
+
+      cli: |
+        esbuild home.ts settings.ts --bundle --outdir=out
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['home.ts', 'settings.ts'],
+          bundle: true,
+          write: true,
+          outdir: 'out',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"home.ts", "settings.ts"},
+            Bundle:      true,
+            Write:       true,
+            Outdir:      "out",
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      This will generate two output files, `out/home.js` and `out/settings.js`
+      corresponding to the two entry points `home.ts` and `settings.ts`.
+
+  - p: >
+      For further control over how the paths of the output files are derived
+      from the corresponding input entry points, you should look into these
+      options:
+
+  - ul:
+    - '[Entry names](#entry-names)'
+    - '[Out extension](#out-extension)'
+    - '[Outbase](#outbase)'
+    - '[Outdir](#outdir)'
+    - '[Outfile](#outfile)'
+
+  - p: >
+      In addition, you can also specify a fully custom output path for each
+      individual entry point using an alternative entry point syntax:
+
+  - example:
+      in:
+        home.js: '1 + 2'
+        settings.js: '1 + 2'
+
+      cli: |
+        esbuild out1=home.js out2=settings.js --bundle --outdir=out
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: {
+            out1: 'home.js',
+            out2: 'settings.js',
+          },
+          bundle: true,
+          write: true,
+          outdir: 'out',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPointsAdvanced: []api.EntryPoint{{
+              OutputPath: "out1",
+              InputPath:  "home.js",
+            }, {
+              OutputPath: "out2",
+              InputPath:  "settings.js",
+            }},
+            Bundle: true,
+            Write:  true,
+            Outdir: "out",
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      This will generate two output files, `out/out1.js` and `out/out2.js`
+      corresponding to the two entry points `home.ts` and `settings.ts`.
+
   - h3: External
 
   - p: >
@@ -422,7 +555,7 @@ body:
               external: ['fsevents'],
             })
         - expect: |
-            { warnings: [] }
+            { errors: [], warnings: [] }
 
       go: |
         package main
@@ -1384,6 +1517,15 @@ body:
       特定表达式 <code>typeof <wbr>require <wbr>== <wbr>'function' <wbr>&& <wbr>require</code>
       会被替换为 `false`。这段代码会在已经发布到 npm 的一些包中出现。
       </p>
+    - >
+      <p>
+      All <code>process.<wbr>env.<wbr>NODE_ENV</code> expressions are automatically
+      [defined](#define) to `"production"` if all [minification](#minify)
+      options are enabled and `"development"` otherwise. This only happens if
+      `process`, `process.env`, and `process.env.NODE_ENV` are not already
+      defined. This substitution is necessary to avoid React-based code crashing
+      instantly (since `process` is a node API, not a web API).
+      </p>
 
   - p: >
       当 platform 设置为 `node` 时：
@@ -2172,7 +2314,7 @@ body:
           watch: {
             onRebuild(error, result) {
               if (error) console.error('watch build failed:', error)
-              else console.error('watch build succeeded:', result)
+              else console.log('watch build succeeded:', result)
             },
           },
         }).then(result => {
@@ -3212,15 +3354,98 @@ body:
           }
         }
 
+  - h3: Legal comments
+
+  - p: >
+      A "legal comment" is considered to be any statement-level comment that
+      contains `@license` or `@preserve` or that starts with `//!` or `/*!`.
+      These comments are preserved in output files by default since that
+      follows the intent of the original authors of the code. However, this
+      behavior can be configured by using one of the following options:
+
+  - ul:
+    - >
+      <p>`none`<br>Do not preserve any legal comments.</p>
+
+    - >
+      <p>`inline`<br>Preserve all legal comments.</p>
+
+    - >
+      <p>`eof`<br>Move all legal comments to the end of the file.</p>
+
+    - >
+      <p>`linked`<br>Move all legal comments to a `.LEGAL.txt` file and link to them with a comment.</p>
+
+    - >
+      <p>`external`<br>Move all legal comments to a `.LEGAL.txt` file but to not link to them.</p>
+
+  - p: >
+      The default behavior is `eof` when [bundle](#bundle) is enabled and
+      `inline` otherwise. Setting the legal comment mode looks like this:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --legal-comments=eof
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          legalComments: 'eof',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:   []string{"app.js"},
+            LegalComments: api.LegalCommentsEndOfFile,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Note that "statement-level" means the comment must appear in a context
+      where multiple statements are allowed such as in the top-level scope or
+      in a statement block. So comments inside expressions are not considered
+      license comments.
+
   - h3: 日志级别
 
   - p: >
-      可以修改日志级别，以阻止 esbuild 在终端中打印警告/错误信息。四个日志级别分别是： `info`（显示一切）、
-      `warning` (只显示警告与错误)、`error`
-      （只显示错误）与 `silent`（什么也不显示）。
+      可以修改日志级别，以阻止 esbuild 在终端中打印警告/错误信息。
+      六个日志级别分别是：
+
+  - ul:
+    - >
+      <p>`silent`<br>Do not show any log output.</p>
+    - >
+      <p>`error`<br>Only show errors.</p>
+    - >
+      <p>`warning`<br>Only show warnings and errors.</p>
+    - >
+      <p>`info`<br>Show warnings, errors, and an output file summary. This is
+      the default log level.</p>
+    - >
+      <p>`debug`<br>Log everything from `info` and some additional messages
+      that may help you debug a broken bundle. This log level has a performance
+      impact and some of the messages may be false positives, so this information
+      is not shown by default.</p>
+    - >
+      <p>`verbose`<br>This generates a torrent of log messages and was added to
+      debug issues with file system drivers. It's not intended for general use.</p>
 
   - p: >
-      例如，你可以通过设置日志级别为 `error` 以隐藏所有警告：
+      你可以通过如下方式设置日志级别：
 
   - example:
       cli: |
@@ -4280,7 +4505,7 @@ body:
           }
         }
 
-  - h3: Working Directory
+  - h3: Working directory
 
   - p: >
       这个 API 配置允许你指定用于构建的工作目录。它通常默认为用于调用 esbuild 的 API 的进程的 [当前工作目录](https://en.wikipedia.org/wiki/Working_directory)。
