@@ -255,6 +255,25 @@ body:
       bundle 而不是将输入文件连接在一起。为了使用 esbuild 将一系列文件打包在一起，
       在一个入口起点文件中引入所有文件，然后就像打包一个文件那样将它们打包。
 
+  - p: >
+      Also note that bundling only works with statically-defined imports
+      (i.e. when the import path is a string literal). Imports that are
+      defined at run-time (i.e. imports that depend on run-time code
+      evaluation) are not bundled, since bundling is a compile-time
+      operation. If you need to bundle code that does this, you will
+      likely need to use another bundler instead of esbuild. For example:
+
+  - pre.js: |
+      // Static imports (will be bundled by esbuild)
+      import 'pkg';
+      import('pkg');
+      require('pkg');
+
+      // Dynamic imports (will not be bundled by esbuild)
+      import(`pkg/${foo}`);
+      require(`pkg/${foo}`);
+      ['pkg'].map(require);
+
   - h3: Define
 
   - p: >
