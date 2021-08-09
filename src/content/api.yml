@@ -1963,9 +1963,25 @@ body:
   - h3: Sourcemap
 
   - p: >
+<<<<<<< HEAD
       Source map 可以使调试代码更容易。它们编码从生成的输出文件中的行/列偏移量转换回对应的
       原始输入文件中的行/列偏移量所需的信息。如果生成的代码与原始代码有很大的不同，这是很有用的
       （例如 你的源代码为 Typescript 或者你启用了 [压缩](#minify)）
+=======
+      Source maps can make it easier to debug your code. They encode the
+      information necessary to translate from a line/column offset in a
+      generated output file back to a line/column offset in the corresponding
+      original input file. This is useful if your generated code is
+      sufficiently different from your original code (e.g. your original code
+      is TypeScript or you enabled [minification](#minify)). This is also useful
+      if you prefer looking at individual files in your browser's developer
+      tools instead of one big bundled file.
+
+  - p: >
+      Note that source map output is supported for both JavaScript and CSS, and
+      the same options apply to both. Everything below that talks about `.js`
+      files also applies similarly to `.css` files.
+>>>>>>> e934beabb5e59685acf8963d5c4ed84a6b8cffe7
 
   - p: >
       启用 source map 将会伴随着任何一个生成的 `.js` 文件生成一个 `.js.map` 文件，并且在
