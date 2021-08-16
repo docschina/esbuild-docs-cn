@@ -251,9 +251,17 @@ body:
       查看打包实际代码的例子。
 
   - p: >
+<<<<<<< HEAD
       请注意打包与文件连接不同。在启用打包时向 esbuild 传递多个输入文件将创建两个单独的
       bundle 而不是将输入文件连接在一起。为了使用 esbuild 将一系列文件打包在一起，
       在一个入口起点文件中引入所有文件，然后就像打包一个文件那样将它们打包。
+=======
+      Note that bundling is different than file concatenation. Passing
+      esbuild multiple input files with bundling enabled will create multiple
+      separate bundles instead of joining the input files together. To join
+      a set of files together with esbuild, import them all into a single
+      entry point file and bundle just that one file with esbuild.
+>>>>>>> 048c6741805d433321c1a7abb59885345b523d03
 
   - p: >
       Also note that bundling only works with statically-defined imports
@@ -1963,9 +1971,25 @@ body:
   - h3: Sourcemap
 
   - p: >
+<<<<<<< HEAD
       Source map 可以使调试代码更容易。它们编码从生成的输出文件中的行/列偏移量转换回对应的
       原始输入文件中的行/列偏移量所需的信息。如果生成的代码与原始代码有很大的不同，这是很有用的
       （例如 你的源代码为 Typescript 或者你启用了 [压缩](#minify)）
+=======
+      Source maps can make it easier to debug your code. They encode the
+      information necessary to translate from a line/column offset in a
+      generated output file back to a line/column offset in the corresponding
+      original input file. This is useful if your generated code is
+      sufficiently different from your original code (e.g. your original code
+      is TypeScript or you enabled [minification](#minify)). This is also useful
+      if you prefer looking at individual files in your browser's developer
+      tools instead of one big bundled file.
+
+  - p: >
+      Note that source map output is supported for both JavaScript and CSS, and
+      the same options apply to both. Everything below that talks about `.js`
+      files also applies similarly to `.css` files.
+>>>>>>> 048c6741805d433321c1a7abb59885345b523d03
 
   - p: >
       启用 source map 将会伴随着任何一个生成的 `.js` 文件生成一个 `.js.map` 文件，并且在
