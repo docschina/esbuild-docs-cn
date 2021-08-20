@@ -399,18 +399,12 @@ function generateMain(key, main) {
       let dataset = ''
       if (tag !== 'h2' && h2) dataset += ` data-h2="${escapeAttribute(h2)}"`
       if (tag === 'h4' && h3) dataset += ` data-h3="${escapeAttribute(h3)}"`
-<<<<<<< HEAD
       // 过滤掉多余的锚点内容
       let newValue = escapeHTML(value)
       let html = `      <${tag} id="${escapeAttribute(toID(cssID || value))}"${dataset}>
         <a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>
         ${md.renderInline(newValue)}
       </${tag}>`
-=======
-      let html = `<${tag} id="${escapeAttribute(toID(cssID || value))}"${dataset}>` +
-        `<a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>` +
-        `${md.renderInline(value)}</${tag}>`
->>>>>>> 7bf7f6eacf716dbeb6be3914efad5d9aa8ec627a
       let calls = apiCallsForOption[value]
       if (calls) {
         html += `<p><i>Supported by: ${calls.map(call => {
@@ -423,14 +417,10 @@ function generateMain(key, main) {
     if (tag === 'toc') {
       let toc = `<ul>\n`
       for (let { tag: t, value: v } of main.body) {
-<<<<<<< HEAD
         if (t === 'h2') {
           let newValue = escapeHTML(v)
           toc += `        <li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(newValue.trim())}</a></li>\n`
         }
-=======
-        if (t === 'h2') toc += `<li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(v.trim())}</a></li>\n`
->>>>>>> 7bf7f6eacf716dbeb6be3914efad5d9aa8ec627a
       }
       return toc + `</ul>`
     }
