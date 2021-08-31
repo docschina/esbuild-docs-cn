@@ -146,11 +146,15 @@ body:
         }
 
   - p: >
-      如果至少提供一个输入文件或者存在 `--bundle` 标志，那么命令行接口会调用该 API。
-      请注意 esbuild _不会_ 默认打包。你必须传递 `--bundle` 标志启用打包。
-      如果没有提供输入文件，则从标准化输入（stdin）读取单个输入文件。build API 可以使用以下配置项：
+      如果至少提供一个输入文件或者存在 `--bundle` 标志，
+      那么命令行接口会调用该 API。
+      请注意 esbuild _不会_ 默认打包。
+      你必须传递 `--bundle` 标志启用打包。
+      如果没有提供输入文件，则从标准化输入（stdin）读取单个输入文件。
+      build API 可以使用以下配置项：
 
   - available-options:
+    - Allow overwrite
     - Asset names
     - Banner
     - Bundle
@@ -1314,13 +1318,18 @@ body:
 
     - >
       <p>
-      对于所有的 JavaScript 代码，压缩不是 100% 安全的。这对 esbuild 和其他流行的
-      JavaScript 压缩器例如[terser](https://github.com/terser/terser) 是真实存在的。
+      对于所有的 JavaScript 代码，
+      压缩不是 100% 安全的。
+      这对 esbuild 和其他流行的 JavaScript 压缩器，
+      例如 [terser](https://github.com/terser/terser) 是真实存在的。
       特别地，esbuild 并不是为了保存函数上调用 `.toString()` 的值而设计的。
-      原因是如果所有函数中的所有代码都要逐字保存的话，压缩会变得非常困难并且实际上是没有用的。
-      然而，这意味着依赖于 `.toString()` 返回值的 JavaScript 代码在压缩过程中可能会中断。
-      例如，在 [Angular](https://angular.io/) 框架中一些模式在代码压缩时会中断，因为 Angular
-      使用 `.toString()` 来读取函数的参数名称。一个解决方案是不要使用这些模式。
+      原因是如果所有函数中的所有代码都要逐字保存的话，
+      压缩会变得非常困难并且实际上是没有用的。
+      然而，这意味着依赖于 `.toString()` 返回值的 JavaScript 代码
+      在压缩过程中可能会中断。
+      例如，在 [Angular](https://angular.io/) 框架中一些模式在代码压缩时会中断，
+      因为 Angular 使用 `.toString()` 来读取函数的参数名称。
+      一个解决方案是使用 [明确的注释替代](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation)。
       </p>
 
     - >
@@ -1535,12 +1544,6 @@ body:
       <p>
       [conditions](#conditions) 设置自动包含了 `browser` 情况。
       这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于浏览器代码的方式。
-      </p>
-    - >
-      <p>
-      为了避免在通过 Browserify 生成的代码中使用 `require` 产生警告，
-      特定表达式 <code>typeof <wbr>require <wbr>== <wbr>'function' <wbr>&& <wbr>require</code>
-      会被替换为 `false`。这段代码会在已经发布到 npm 的一些包中出现。
       </p>
     - >
       <p>
@@ -2438,6 +2441,48 @@ body:
         }
 
   - h2: 高级配置
+
+  - h3: Allow overwrite
+
+  - p: >
+      Enabling this setting allows output files to overwrite input files. It's
+      not  enabled by default because doing so means overwriting your source
+      code, which can lead to data loss if your code is not checked in. But
+      supporting this makes certain workflows easier by avoiding the need for
+      a temporary directory. So you can enable this when you want to deliberately
+      overwrite your source code:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --outdir=. --allow-overwrite
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          outdir: '.',
+          allowOverwrite: true,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:    []string{"app.js"},
+            Outdir:         ".",
+            AllowOverwrite: true,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
 
   - h3: 资源名称
 
