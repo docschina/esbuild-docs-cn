@@ -268,10 +268,18 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       有时由于某些原因，你所使用的包中的代码无法被打包。
       一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
       此时可以通过将该包设置为外部（external）包来实现：
+=======
+      Sometimes the packages you want to use contain code that can't be
+      bundled for some reason. An example of this is a package with
+      native extensions such as `fsevents`. Or, you may want to exclude
+      a package from the bundle for other reasons. This can be done by
+      marking the package as [external](/api/#external):
+>>>>>>> 12b48b46d453b9dc32556fb327bf8e2315f0f1d7
 
   - example:
       in:
@@ -383,7 +391,11 @@ body:
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
 
     - |
+<<<<<<< HEAD
       下载源码：
+=======
+      Download the source code for esbuild:
+>>>>>>> 12b48b46d453b9dc32556fb327bf8e2315f0f1d7
       <pre>
       git clone --depth 1 --branch vCURRENT_ESBUILD_VERSION https://github.com/evanw/esbuild.git
       cd esbuild
@@ -442,6 +454,7 @@ body:
   - table: |
       | 包名                      | 操作系统   | 架构            |
       |--------------------------|-----------|----------------|
+      | `esbuild-android-arm64`  | `android` | `arm64`        |
       | `esbuild-darwin-64`      | `darwin`  | `x64`          |
       | `esbuild-darwin-arm64`   | `darwin`  | `arm64`        |
       | `esbuild-freebsd-64`     | `freebsd` | `x64`          |
@@ -452,6 +465,7 @@ body:
       | `esbuild-linux-arm64`    | `linux`   | `arm64`        |
       | `esbuild-linux-mips64le` | `linux`   | `mips64el`     |
       | `esbuild-linux-ppc64le`  | `linux`   | `ppc64`        |
+      | `esbuild-openbsd-64`     | `openbsd` | `x64`          |
       | `esbuild-sunos-64`       | `sunos`   | `x64`          |
       | `esbuild-windows-32`     | `win32`   | `ia32`         |
       | `esbuild-windows-64`     | `win32`   | `x64`          |
