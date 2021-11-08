@@ -364,7 +364,6 @@ function generateMain(key, main) {
   let apiCallsForOption = {}
   let benchmarkCount = 0
   let h2 = null
-  let h3 = null
 
   return main.body.map(({ tag, value }) => {
     let cssID = ''
@@ -395,6 +394,7 @@ function generateMain(key, main) {
 
     if (/^h[234]$/.test(tag)) {
       if (tag === 'h2') h2 = toID(value)
+<<<<<<< HEAD
       if (tag === 'h3') h3 = toID(value)
       let dataset = ''
       if (tag !== 'h2' && h2) dataset += ` data-h2="${escapeAttribute(h2)}"`
@@ -405,6 +405,11 @@ function generateMain(key, main) {
         <a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>
         ${md.renderInline(newValue)}
       </${tag}>`
+=======
+      let html = `<${tag} id="${escapeAttribute(toID(cssID || value))}">` +
+        `<a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>` +
+        `${md.renderInline(value)}</${tag}>`
+>>>>>>> b0f9f3684a858f617fb974bc666dc8341ea352f9
       let calls = apiCallsForOption[value]
       if (calls) {
         html += `<p><i>Supported by: ${calls.map(call => {

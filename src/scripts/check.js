@@ -1,3 +1,7 @@
+// You can run an individual test like this:
+//
+//   npm test -- "Test Name"
+//
 const child_process = require('child_process')
 const assert = require('assert')
 const yaml = require('js-yaml')
@@ -36,7 +40,7 @@ async function checkCommon(kind, text, value, callback) {
     if (value.install) {
       for (let name in value.install) {
         let version = value.install[name];
-        await execFileAsync('npm', ['i', `${name}@${version}`], { cwd: testDir, stdio: 'pipe' })
+        await execFileAsync('npm', ['i', '--prefer-offline', `${name}@${version}`], { cwd: testDir, stdio: 'pipe' })
       }
     }
 
@@ -57,7 +61,7 @@ async function checkCommon(kind, text, value, callback) {
 
 async function checkCli(text, value) {
   return await checkCommon('cli', text, value, async ({ testDir }) => {
-    await execAsync(`npm i esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
+    await execAsync(`npm i --prefer-offline esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
 
     if (!Array.isArray(value.cli)) {
       await execAsync(value.cli, {
@@ -69,6 +73,7 @@ async function checkCli(text, value) {
     }
 
     let stdout = ''
+    let stderr = ''
 
     for (let item of value.cli) {
       if (item.$) {
@@ -83,14 +88,18 @@ async function checkCli(text, value) {
           assert.strictEqual(result.stderr, '')
         }
 
-        stdout = result.stdout
+        stdout = result.stdout.replace(/\n\n$/, '\n')
+        stderr = result.stderr.replace(/\n\n$/, '\n')
       }
 
       else if (item.expect) {
         if (item.expect.startsWith('...\n')) {
           let expect = item.expect.slice(4)
-          let text = stdout.slice(Math.max(0, stdout.length - expect.length))
-          assert.strictEqual(text, expect)
+          let stdoutTail = stdout.slice(Math.max(0, stdout.length - expect.length))
+          if (stdoutTail !== expect) {
+            let stderrTail = stderr.slice(Math.max(0, stderr.length - expect.length))
+            if (stderrTail !== expect) assert.strictEqual(stdoutTail + stderrTail, expect)
+          }
         } else {
           assert.strictEqual(stdout, item.expect)
         }
@@ -107,7 +116,7 @@ async function checkCli(text, value) {
 
 async function checkJs(text, value) {
   return await checkCommon('js', text, value, async ({ testDir }) => {
-    await execAsync(`npm i esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
+    await execAsync(`npm i --prefer-offline esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
 
     if (!Array.isArray(value.js)) {
       const mainPath = path.join(testDir, 'main.js')
@@ -226,6 +235,7 @@ async function main() {
       if (tag !== 'example' || value.noCheck) continue;
       let text = `${page.title}` + (h2 ? ` :: ${h2}` + (h3 ? ` :: ${h3}` : '') : '')
       if (times[text]) text += ` :: ${++times[text]}`
+      if (process.argv[2] && !text.includes(process.argv[2])) continue
       times[text] = 1
       if (value.cli) callbacks.push(() => checkCli(text, value))
       if (value.js) callbacks.push(() => checkJs(text, value))
