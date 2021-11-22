@@ -18,6 +18,15 @@ body:
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
 
+  - p: >
+      If you are using the command-line API, it may be helpful to know that the
+      flags come in one of three forms: `--foo`, `--foo=bar`, or `--foo:bar`.
+      The form `--foo` is used for enabling boolean flags such as [`--minify`](#minify),
+      the form `--foo=bar` is used for flags that have a single value and are
+      only specified once such as [`--platform=`](#platform), and the form
+      `--foo:bar` is used for flags that have multiple values and can be
+      re-specified multiple times such as [`--external:`](#external).
+
   - h2: Transform API
 
   - p: >
@@ -264,24 +273,39 @@ body:
       在一个入口起点文件中引入所有文件，
       然后就像打包一个文件那样将它们打包。
 
+  - h4: Non-analyzable imports
+
   - p: >
-      Also note that bundling only works with statically-defined imports
+      Bundling with esbuild only works with statically-defined imports
       (i.e. when the import path is a string literal). Imports that are
       defined at run-time (i.e. imports that depend on run-time code
       evaluation) are not bundled, since bundling is a compile-time
-      operation. If you need to bundle code that does this, you will
-      likely need to use another bundler instead of esbuild. For example:
+      operation. For example:
 
   - pre.js: |
-      // Static imports (will be bundled by esbuild)
+      // Analyzable imports (will be bundled by esbuild)
       import 'pkg';
       import('pkg');
       require('pkg');
 
-      // Dynamic imports (will not be bundled by esbuild)
+      // Non-analyzable imports (will not be bundled by esbuild)
       import(`pkg/${foo}`);
       require(`pkg/${foo}`);
       ['pkg'].map(require);
+
+  - p: >
+      The way to work around this issue is to mark the package containing this
+      problematic code as [external](#external) so that it's not included in
+      the bundle. You will then need to ensure that a copy of the external
+      package is available to your bundled code at run-time.
+
+  - p: >
+      Some bundlers such as [Webpack](https://webpack.js.org/) try to support
+      this by including all potentially-reachable files in the bundle and then
+      emulating a file system at run-time. However, run-time file system
+      emulation is out of scope and will not be implemented in esbuild. If you
+      really need to bundle code that does this, you will likely need to use
+      another bundler instead of esbuild.
 
   - h3: Define
 
@@ -620,16 +644,37 @@ body:
   - h3: Format
 
   - p: >
+<<<<<<< HEAD
       为生成的 JavaScript 文件设置输出格式。有三个可能的值：`iife`、`cjs` 与 `esm`。
+=======
+      This sets the output format for the generated JavaScript files. There are
+      currently three possible values that can be configured: `iife`, `cjs`,
+      and `esm`. When no output format is specified, esbuild picks an output
+      format for you if [bundling](#bundle) is enabled (as described below),
+      or doesn't do any format conversion if [bundling](#bundle) is disabled.
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - h4#format-iife: IIFE
 
   - p: >
+<<<<<<< HEAD
       `iife` 格式代表“立即调用函数表达式（immediately-invoked function expression）”并且在浏览器中运行。
       将你的代码包裹在一个函数表达式中，以确保代码中的所有变量不会与全局作用域中的变量冲突。
       如果你的入口起点有你想要暴露在浏览器全局环境中的导出，你可以使用 [global name](#global-name)
       设置 global `iife` 为默认格式，除非你设置 [platform](#platform) 为 `node`。
       像这样使用它：
+=======
+      The `iife` format stands for "immediately-invoked function expression" and
+      is intended to be run in the browser. Wrapping your code in a function
+      expression ensures that any variables in your code don't accidentally
+      conflict with variables in the global scope. If your entry point has
+      exports that you want to expose as a global in the browser, you can
+      configure that global's name using the [global name](#global-name)
+      setting. The `iife` format will automatically be enabled when no output
+      format is specified, [bundling](#bundle) is enabled, and [platform](#platform)
+      is set to `browser` (which it is by default). Specifying the `iife` format
+      looks like this:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - example:
       cli:
@@ -668,10 +713,20 @@ body:
   - h4#format-commonjs: CommonJS
 
   - p: >
+<<<<<<< HEAD
       `cjs` 格式打包代表"CommonJS" 并且在 node 环境中运行。它假设环境包括 `exports`、
       `require` 与 `module`。在 ECMAScript 模块语法中带有导出的入口点将被转换为一个模块，
       每个导出名称的 “exports” 上都有一个 getter。当你设置 [platform](#platform) 为 `node` 时，
       `cjs` 为默认格式。像这样使用它：
+=======
+      The `cjs` format stands for "CommonJS" and is intended to be run in node.
+      It assumes the environment contains `exports`, `require`, and `module`.
+      Entry points with exports in ECMAScript module syntax will be converted
+      to a module with a getter on `exports` for each export name. The `cjs`
+      format will automatically be enabled when no output format is specified,
+      [bundling](#bundle) is enabled, and [platform](#platform) is set to `node`.
+      Specifying the `cjs` format looks like this:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - example:
       cli:
@@ -712,9 +767,18 @@ body:
   - h4#format-esm: ESM
 
   - p: >
+<<<<<<< HEAD
       `esm` 格式代表 "ECMAScript module"。它假设环境支持 `import` 与 `export` 语法。
       在 CommonJS 模块语法中带有导出的入口点将被转换为 `module.exports` 值的单个 `default` 导出。
       像这样使用它：
+=======
+      The `esm` format stands for "ECMAScript module". It assumes the environment
+      supports `import` and `export` syntax. Entry points with exports in CommonJS
+      module syntax will be converted to a single `default` export of the value
+      of `module.exports`. The `esm` format will automatically be enabled when no
+      output format is specified, [bundling](#bundle) is enabled, and [platform](#platform)
+      is set to `neutral`. Specifying the `esm` format looks like this:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - example:
       cli:
@@ -1523,6 +1587,7 @@ body:
       当 platform 设置为 `browser`（默认值）时：
 
   - ul:
+<<<<<<< HEAD
       - >
         <p>
         默认的输出 [格式](#format) 为 `iife`，将生成的 JavaScript 代码包裹在立即执行函数表达式中，
@@ -1557,11 +1622,54 @@ body:
         defined. This substitution is necessary to avoid React-based code crashing
         instantly (since `process` is a node API, not a web API).
         </p>
+=======
+    - >
+      <p>
+      When [bundling](#bundle) is enabled the default output [format](#format)
+      is set to `iife`, which wraps the generated JavaScript code in an
+      immediately-invoked function expression to prevent variables from leaking
+      into the global scope.
+      </p>
+    - >
+      <p>
+      If a package specifies a map for the
+      [`browser`](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)
+      field in its `package.json` file, esbuild will use that map to replace
+      specific files or modules with their browser-friendly versions. For
+      example, a package might contain a substitution of [`path`](https://nodejs.org/api/path.html)
+      with [`path-browserify`](https://www.npmjs.com/package/path-browserify).
+      </p>
+    - >
+      <p>
+      The [main fields](#main-fields) setting is set to <code>browser,<wbr>module,<wbr>main</code>
+      but with some additional special behavior. If a package supports `module`
+      and `main` but not `browser` then `main` is used instead of `module` if
+      that package is ever imported using `require()`. This behavior improves
+      compatibility with CommonJS modules that export a function by assigning
+      it to `module.exports`.
+      </p>
+    - >
+      <p>
+      The [conditions](#conditions) setting automatically includes the `browser`
+      condition. This changes how the `exports` field in `package.json` files
+      is interpreted to prefer browser-specific code.
+      </p>
+    - >
+      <p>
+      When using the [build API](#build-api), all <code>process.<wbr>env.<wbr>NODE_ENV</code>
+      expressions are automatically [defined](#define) to `"production"` if all
+      [minification](#minify) options are enabled and `"development"` otherwise.
+      This only happens if `process`, `process.env`, and `process.env.NODE_ENV`
+      are not already defined. This substitution is necessary to avoid React-based
+      code crashing instantly (since `process` is a node API, not a web API).
+      </p>
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - p: >
       当 platform 设置为 `node` 时：
 
   - ul:
+<<<<<<< HEAD
       - >
         <p>
         默认输出 [格式](#format) 为 `cjs`，代表 CommonJS（node 使用的模块格式）。
@@ -1588,11 +1696,47 @@ body:
         [conditions](#conditions) 设置自动包含 `node` 情况。
         这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于 node 端代码的方式。
         </p>
+=======
+    - >
+      <p>
+      When [bundling](#bundle) is enabled the default output [format](#format)
+      is set to `cjs`, which stands for  CommonJS (the module format used by node).
+      ES6-style exports using `export` statements will be converted into getters
+      on the CommonJS `exports` object.
+      </p>
+    - >
+      <p>
+      All [built-in node modules](https://nodejs.org/docs/latest/api/) such
+      as `fs` are automatically marked as [external](#external) so they don't
+      cause errors when the bundler tries to bundle them.
+      </p>
+    - >
+      <p>
+      The [main fields](#main-fields) setting is set to <code>main,<wbr>module</code>. This
+      means tree shaking will likely not happen for packages that provide both
+      `module` and `main` since tree shaking works with ECMAScript modules but
+      not with CommonJS modules.
+      </p>
+      <p>
+      Unfortunately some packages incorrectly treat `module` as meaning "browser
+      code" instead of "ECMAScript module code" so this default behavior is
+      required for compatibility. You can manually configure the [main fields](#main-fields)
+      setting to <code>module,<wbr>main</code> if you want to enable tree shaking and know it
+      is safe to do so.
+      </p>
+    - >
+      <p>
+      The [conditions](#conditions) setting automatically includes the `node`
+      condition. This changes how the `exports` field in `package.json` files
+      is interpreted to prefer node-specific code.
+      </p>
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - p: >
       当 platform 设置为 `neutral` 时：
 
   - ul:
+<<<<<<< HEAD
       - >
         <p>
         默认输出 [格式](#format) 为 `esm`，使用 ECMAScript 2015 (即 ES6) 中引入的 `export` 语法。
@@ -1607,6 +1751,26 @@ body:
         <p>
         [conditions](#conditions) 设置不会自动包含任何平台特定值。
         </p>
+=======
+    - >
+      <p>
+      When [bundling](#bundle) is enabled the default output [format](#format)
+      is set to `esm`, which uses the `export` syntax introduced with ECMAScript
+      2015 (i.e. ES6). You can change the output format if this default is not
+      appropriate.
+      </p>
+    - >
+      <p>
+      The [main fields](#main-fields) setting is empty by default. If you want
+      to use npm-style packages, you will likely have to configure this to be
+      something else such as `main` for the standard main field used by node.
+      </p>
+    - >
+      <p>
+      The [conditions](#conditions) setting does not automatically include any
+      platform-specific values.
+      </p>
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - p: >
       可以查看 [为浏览器打包](/getting-started/#bundling-for-the-browser)
@@ -1662,7 +1826,7 @@ body:
           outdir: 'www/js',
           bundle: true,
         }).then(server => {
-          // Call "stop" on the web server when you're done
+          // Call "stop" on the web server to stop serving
           server.stop()
         })
 
@@ -1675,7 +1839,7 @@ body:
           Bundle:      true,
         })
 
-        // Call "stop" on the web server when you're done
+        // Call "stop" on the web server to stop serving
         server.Stop()
 
   - p: >
@@ -1722,7 +1886,7 @@ body:
           bundle: true,
           outfile: 'out.js',
         }).then(server => {
-          // Call "stop" on the web server when you're done
+          // Call "stop" on the web server to stop serving
           server.stop()
         })
 
@@ -1735,7 +1899,7 @@ body:
           Outfile:     "out.js",
         })
 
-        // Call "stop" on the web server when you're done
+        // Call "stop" on the web server to stop serving
         server.Stop()
 
   - p: >
@@ -2372,8 +2536,11 @@ body:
   - example:
       noCheck: true
 
-      cli: |
-        esbuild app.js --outfile=out.js --bundle --watch
+      cli:
+        - $: |
+            esbuild app.js --outfile=out.js --bundle --watch
+        - expect: |
+            [watch] build finished, watching for changes...
 
       js: |
         require('esbuild').build({
@@ -2382,8 +2549,7 @@ body:
           bundle: true,
           watch: true,
         }).then(result => {
-          // Call "stop" on the result when you're done
-          result.stop()
+          console.log('watching...')
         })
 
       go: |
@@ -2393,9 +2559,7 @@ body:
           Bundle:      true,
           Watch:       &api.WatchMode{},
         })
-
-        // Call "stop" on the result when you're done
-        result.Stop()
+        fmt.Printf("watching...\n")
 
   - p: >
       如果你正在使用 JavaScript 或者 Go API，你可以选择性地提供一个回调函数，该函数将会在
@@ -2416,8 +2580,7 @@ body:
             },
           },
         }).then(result => {
-          // Call "stop" on the result when you're done
-          result.stop()
+          console.log('watching...')
         })
 
       go: |
@@ -2435,9 +2598,41 @@ body:
             },
           },
         })
+        fmt.Printf("watching...\n")
 
-        // Call "stop" on the result when you're done
+  - p: >
+      If you want to stop watch mode at some point in the future, you can call
+      "stop" on the result object to terminate the file watcher:
+
+  - example:
+      noCheck: true
+
+      js: |
+        require('esbuild').build({
+          entryPoints: ['app.js'],
+          outfile: 'out.js',
+          bundle: true,
+        }).then(result => {
+          console.log('watching...')
+
+          setTimeout(() => {
+            result.stop()
+            console.log('stopped watching')
+          }, 10 * 1000)
+        })
+
+      go: |
+        result := api.Build(api.BuildOptions{
+          EntryPoints: []string{"app.js"},
+          Outfile:     "out.js",
+          Bundle:      true,
+          Watch:       &api.WatchMode{},
+        })
+        fmt.Printf("watching...\n")
+
+        time.Sleep(10 * time.Second)
         result.Stop()
+        fmt.Printf("stopped watching\n")
 
   - p: >
       为了实现可移植性，esbuild 中的监视模式使用轮询而不是特定于操作系统的文件系统 api 来实现的。
@@ -2572,7 +2767,7 @@ body:
               out.js                                                                    27.4kb  100.0%
                ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js  19.2kb   70.1%
                ├ node_modules/react/cjs/react.production.min.js                          5.9kb   21.5%
-               ├ node_modules/object-assign/index.js                                     965b     3.4%
+               ├ node_modules/object-assign/index.js                                     962b     3.4%
                ├ example.jsx                                                             137b     0.5%
                ├ node_modules/react-dom/server.browser.js                                 50b     0.2%
                └ node_modules/react/index.js                                              50b     0.2%
@@ -2651,7 +2846,7 @@ body:
                ├ node_modules/react/cjs/react.production.min.js ───────────────────────── 5.9kb ── 21.5%
                │  └ node_modules/react/index.js
                │     └ example.jsx
-               ├ node_modules/object-assign/index.js ──────────────────────────────────── 965b ──── 3.4%
+               ├ node_modules/object-assign/index.js ──────────────────────────────────── 962b ──── 3.4%
                │  └ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js
                │     └ node_modules/react-dom/server.browser.js
                │        └ example.jsx
@@ -3817,11 +4012,12 @@ body:
   - h3: Legal comments
 
   - p: >
-      A "legal comment" is considered to be any statement-level comment that
-      contains `@license` or `@preserve` or that starts with `//!` or `/*!`.
-      These comments are preserved in output files by default since that
-      follows the intent of the original authors of the code. However, this
-      behavior can be configured by using one of the following options:
+      A "legal comment" is considered to be any statement-level comment in JS
+      or rule-level  comment in CSS that contains `@license` or `@preserve` or
+      that starts with `//!` or `/*!`. These comments are preserved in output
+      files by default since that follows the intent of the original authors
+      of the code. However, this behavior can be configured by using one of
+      the following options:
 
   - ul:
       - >
@@ -3874,10 +4070,11 @@ body:
         }
 
   - p: >
-      Note that "statement-level" means the comment must appear in a context
-      where multiple statements are allowed such as in the top-level scope or
-      in a statement block. So comments inside expressions are not considered
-      license comments.
+      Note that "statement-level" for JS and "rule-level" for CSS means the
+      comment must appear in a context where multiple statements or rules
+      are allowed such as in the top-level scope or in a statement or rule
+      block. So comments inside expressions or at the declaration level are
+      not considered license comments.
 
   - h3: 日志级别
 
@@ -3886,6 +4083,7 @@ body:
       六个日志级别分别是：
 
   - ul:
+<<<<<<< HEAD
       - >
         <p>`silent`<br>Do not show any log output.</p>
       - >
@@ -3906,6 +4104,30 @@ body:
 
   - p: >
       你可以通过如下方式设置日志级别：
+=======
+    - >
+      <p>`silent`<br>Do not show any log output. This is the default log level
+      when using the JS [`transform` API](#transform-api).</p>
+    - >
+      <p>`error`<br>Only show errors.</p>
+    - >
+      <p>`warning`<br>Only show warnings and errors. This is the default log
+      level when using the JS [`build` API](#build-api).</p>
+    - >
+      <p>`info`<br>Show warnings, errors, and an output file summary. This is
+      the default log level when using the CLI.</p>
+    - >
+      <p>`debug`<br>Log everything from `info` and some additional messages
+      that may help you debug a broken bundle. This log level has a performance
+      impact and some of the messages may be false positives, so this information
+      is not shown by default.</p>
+    - >
+      <p>`verbose`<br>This generates a torrent of log messages and was added to
+      debug issues with file system drivers. It's not intended for general use.</p>
+
+  - p: >
+      The log level can be set like this:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - example:
       cli: |
@@ -5050,6 +5272,7 @@ body:
   - h2: JS 特殊细节
 
   - p: >
+<<<<<<< HEAD
       由于 JavaScript 是单线程的，因此有几种不同的方法来调用 API，这些方法具有不同的性能和方便性。
       重要的是要意识到这些差异，以正确选择的一个适合你的情况。
 
@@ -5058,6 +5281,16 @@ body:
       如果你所需要做的只是运行 esbuild 然后退出，那么它也是最佳性能的。
       但是，它阻塞了主线程，所以如果你在此期间有其他工作要执行，你就不希望使用它。
       这也是唯一不能使用插件的选项（因为插件是异步的）。它是这样的：
+=======
+      The node-based JS API comes in both synchronous and asynchronous flavors,
+      each with different tradeoffs. It's important to be aware of the differences
+      to pick the correct one for your situation:
+
+  - h4: Sync API
+
+  - p: >
+      Synchronous API calls return their results inline:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - pre.js: |
       let esbuild = require('esbuild')
@@ -5065,18 +5298,72 @@ body:
       let result2 = esbuild.buildSync(options)
 
   - p: >
+<<<<<<< HEAD
       然后是异步 API。每个调用返回一个 promise，而不是立即完成。在底层，esbuild 二进制文件作为一个子进程生成，
       在宿主进程中的所有调用之间共享。主机使用自定义二进制协议通过 stdin、stdout 和 stderr 管道与子进程通信。
       如果你只需要运行esbuild一次，但又需要在后台做其他工作，那么这是理想的。
       它还允许你并发地运行许多 esbuild API 调用，然后将这些调用分散到所有可用的核心上，以获得最佳性能。
       使用它看起来像这样：
+=======
+      Pros:
+
+  - ul:
+    - >
+      Avoiding promises can result in cleaner code
+    - >
+      Works in situations that must be synchronous such as within
+      <a href="https://nodejs.org/api/modules.html#requireextensions"><code>require<wbr>.extensions</code></a>
+
+  - p: >
+      Cons:
+
+  - ul:
+    - >
+      You can't use [plugins](/plugins/) with the synchronous API since plugins are asynchronous
+    - >
+      It blocks the current thread so you can't perform other work in the meantime
+    - >
+      Using the synchronous API prevents esbuild from parallelizing esbuild API calls
+
+  - h4: Async API
+
+  - p: >
+      Asynchronous API calls return their results using a promise:
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - pre.js: |
       let esbuild = require('esbuild')
       esbuild.transform(code, options).then(result => { ... })
       esbuild.build(options).then(result => { ... })
 
+<<<<<<< HEAD
   - h3: 在浏览器中运行
+=======
+  - p: >
+      Pros:
+
+  - ul:
+    - >
+      You can use [plugins](/plugins/) with the asynchronous API
+    - >
+      The current thread is not blocked so you can perform other work in the meantime
+    - >
+      You can run many simultaneous esbuild API calls concurrently which are
+      then spread across all available CPUs for maximum performance
+
+  - p: >
+      Cons:
+
+  - ul:
+    - >
+      Using promises can result in messier code, especially in CommonJS where
+      [top-level await](https://v8.dev/features/top-level-await) is not available
+    - >
+      Doesn't work in situations that must be synchronous such as within
+      <a href="https://nodejs.org/api/modules.html#requireextensions"><code>require<wbr>.extensions</code></a>
+
+  - h3: Running in the browser
+>>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
   - p: >
       esbuild API 也可以在 Web Worker 中使用 WebAssembly 运行。为了使用它你需要安装
       `esbuild-wasm` 而不是 `esbuild`：
