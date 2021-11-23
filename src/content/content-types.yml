@@ -64,6 +64,7 @@ body:
       | [Private static fields](https://github.com/tc39/proposal-static-class-features)     | `esnext`                             | `class { static #x }`      |
       | [Ergonomic brand checks](https://github.com/tc39/proposal-private-fields-in-in)     | `esnext`                             | `#x in y`                  |
       | [Import assertions](https://github.com/tc39/proposal-import-assertions)             | `esnext`                             | `import "x" assert {}`     |
+      | [Class static blocks](https://github.com/tc39/proposal-class-static-block)          | `esnext`                             | `class { static {} }`      |
 
   - p: >
       These syntax features are currently always passed through un-transformed:
@@ -119,6 +120,34 @@ body:
       keys themselves, and large map objects can cause performance issues with
       garbage collection. See [this reference](https://github.com/tc39/ecma262/issues/1657#issuecomment-518916579)
       for more information.
+
+  - h4#real-esm-imports: Imports follow ECMAScript module behavior
+  - p: >
+      You might try to modify global state before importing a module which
+      needs that global state and expect it to work. However, JavaScript
+      (and therefore esbuild) effectively "hoists" all `import` statements
+      to the top of the file, so doing this won't work:
+
+  - pre.js: |
+      window.foo = {}
+      import './something-that-needs-foo'
+
+  - p: >
+      There are some broken implementations of ECMAScript modules out there
+      (e.g. the TypeScript compiler) that don't follow the JavaScript
+      specification in this regard. Code compiled with these tools may "work"
+      since the `import` is replaced with an inline call to `require()`, which
+      ignores the hoisting requirement. But such code will not work with real
+      ECMAScript module implementations such as node, a browser, or esbuild,
+      so writing code like this is non-portable and is not recommended.
+
+  - p: >
+      The way to do this correctly is to move the global state modification
+      into its own import. That way it _will_ be run before the other import:
+
+  - pre.js: |
+      import './assign-to-foo-on-window'
+      import './something-that-needs-foo'
 
   - h4#direct-eval: Avoid direct `eval` when bundling
   - p: >
@@ -253,25 +282,28 @@ body:
   - p: 'Loader: `ts` or `tsx`'
 
   - p: >
-      This loader is enabled by default for `.ts` and `.tsx` files, which
-      means esbuild has built-in support for parsing TypeScript syntax and
-      discarding the type annotations. However, esbuild _does not_ do any type
-      checking so you will still need to run `tsc -noEmit` in parallel with
-      esbuild to check types. This is not something esbuild does itself.
+      This loader is enabled by default for `.ts`, `.tsx`, `.mts`, and `.cts`
+      files, which means esbuild has built-in support for parsing TypeScript
+      syntax and discarding the type annotations. However, esbuild _does not_
+      do any type checking so you will still need to run `tsc -noEmit` in
+      parallel with esbuild to check types. This is not something esbuild does
+      itself.
 
   - p: >
       TypeScript type declarations like these are parsed and ignored (a
       non-exhaustive list):
 
   - table: |
-      | Syntax feature         | Example                         |
-      |------------------------|---------------------------------|
-      | Interface declarations | `interface Foo {}`              |
-      | Type declarations      | `type Foo = number`             |
-      | Function declarations  | `function foo(): void;`         |
-      | Ambient declarations   | `declare module 'foo' {}`       |
-      | Type-only imports      | `import type {Type} from 'foo'` |
-      | Type-only exports      | `export type {Type} from 'foo'` |
+      | Syntax feature              | Example                         |
+      |-----------------------------|---------------------------------|
+      | Interface declarations      | `interface Foo {}`              |
+      | Type declarations           | `type Foo = number`             |
+      | Function declarations       | `function foo(): void;`         |
+      | Ambient declarations        | `declare module 'foo' {}`       |
+      | Type-only imports           | `import type {Type} from 'foo'` |
+      | Type-only exports           | `export type {Type} from 'foo'` |
+      | Type-only import specifiers | `import {type Type} from 'foo'` |
+      | Type-only export specifiers | `export {type Type} from 'foo'` |
 
   - p: >
       TypeScript-only syntax extensions are supported, and are always
@@ -368,6 +400,17 @@ body:
       constant at compile time. Since esbuild does not replicate TypeScript's
       type system, `const enum` declarations are compiled as `enum` declarations
       instead.
+      </p>
+    - >
+      <p>
+      The [`declaration`](https://www.typescriptlang.org/tsconfig#declaration)
+      TypeScript configuration option (i.e. generation of `.d.ts` files) is
+      not supported. If you are writing a library in TypeScript and you want to
+      publish the compiled JavaScript code as a package for others to use, you
+      will probably also want to publish type declarations. This is not something
+      that esbuild can do for you because it doesn't retain any type information.
+      You will likely either need to use the TypeScript compiler to generate them
+      or manually write them yourself.
       </p>
 
   - h4#tsconfig-json: Only certain `tsconfig.json` fields are respected
