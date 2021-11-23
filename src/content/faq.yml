@@ -150,7 +150,6 @@ body:
       | webpack 5       |  41.53s |              126x |    13.2 kloc/s |      5.84mb |
 
   - p: >
-<<<<<<< HEAD
       每次报告的数据均为三次中最好的一次。
       我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap</code> 来运行 esbuild
       （单线程时则使用 `GOMAXPROCS=1`）。
@@ -159,18 +158,7 @@ body:
       <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code> 的选项。
       Parcel 则相对简单，使用默认选项即可。数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
       目前为 547,441 行。
-      测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
-=======
-      Each time reported is the best of three runs. I'm running esbuild with
-      <code>--bundle <wbr>--minify <wbr>--sourcemap</code>. I used the
-      <a href="https://github.com/TrySound/rollup-plugin-terser"><code>rollup-<wbr>plugin-<wbr>terser</code></a>
-      plugin because Rollup itself doesn't support minification. Webpack 5 uses
-      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>.
-      Parcel 2 uses the default options. Absolute speed is based on the total
-      line count including comments and blank lines, which is currently 547,441.
-      The tests were done on a 6-core 2019 MacBook Pro with 16gb of RAM and with
-      [macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) disabled.
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
+      测试环境为一台 6 核，16gb 内存，[macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) 禁用的 2019 款 MacBook Pro。
 
   - figcaption: TypeScript benchmark
   - benchmark:
@@ -193,7 +181,6 @@ body:
       | webpack 5 |  18.89s |              189x |     7.0 kloc/s |      1.27mb |
 
   - p: >
-<<<<<<< HEAD
       每次报告的数据均为三次中最好的一次。
       我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap
       <wbr>--platform=<wbr>node</code> 来运行 esbuild（单线程时则使用
@@ -214,22 +201,6 @@ body:
       <code>@rollup/<wbr>plugin-<wbr>typescript</code>，以及
       <code>@rollup/<wbr>plugin-<wbr>sucrase</code>，
       但他们都因为与 TypeScript 编译相关的原因而无法正常工作。
-=======
-      Each time reported is the best of three runs. I'm running esbuild with
-      <code>--bundle <wbr>--minify <wbr>--sourcemap <wbr>--platform=<wbr>node</code>.
-      Webpack 5 uses [`ts-loader`](https://github.com/TypeStrong/ts-loader) with <code>transpileOnly: <wbr>true</code> and
-      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>. Parcel 2 uses
-      <code>"engines": <wbr>"node"</code> in <code>package.json</code>. Absolute
-      speed is based on the total line count including comments and blank lines,
-      which is currently 131,836. The tests were done on a 6-core 2019 MacBook Pro
-      with 16gb of RAM and with [macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) disabled.
-
-  - p: >
-      The results don't include Rollup because I couldn't get it to work. I
-      tried <a href="https://github.com/rollup/plugins/tree/master/packages/typescript"><code>@rollup/<wbr>plugin-<wbr>typescript</code></a>
-      and <a href="https://github.com/rollup/plugins/tree/master/packages/sucrase"><code>@rollup/<wbr>plugin-<wbr>sucrase</code></a>
-      but they both failed with build errors relating to TypeScript miscompilation.
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
 
   - h2: 即将发布的路线图 <#upcoming-roadmap>
 
@@ -306,7 +277,6 @@ body:
     - >
       **被其他项目所使用**
       <p>
-<<<<<<< HEAD
       esbuild 的 API 已被其他开发者工具使用。例如，[Vite](https://github.com/vitejs/vite)
       和 [Snowpack](https://github.com/pikapkg/snowpack) 使用了
       esbuild 的 [transform API](/api/#transform-api)，用于将
@@ -316,15 +286,6 @@ body:
       一旦 esbuild 有足够的功能，
       我也会将 esbuild 投入生产中使用，
       但目前来说，还未这样做。
-=======
-      The API is already being used as a library within many other
-      developer tools. For example, [Vite](https://vitejs.dev/)
-      and [Snowpack](https://www.snowpack.dev/) are using
-      esbuild to transform TypeScript into JavaScript and
-      [Amazon CDK](https://aws.amazon.com/cdk/) (Cloud Development Kit)
-      and [Phoenix](https://www.phoenixframework.org/) are using
-      esbuild to bundle code.
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
       </p>
 
     - >

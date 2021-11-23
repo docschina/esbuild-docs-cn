@@ -394,7 +394,6 @@ function generateMain(key, main) {
 
     if (/^h[234]$/.test(tag)) {
       if (tag === 'h2') h2 = toID(value)
-<<<<<<< HEAD
       if (tag === 'h3') h3 = toID(value)
       let dataset = ''
       if (tag !== 'h2' && h2) dataset += ` data-h2="${escapeAttribute(h2)}"`
@@ -405,11 +404,6 @@ function generateMain(key, main) {
         <a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>
         ${md.renderInline(newValue)}
       </${tag}>`
-=======
-      let html = `<${tag} id="${escapeAttribute(toID(cssID || value))}">` +
-        `<a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>` +
-        `${md.renderInline(value)}</${tag}>`
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
       let calls = apiCallsForOption[value]
       if (calls) {
         html += `<p><i>Supported by: ${calls.map(call => {

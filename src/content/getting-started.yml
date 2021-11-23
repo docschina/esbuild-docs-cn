@@ -268,18 +268,10 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
       有时由于某些原因，你所使用的包中的代码无法被打包。
       一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
-      此时可以通过将该包设置为外部（external）包来实现：
-=======
-      Sometimes the packages you want to use contain code that can't be
-      bundled for some reason. An example of this is a package with
-      native extensions such as `fsevents`. Or, you may want to exclude
-      a package from the bundle for other reasons. This can be done by
-      marking the package as [external](/api/#external):
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
+      此时可以通过将该包设置为外部 [external](/api/#external) 包来实现：
 
   - example:
       in:
@@ -391,11 +383,7 @@ body:
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
 
     - |
-<<<<<<< HEAD
       下载源码：
-=======
-      Download the source code for esbuild:
->>>>>>> 15cbe232fce629d6e9058bae02f5a58e1e333b6a
       <pre>
       git clone --depth 1 --branch vCURRENT_ESBUILD_VERSION https://github.com/evanw/esbuild.git
       cd esbuild
