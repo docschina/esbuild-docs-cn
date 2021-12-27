@@ -13,10 +13,18 @@ body:
       因为他们的工作方式不同。
 
   - p: >
+<<<<<<< HEAD
       如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
       你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
+=======
+      If you are using JavaScript be sure to check out the
+      [JS-specific details](#js-specific-details) section below. You may also
+      find the [TypeScript type definitions](https://github.com/evanw/esbuild/blob/master/lib/shared/types.ts)
+      for esbuild helpful as a reference. If you are using Go be sure to check
+      out the automatically generated [Go documentation](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api).
+>>>>>>> 3cc69ce2ffca52bd1a45e3a4daa8f80ad2352afa
 
   - p: >
       If you are using the command-line API, it may be helpful to know that the
@@ -703,10 +711,12 @@ body:
             echo 'export default "test"' | esbuild --format=cjs
         - expect: |
             ...
-            __export(exports, {
+            var stdin_exports = {};
+            __export(stdin_exports, {
               default: () => stdin_default
             });
             var stdin_default = "test";
+            module.exports = __toCommonJS(stdin_exports);
 
       js: |
         let js = 'export default "test"'
@@ -2472,6 +2482,7 @@ body:
           entryPoints: ['app.js'],
           outfile: 'out.js',
           bundle: true,
+          watch: true,
         }).then(result => {
           console.log('watching...')
 
@@ -3082,13 +3093,23 @@ body:
       esbuild 中有颜色的输出就像是这样：
 
   - pre.raw: |
-      <b> &gt; example.js: <span class="color-red">error:</span> Could not resolve "logger" (mark it as external to exclude it from the bundle)</b>
-      <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+      <span class="color-yellow">▲ <span class="bg-yellow">[<span class="color-black">WARNING</span>]</span></span> <b>The "typeof" operator will never evaluate to "null"</b>
 
-      <b> &gt; example.js: <span class="color-purple">warning:</span> The "typeof" operator will never evaluate to "null"</b>
-      <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+          example.js:2:16:
+        <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+
+        The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to
+        use "x === null" to test for null.
+
+      <span class="color-red">✘ <span class="bg-red">[<span class="color-white">ERROR</span>]</span></span> <b>Could not resolve "logger"</b>
+
+          example.js:1:16:
+        <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+
+        You can mark the path "logger" as external to exclude it from the bundle, which will remove this
+        error.
 
       1 warning and 1 error
 
