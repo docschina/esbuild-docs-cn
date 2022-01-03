@@ -13,10 +13,18 @@ body:
       因为他们的工作方式不同。
 
   - p: >
+<<<<<<< HEAD
       如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
       你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
+=======
+      If you are using JavaScript be sure to check out the
+      [JS-specific details](#js-specific-details) section below. You may also
+      find the [TypeScript type definitions](https://github.com/evanw/esbuild/blob/master/lib/shared/types.ts)
+      for esbuild helpful as a reference. If you are using Go be sure to check
+      out the automatically generated [Go documentation](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api).
+>>>>>>> 6ee2bde9aa8dcaba2175624c2604002fac7565f4
 
   - p: >
       If you are using the command-line API, it may be helpful to know that the
@@ -75,6 +83,7 @@ body:
       transform API 可以使用以下配置项：
 
   - available-options:
+<<<<<<< HEAD
       - Banner
       - Charset
       - Color
@@ -100,6 +109,34 @@ body:
       - Target
       - Tree shaking
       - Tsconfig raw
+=======
+    - Banner
+    - Charset
+    - Color
+    - Define
+    - Drop
+    - Footer
+    - Format
+    - Global name
+    - Ignore annotations
+    - JSX
+    - JSX factory
+    - JSX fragment
+    - Keep names
+    - Legal comments
+    - Loader
+    - Log level
+    - Log limit
+    - Minify
+    - Pure
+    - Source Root
+    - Sourcefile
+    - Sourcemap
+    - Sources Content
+    - Target
+    - Tree shaking
+    - Tsconfig raw
+>>>>>>> 6ee2bde9aa8dcaba2175624c2604002fac7565f4
 
   - h2: Build API
 
@@ -164,6 +201,7 @@ body:
       build API 可以使用以下配置项：
 
   - available-options:
+<<<<<<< HEAD
       - Allow overwrite
       - Analyze
       - Asset names
@@ -217,6 +255,62 @@ body:
       - Watch
       - Working directory
       - Write
+=======
+    - Allow overwrite
+    - Analyze
+    - Asset names
+    - Banner
+    - Bundle
+    - Charset
+    - Chunk names
+    - Color
+    - Conditions
+    - Define
+    - Drop
+    - Entry names
+    - Entry points
+    - External
+    - Footer
+    - Format
+    - Global name
+    - Ignore annotations
+    - Incremental
+    - Inject
+    - JSX
+    - JSX factory
+    - JSX fragment
+    - Keep names
+    - Legal comments
+    - Loader
+    - Log level
+    - Log limit
+    - Main fields
+    - Metafile
+    - Minify
+    - Node paths
+    - Out extension
+    - Outbase
+    - Outdir
+    - Outfile
+    - Platform
+    - Preserve symlinks
+    - Public path
+    - Pure
+    - Resolve extensions
+    - Serve
+    - Source Root
+    - Sourcefile
+    - Sourcemap
+    - Sources Content
+    - Splitting
+    - Stdin
+    - Target
+    - Tree shaking
+    - Tsconfig
+    - Watch
+    - Working directory
+    - Write
+>>>>>>> 6ee2bde9aa8dcaba2175624c2604002fac7565f4
 
   - h2: 一般配置项
 
@@ -703,10 +797,12 @@ body:
             echo 'export default "test"' | esbuild --format=cjs
         - expect: |
             ...
-            __export(exports, {
+            var stdin_exports = {};
+            __export(stdin_exports, {
               default: () => stdin_default
             });
             var stdin_default = "test";
+            module.exports = __toCommonJS(stdin_exports);
 
       js: |
         let js = 'export default "test"'
@@ -2472,6 +2568,7 @@ body:
           entryPoints: ['app.js'],
           outfile: 'out.js',
           bundle: true,
+          watch: true,
         }).then(result => {
           console.log('watching...')
 
@@ -3082,13 +3179,23 @@ body:
       esbuild 中有颜色的输出就像是这样：
 
   - pre.raw: |
-      <b> &gt; example.js: <span class="color-red">error:</span> Could not resolve "logger" (mark it as external to exclude it from the bundle)</b>
-      <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+      <span class="color-yellow">▲ <span class="bg-yellow">[<span class="color-black">WARNING</span>]</span></span> <b>The "typeof" operator will never evaluate to "null"</b>
 
-      <b> &gt; example.js: <span class="color-purple">warning:</span> The "typeof" operator will never evaluate to "null"</b>
-      <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+          example.js:2:16:
+        <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+
+        The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to
+        use "x === null" to test for null.
+
+      <span class="color-red">✘ <span class="bg-red">[<span class="color-white">ERROR</span>]</span></span> <b>Could not resolve "logger"</b>
+
+          example.js:1:16:
+        <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+
+        You can mark the path "logger" as external to exclude it from the bundle, which will remove this
+        error.
 
       1 warning and 1 error
 
@@ -3239,7 +3346,126 @@ body:
       避免这种情况的主要方法是将所有代码都放在 `require` 条件中，而 `import` 条件只是一个轻包装器，
       它调用包上的 `require` ，并使用 ESM 语法重新导出包。
 
+<<<<<<< HEAD
   - h3: 入口名称
+=======
+  - h3: Drop
+
+  - p: >
+      This tells esbuild to edit your source code before building to drop
+      certain constructs. There are currently two possible things that can be
+      dropped:
+
+  - ul:
+    - >
+      `debugger`
+      <p>
+      Passing this flag causes all [`debugger` statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger)
+      to be removed from the output. This is similar to the `drop_debugger: true`
+      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
+      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
+      </p>
+      <p>
+      JavaScript's `debugger` statements cause the active debugger to treat the
+      statement as an automatically-configured breakpoint. Code containing this
+      statement will automatically be paused when the debugger is open. If no
+      debugger is open, the statement does nothing. Dropping these statements
+      from your code just prevents the debugger from automatically stopping
+      when your code runs.
+      </p>
+      <p>
+      You can drop `debugger` statements like this:
+      </p>
+
+  - example:
+      in:
+        app.js: 'debugger'
+
+      cli: |
+        esbuild app.js --drop:debugger
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          drop: ['debugger'],
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Drop:        api.DropDebugger,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - ul:
+    - >
+      `console`
+      <p>
+      Passing this flag causes all [`console` API calls](https://developer.mozilla.org/en-US/docs/Web/API/console#methods)
+      to be removed from the output. This is similar to the `drop_console: true`
+      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
+      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
+      </p>
+      <p>
+      WARNING: Using this flag can introduce bugs into your code! This flag
+      removes the entire call expression including all call arguments. If any
+      of those arguments had important side effects, using this flag will
+      change the behavior of your code. Be very careful when using this flag.
+      </p>
+      <p>
+      If you want to remove console API calls without removing the arguments
+      with side effects (so you do not introduce bugs), you should mark the
+      relevant API calls as [pure](#pure) instead. For example, you can mark
+      `console.log` as pure using <code>--pure:<wbr>console.log</code>. This
+      will cause these API calls to be removed safely when minification is
+      enabled.
+      </p>
+      <p>
+      You can drop `console` API calls like this:
+      </p>
+
+  - example:
+      in:
+        app.js: 'console.log()'
+
+      cli: |
+        esbuild app.js --drop:console
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          drop: ['console'],
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Drop:        api.DropConsole,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - h3: Entry names
+>>>>>>> 6ee2bde9aa8dcaba2175624c2604002fac7565f4
 
   - p: >
       该配置项控制与每一个入口文件相对应的输出文件的名称。它使用带有占位符的模板来配置输出路径，
