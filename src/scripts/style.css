@@ -71,6 +71,19 @@ a {
   color: inherit;
 }
 
+footer {
+  font-size: 80%;
+  line-height: 140%;
+  font-style: italic;
+}
+
+sup {
+  vertical-align: top;
+  font-size: 70%;
+  line-height: 100%;
+  font-style: normal;
+}
+
 code {
   font: 16px/140% 'Noto Sans Mono', monospace;
   background: rgba(159, 159, 159, 0.15);
@@ -78,6 +91,31 @@ code {
   margin: -1px 0;
   border-radius: 5px;
   white-space: nowrap;
+}
+
+.dl {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+/* Use :after so the mask doesn't affect the focus ring, which should still appear */
+.dl:after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* Firefox doesn't support <wbr> so enable wrapping in <code> elements in Firefox */
+@-moz-document url-prefix() {
+  code {
+    white-space: pre-wrap;
+  }
 }
 
 /* ---------- Benchmark ---------- */
@@ -203,22 +241,25 @@ h1 {
 h2 {
   font-size: 160%;
   border-bottom: 2px solid #FFCF00;
+  padding-top: 63px;
+  line-height: 40px;
 }
 
 h3 {
   font-size: 140%;
+  padding-top: 67px;
+  line-height: 32px;
 }
 
 h4 {
   font-size: 100%;
-  margin-top: 60px;
+  padding-top: 70px;
+  line-height: 26px;
 }
 
 h2, h3, h4 {
   position: relative;
   margin: -10px 0 20px 0;
-  padding-top: 63px;
-  line-height: 40px;
 }
 
 h2 .permalink,
@@ -320,16 +361,32 @@ body[data-os2=unix] pre.unix2, body[data-os2=windows] pre.windows2 {
   display: none;
 }
 
+.bg-red {
+  background: #e24834;
+}
+
 .color-red {
   color: #e24834;
+}
+
+.bg-yellow {
+  background: #F2D42D;
+}
+
+.color-yellow {
+  color: #F2D42D;
 }
 
 .color-green {
   color: #58A549;
 }
 
-.color-purple {
-  color: #8E69C9;
+.color-black {
+  color: #000;
+}
+
+.color-white {
+  color: #fff;
 }
 
 .color-dim {
@@ -652,11 +709,28 @@ tr:hover {
   color: var(--warn);
 }
 
+.dl:after {
+  background: var(--fg);
+}
+
+.dl:hover:after {
+  background: var(--fg-on);
+}
+
 /* ---------- Multi-line SVGs last ---------- */
 
 .js2 .repl-in:before,
 .js3 .repl-in:before {
   background-image: url('data:image/svg+xml,<svg width="16" height="20" xmlns="http://www.w3.org/2000/svg">\
 <path d="M2 5.5L6 9.5 2 13.5" stroke-width="1.5" fill="none" stroke="%237f7f7f"/>\
+</svg>');
+}
+
+.dl:after {
+  mask-image: url('data:image/svg+xml,<svg width="22" height="22" xmlns="http://www.w3.org/2000/svg">\
+<path d="M11 2V15M4 8L11.7071 15.7071M18 8L10.2929 15.7071M2 19H20" stroke="black" stroke-width="2"/>\
+</svg>');
+  -webkit-mask-image: url('data:image/svg+xml,<svg width="22" height="22" xmlns="http://www.w3.org/2000/svg">\
+<path d="M11 2V15M4 8L11.7071 15.7071M18 8L10.2929 15.7071M2 19H20" stroke="black" stroke-width="2"/>\
 </svg>');
 }
