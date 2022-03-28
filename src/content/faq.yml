@@ -16,7 +16,11 @@ body:
   - ul:
     - >
       <p>
+<<<<<<< HEAD
       它由 [Go](https://golang.org/) 编写，并被编译成原生代码。
+=======
+      It's written in [Go](https://go.dev/) and compiles to native code.
+>>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
       </p>
       <p>
       大多数构建工具都是用 JavaScript 编写的，
