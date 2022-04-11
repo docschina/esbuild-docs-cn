@@ -5,8 +5,15 @@ body:
   - h2: 安装 esbuild <#install-esbuild>
 
   - p: >
+<<<<<<< HEAD
       首先，下载并本地安装 esbuild，
       可以通过 npm 安装预编译的原生可执行文件：
+=======
+      First, download and install the esbuild command locally. A prebuilt
+      native executable can be installed using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
+      (which is automatically installed when you install the [node](https://nodejs.org/)
+      JavaScript runtime):
+>>>>>>> 8c6a3a16c03ce351fa669d7c5364715a49a0610a
 
   - pre: |
       npm install esbuild
@@ -268,24 +275,32 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       有时由于某些原因，你所使用的包中的代码无法被打包。
       一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
       此时可以通过将该包设置为外部 [external](/api/#external) 包来实现：
+=======
+      You also may not want to bundle your dependencies with esbuild. There
+      are many node-specific features that esbuild doesn't support while
+      bundling such as `__dirname`, `import.meta.url`, `fs.readFileSync`,
+      and `*.node` native binary modules. You can exclude all of your
+      dependencies from the bundle by marking them as [external](/api/#external):
+>>>>>>> 8c6a3a16c03ce351fa669d7c5364715a49a0610a
 
   - example:
       in:
         app.jsx: '<div/>'
 
       cli: |
-        esbuild app.jsx --bundle --platform=node --external:fsevents
+        esbuild app.jsx --bundle --platform=node --external:./node_modules/*
 
       js: |
         require('esbuild').buildSync({
           entryPoints: ['app.jsx'],
           bundle: true,
           platform: 'node',
-          external: ['fsevents'],
+          external: ['./node_modules/*'],
           outfile: 'out.js',
         })
 
@@ -300,7 +315,7 @@ body:
             EntryPoints: []string{"app.jsx"},
             Bundle:      true,
             Platform:    api.PlatformNode,
-            External:    []string{"fsevents"},
+            External:    []string{"./node_modules/*"},
             Write:       true,
           })
 
@@ -309,7 +324,61 @@ body:
           }
         }
 
+<<<<<<< HEAD
   - h2: 其他安装方式 <#other-ways-to-install>
+=======
+  - p: >
+      If you do this, your dependencies must still be present on the file
+      system at run-time since they are no longer included in the bundle.
+
+  - h2: Simultaneous platforms
+
+  - p: >
+      You cannot install esbuild on one OS, copy the `node_modules` directory
+      to another OS without reinstalling, and then run esbuild on that other OS.
+      This won't work because esbuild is written with native code and needs to
+      install a platform-specific binary executable. Normally this isn't an
+      issue because you typically check your `package.json` file into version
+      control, not your `node_modules` directory, and then everyone runs
+      `npm install` on their local machine after cloning the repository.
+
+  - p: >
+      However, people sometimes get into this situation by installing esbuild
+      on Windows or macOS and copying their `node_modules` directory into a
+      [Docker](https://www.docker.com/) image that runs Linux, or by copying
+      their `node_modules` directory between Windows and [WSL](https://docs.microsoft.com/en-us/windows/wsl/)
+      environments. The way to get this to work depends on your package manager:
+
+  - ul:
+    - >
+        <p>
+        **npm/pnpm:**
+        If you are installing with npm or pnpm, you can try not copying the
+        `node_modules` directory when you copy the files over, and running
+        `npm ci` or `npm install` on the destination platform after the copy.
+        Or you could consider using [Yarn](https://yarnpkg.com/) instead which
+        has built-in support for installing a package on multiple platforms
+        simultaneously.
+        </p>
+
+    - >
+        <p>
+        **Yarn:**
+        If you are installing with Yarn, you can try listing both this platform and the
+        other platform in your `.yarnrc.yml` file using
+        [the `supportedArchitectures` feature](https://yarnpkg.com/configuration/yarnrc/#supportedArchitectures).
+        Keep in mind that this means multiple copies of esbuild will be present
+        on the file system.
+        </p>
+
+  - p: >
+      Another alternative is to [use the `esbuild-wasm` package instead](#wasm),
+      which works the same way on all platforms. But it comes with a heavy
+      performance cost and can sometimes be 10x slower than the `esbuild` package,
+      so you may also not want to do that.
+
+  - h2: Other ways to install
+>>>>>>> 8c6a3a16c03ce351fa669d7c5364715a49a0610a
 
   - p: >
       推荐安装 esbuild 的方式是[使用 npm 安装原生可执行文件](#install-esbuild)。
@@ -379,8 +448,13 @@ body:
 
   - ol:
     - |
+<<<<<<< HEAD
       安装 Go 编译器：
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
+=======
+      Install the Go compiler:
+      <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
+>>>>>>> 8c6a3a16c03ce351fa669d7c5364715a49a0610a
 
     - |
       下载源码：
@@ -440,6 +514,7 @@ body:
       完整表格如下：
 
   - table: |
+<<<<<<< HEAD
       | 包名                      | 操作系统   | 架构            |
       |--------------------------|-----------|----------------|
       | `esbuild-android-arm64`  | `android` | `arm64`        |
@@ -469,3 +544,43 @@ body:
       因为这种方式对现有的 esbuild 版本永久有效，
       因为发布到 npm 的包是不可变的。
       另一个缺点是你没法使用原生版本的[插件](/plugins/)。
+=======
+      | Package name                                                                     | OS                   | Architecture           | Download                                                                                                                         |
+      |----------------------------------------------------------------------------------|----------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+      | [`esbuild-android-arm64`](https://www.npmjs.org/package/esbuild-android-arm64)   | `android`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-android-arm64/-/esbuild-android-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-darwin-64`](https://www.npmjs.org/package/esbuild-darwin-64)           | `darwin`             | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-darwin-arm64`](https://www.npmjs.org/package/esbuild-darwin-arm64)     | `darwin`             | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-arm64/-/esbuild-darwin-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>     |
+      | [`esbuild-freebsd-64`](https://www.npmjs.org/package/esbuild-freebsd-64)         | `freebsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-64/-/esbuild-freebsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-freebsd-arm64`](https://www.npmjs.org/package/esbuild-freebsd-arm64)   | `freebsd`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-32`](https://www.npmjs.org/package/esbuild-linux-32)             | `linux`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-32/-/esbuild-linux-32-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-linux-64`](https://www.npmjs.org/package/esbuild-linux-64)             | `linux`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-linux-arm`](https://www.npmjs.org/package/esbuild-linux-arm)           | `linux`              | `arm`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm/-/esbuild-linux-arm-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-linux-arm64`](https://www.npmjs.org/package/esbuild-linux-arm64)       | `linux`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm64/-/esbuild-linux-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>       |
+      | [`esbuild-linux-mips64le`](https://www.npmjs.org/package/esbuild-linux-mips64le) | `linux`              | `mips64el`<sup>2</sup> | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-mips64le/-/esbuild-linux-mips64le-CURRENT_ESBUILD_VERSION.tgz"></a> |
+      | [`esbuild-linux-ppc64le`](https://www.npmjs.org/package/esbuild-linux-ppc64le)   | `linux`              | `ppc64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-riscv64`](https://www.npmjs.org/package/esbuild-linux-riscv64)   | `linux`              | `riscv64`<sup>2</sup>  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-riscv64/-/esbuild-linux-riscv64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-s390x`](https://www.npmjs.org/package/esbuild-linux-s390x)       | `linux`              | `s390x`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-s390x/-/esbuild-linux-s390x-CURRENT_ESBUILD_VERSION.tgz"></a>       |
+      | [`esbuild-netbsd-64`](https://www.npmjs.org/package/esbuild-netbsd-64)           | `netbsd`<sup>1</sup> | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-netbsd-64/-/esbuild-netbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-openbsd-64`](https://www.npmjs.org/package/esbuild-openbsd-64)         | `openbsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-openbsd-64/-/esbuild-openbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-sunos-64`](https://www.npmjs.org/package/esbuild-sunos-64)             | `sunos`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-sunos-64/-/esbuild-sunos-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-windows-32`](https://www.npmjs.org/package/esbuild-windows-32)         | `win32`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-32/-/esbuild-windows-32-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-windows-64`](https://www.npmjs.org/package/esbuild-windows-64)         | `win32`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-windows-arm64`](https://www.npmjs.org/package/esbuild-windows-arm64)   | `win32`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-arm64/-/esbuild-windows-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+
+  - p: >
+      **Why this is not recommended:**
+      This relies on internal implementation details of esbuild's native
+      executable installer. These details may change at some point, in which
+      case this approach will no longer work for new esbuild versions. This
+      is only a minor drawback though since the approach should still work
+      forever for existing esbuild versions since packages published to npm
+      are immutable. An additional drawback is that you cannot use [plugins](/plugins/)
+      with the native version.
+
+  - p: >
+      <footer>
+      <sup>1</sup> This operating system is not on [node's list of supported platforms](https://nodejs.org/api/process.html#process_process_platform)
+      <br>
+      <sup>2</sup> This architecture is not on [node's list of supported architectures](https://nodejs.org/api/process.html#processarch)
+      </footer>
+>>>>>>> 8c6a3a16c03ce351fa669d7c5364715a49a0610a
