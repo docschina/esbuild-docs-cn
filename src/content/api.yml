@@ -13,10 +13,18 @@ body:
       因为他们的工作方式不同。
 
   - p: >
+<<<<<<< HEAD
       如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
       你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
+=======
+      If you are using JavaScript be sure to check out the
+      [JS-specific details](#js-specific-details) section below. You may also
+      find the [TypeScript type definitions](https://github.com/evanw/esbuild/blob/master/lib/shared/types.ts)
+      for esbuild helpful as a reference. If you are using Go be sure to check
+      out the automatically generated [Go documentation](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api).
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - p: >
       If you are using the command-line API, it may be helpful to know that the
@@ -75,6 +83,7 @@ body:
       transform API 可以使用以下配置项：
 
   - available-options:
+<<<<<<< HEAD
       - Banner
       - Charset
       - Color
@@ -100,6 +109,35 @@ body:
       - Target
       - Tree shaking
       - Tsconfig raw
+=======
+    - Banner
+    - Charset
+    - Color
+    - Define
+    - Drop
+    - Footer
+    - Format
+    - Global name
+    - Ignore annotations
+    - JSX
+    - JSX factory
+    - JSX fragment
+    - Keep names
+    - Legal comments
+    - Loader
+    - Log level
+    - Log limit
+    - Mangle props
+    - Minify
+    - Pure
+    - Source root
+    - Sourcefile
+    - Sourcemap
+    - Sources content
+    - Target
+    - Tree shaking
+    - Tsconfig raw
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - h2: Build API
 
@@ -164,6 +202,7 @@ body:
       build API 可以使用以下配置项：
 
   - available-options:
+<<<<<<< HEAD
       - Allow overwrite
       - Analyze
       - Asset names
@@ -217,6 +256,63 @@ body:
       - Watch
       - Working directory
       - Write
+=======
+    - Allow overwrite
+    - Analyze
+    - Asset names
+    - Banner
+    - Bundle
+    - Charset
+    - Chunk names
+    - Color
+    - Conditions
+    - Define
+    - Drop
+    - Entry names
+    - Entry points
+    - External
+    - Footer
+    - Format
+    - Global name
+    - Ignore annotations
+    - Incremental
+    - Inject
+    - JSX
+    - JSX factory
+    - JSX fragment
+    - Keep names
+    - Legal comments
+    - Loader
+    - Log level
+    - Log limit
+    - Main fields
+    - Mangle props
+    - Metafile
+    - Minify
+    - Node paths
+    - Out extension
+    - Outbase
+    - Outdir
+    - Outfile
+    - Platform
+    - Preserve symlinks
+    - Public path
+    - Pure
+    - Resolve extensions
+    - Serve
+    - Source root
+    - Sourcefile
+    - Sourcemap
+    - Sources content
+    - Splitting
+    - Stdin
+    - Target
+    - Tree shaking
+    - Tsconfig
+    - Watch
+    - Working directory
+    - Write
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - h2: 一般配置项
 
@@ -316,17 +412,17 @@ body:
   - example:
       cli:
         - $: |
-            echo 'DEBUG && require("hooks")' | esbuild --define:DEBUG=true
+            echo 'hooks = DEBUG && require("hooks")' | esbuild --define:DEBUG=true
         - expect: |
-            require("hooks");
+            hooks = require("hooks");
 
         - $: |
-            echo 'DEBUG && require("hooks")' | esbuild --define:DEBUG=false
+            echo 'hooks = DEBUG && require("hooks")' | esbuild --define:DEBUG=false
         - expect: |
-            false;
+            hooks = false;
 
       js:
-        - $: let js = 'DEBUG && require("hooks")'
+        - $: let js = 'hooks = DEBUG && require("hooks")'
 
         - $: |
             require('esbuild').transformSync(js, {
@@ -334,7 +430,7 @@ body:
             })
         - expect: |
             {
-              code: 'require("hooks");\n',
+              code: 'hooks = require("hooks");\n',
               map: '',
               warnings: []
             }
@@ -345,7 +441,7 @@ body:
             })
         - expect: |
             {
-              code: 'false;\n',
+              code: 'hooks = false;\n',
               map: '',
               warnings: []
             }
@@ -357,7 +453,7 @@ body:
         import "github.com/evanw/esbuild/pkg/api"
 
         func main() {
-          js := "DEBUG && require('hooks')"
+          js := "hooks = DEBUG && require('hooks')"
 
           result1 := api.Transform(js, api.TransformOptions{
             Define: map[string]string{"DEBUG": "true"},
@@ -635,11 +731,56 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       你也可以在外部（external）路径中使用 `*` 通配符标记所有符合该模式的为外部（external）。
       例如，你可以使用 `*.png` 移除所有的 `.png` 文件或者使用 `/images/*` 移除所有路径以
       `/images/` 开头的路径。当在 外部（external）路径中使用 `*` 通配符时，
       该模式将应用于源代码中的原始路径，而不是解析为实际文件系统路径后的路径。
       这允许你匹配不是真实文件系统路径的路径。
+=======
+      You can also use the `*` wildcard character in an external path to mark
+      all files matching that pattern as external. For example, you can use
+      `*.png` to remove all `.png` files or `/images/*` to remove all paths
+      starting with `/images/`.
+
+  - p: >
+      External paths are applied both before and after path resolution, which
+      lets you match against both the import path in the source code and the
+      absolute file system path. The path is considered to be external if the
+      external path matches in either case. The specific behavior is as follows:
+
+  - ul:
+    - >
+      <p>
+      Before path resolution begins, import paths are checked against all
+      external paths. In addition, if the external path looks like a package
+      path (i.e. doesn't start with `/` or `./` or `../`), import paths are
+      checked to see if they have that package path as a path prefix.
+      </p>
+      <p>
+      This means that <code>--external:<wbr>@foo/<wbr>bar</code> implicitly
+      also means <code>--external:<wbr>@foo/<wbr>bar/\*</code> which matches
+      the import path <code>@foo/<wbr>bar/<wbr>baz</code>. So it marks all
+      paths inside the `@foo/bar` package as external too.
+      </p>
+
+    - >
+      <p>
+      After path resolution ends, the resolved absolute paths are checked
+      against all external paths that don't look like a package path (i.e.
+      those that start with `/` or `./` or `../`). But before checking, the
+      external path is joined with the current working directory and then
+      normalized, becoming an absolute path (even if it contains a `*`
+      wildcard character).
+      </p>
+      <p>
+      This means that you can mark everything in the directory `dir` as
+      external using <code>--external:<wbr>./dir/\*</code>. Note that the
+      leading `./` is important. Using <code>--external:<wbr>dir/\*</code>
+      instead is treated as a package path and is not checked for after
+      path resolution ends.
+      </p>
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - h3: Format
 
@@ -703,9 +844,11 @@ body:
             echo 'export default "test"' | esbuild --format=cjs
         - expect: |
             ...
-            __export(exports, {
+            var stdin_exports = {};
+            __export(stdin_exports, {
               default: () => stdin_default
             });
+            module.exports = __toCommonJS(stdin_exports);
             var stdin_default = "test";
 
       js: |
@@ -1343,6 +1486,7 @@ body:
         你应该使用一个更老的语言目标，例如 <code>--target=es6</code>。
         </p>
 
+<<<<<<< HEAD
       - >
         <p>
         对于所有的 JavaScript 代码，
@@ -1358,6 +1502,45 @@ body:
         因为 Angular 使用 `.toString()` 来读取函数的参数名称。
         一个解决方案是使用 [明确的注释替代](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation)。
         </p>
+=======
+    - >
+      <p>
+      The character escape sequence `\n` will be replaced with a newline
+      character in JavaScript template literals. String literals will also be
+      converted into template literals if the [target](#target) supports them
+      and if doing so would result in smaller output. **This is not a bug.**
+      Minification means you are asking for smaller output, and the escape
+      sequence `\n` takes two bytes while the newline character takes one byte.
+      </p>
+
+    - >
+      <p>
+      By default esbuild won't minify the names of top-level declarations. This
+      is because esbuild doesn't know what you will be doing with the output.
+      You might be injecting the minified code into the middle of some other
+      code, in which case minifying top-level declaration names would be unsafe.
+      Setting an output [format](#format) (or enabling [bundling](#bundle),
+      which picks an output format for you if you haven't set one) tells
+      esbuild that the output will be run within its own scope, which means
+      it's then safe to minify top-level declaration names.
+      </p>
+
+    - >
+      <p>
+      Minification is not safe for 100% of all JavaScript code. This is true
+      for esbuild as well as for other popular JavaScript minifiers such as
+      [terser](https://github.com/terser/terser). In particular, esbuild is
+      not designed to preserve the value of calling `.toString()` on a
+      function. The reason for this is because if all code inside all
+      functions had to be preserved verbatim, minification would hardly do
+      anything at all and would be virtually useless. However, this means that
+      JavaScript code relying on the return value of `.toString()` will likely
+      break when minified. For example, some patterns in the [AngularJS](https://angularjs.org/)
+      framework break when code is minified because AngularJS uses `.toString()`
+      to read the argument names of functions. A workaround is to use [explicit
+      annotations instead](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation).
+      </p>
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
       - >
         <p>
@@ -1929,8 +2112,14 @@ body:
       相反，应该通过在 esbuild 前设置代理来定制行为。
 
   - p: >
+<<<<<<< HEAD
       下面是一个代理服务器的简单示例。
       他添加了自定义 404 页面而不使用 esbuild 的默认 404 页面：
+=======
+      Here's a simple example of a proxy server to get you started, using node's
+      built-in [`http`](https://nodejs.org/api/http.html) module. It adds a
+      custom 404 page instead of esbuild's default 404 page:
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - pre.js: |
       const esbuild = require('esbuild');
@@ -1984,10 +2173,19 @@ body:
       你可以使用代理做很多事情，就像下面的举例：
 
   - ul:
+<<<<<<< HEAD
       - 插入你自己的 404 页面（上面的示例）
       - 自定义路由与文件系统中文件之间的映射关系
       - 重定向一些路由到 API 服务器而不是到 esbuild
       - 使用自签名证书添加 HTTPS 支持
+=======
+    - Injecting your own 404 page (the example above)
+    - Customizing the mapping of routes to files on the file system
+    - Redirecting some routes to an API server instead of to esbuild
+    - >
+      Adding support for HTTPS using your own self-signed certificates
+      ([instructions here](https://nodejs.org/en/knowledge/HTTP/servers/how-to-create-a-HTTPS-server/))
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - p: >
       如果你有更高级的需求的话，你也可以使用诸如 [NGINX](https://nginx.org/en/docs/beginners_guide.html#proxy) 一样真正的代理。
@@ -2319,6 +2517,7 @@ body:
   - h3: Target
 
   - p: >
+<<<<<<< HEAD
       此配置项设置生成 JavaScript 代码的目标环境。例如，你可以配置 esbuild 不要生成任何
       v10 版本的 node 不能处理的新的 JavaScript 代码。target 可以设置为类似于 `es2020`
       的 JavaScript 语言版本，或者一个引擎列表（目前可以是 `chrome`、`firefox`、`safari`、`edge`
@@ -2329,13 +2528,53 @@ body:
       这里是在 esbuild 中使用所有可用 target 环境名称的例子。请注意你不需要指定所有这些；
       你可以仅仅指定你的项目关心的目标环境的子集。如果你愿意的话，你也可以更精确地描述版本号
       （例如 设置为 `node12.19.0` 而不仅仅是 `node12`）：
+=======
+      This sets the target environment for the generated JavaScript and/or CSS
+      code. It tells esbuild to transform JavaScript syntax that is too new for
+      these environments into older JavaScript syntax that will work in these
+      environments. For example, the `??` operator was introduced in Chrome 80
+      so esbuild will convert it into an equivalent (but more verbose)
+      conditional expression when targeting Chrome 79 or earlier.
+
+  - p: >
+      Note that this is only concerned with syntax features, not APIs. It does
+      *not* automatically add [polyfills](https://developer.mozilla.org/en-US/docs/Glossary/Polyfill)
+      for new APIs that are not used by these environments. You will have to
+      explicitly import polyfills for the APIs you need (e.g. by importing
+      [`core-js`](https://www.npmjs.com/package/core-js)). Automatic polyfill
+      injection is outside of esbuild's scope.
+
+  - p: >
+      Each target environment is an environment name followed by a version
+      number. The following environment names are currently supported:
+
+  - ul:
+    - '`chrome`'
+    - '`edge`'
+    - '`firefox`'
+    - '`ie`'
+    - '`ios`'
+    - '`node`'
+    - '`opera`'
+    - '`safari`'
+
+  - p: >
+      In addition, you can also specify JavaScript language versions such as
+      `es2020`. The default target is `esnext` which means that by default,
+      esbuild will assume all of the latest JavaScript and CSS features are
+      supported. Here is an example that uses all of the available target
+      environment names in esbuild. You don't need to specify all of them;
+      you can just specify the subset of target environments that your project
+      cares about. You can also be more precise about version numbers if you'd
+      like (e.g. `node12.19.0` instead of just `node12`):
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - example:
       in:
         app.js: "1 + 2"
 
       cli: |
-        esbuild app.js --target=es2020,chrome58,firefox57,safari11,edge16,node12
+        esbuild app.js --target=es2020,chrome58,edge16,firefox57,ie11,ios10,node12,opera45,safari11
 
       js: |
         require('esbuild').buildSync({
@@ -2343,10 +2582,13 @@ body:
           target: [
             'es2020',
             'chrome58',
-            'firefox57',
-            'safari11',
             'edge16',
+            'firefox57',
+            'ie11',
+            'ios10',
             'node12',
+            'opera45',
+            'safari11',
           ],
           outfile: 'out.js',
         })
@@ -2363,10 +2605,13 @@ body:
             Target:      api.ES2020,
             Engines: []api.Engine{
               {Name: api.EngineChrome, Version: "58"},
-              {Name: api.EngineFirefox, Version: "57"},
-              {Name: api.EngineSafari, Version: "11"},
               {Name: api.EngineEdge, Version: "16"},
+              {Name: api.EngineFirefox, Version: "57"},
+              {Name: api.EngineIE, Version: "11"},
+              {Name: api.EngineIOS, Version: "10"},
               {Name: api.EngineNode, Version: "12"},
+              {Name: api.EngineOpera, Version: "45"},
+              {Name: api.EngineSafari, Version: "11"},
             },
             Write: true,
           })
@@ -2383,9 +2628,17 @@ body:
       早于或晚于那一年。
 
   - p: >
+<<<<<<< HEAD
       请注意如果你使用了一个语法特性，esbuild 还不支持将其转为目标语言 target，esbuild 将会
       在不支持的语法位置生成一个错误。例如，当目标是 `es5` 语言版本时，经常会出现这种情况，
       因为 esbuild 只支持将大多数较新的 JavaScript 语法特性转换为 `es6`。
+=======
+      If you use a syntax feature that esbuild doesn't yet have support for
+      transforming to your current language target, esbuild will generate an
+      error where the unsupported syntax is used. This is often the case when
+      targeting the `es5` language version, for example, since esbuild only
+      supports transforming most newer JavaScript syntax features to `es6`.
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - h3: Watch
 
@@ -2413,13 +2666,31 @@ body:
         })
 
       go: |
-        result := api.Build(api.BuildOptions{
-          EntryPoints: []string{"app.js"},
-          Outfile:     "out.js",
-          Bundle:      true,
-          Watch:       &api.WatchMode{},
-        })
-        fmt.Printf("watching...\n")
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Outfile:     "out.js",
+            Bundle:      true,
+            Write:       true,
+            Watch:       &api.WatchMode{},
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          fmt.Printf("watching...\n")
+
+          // Returning from main() exits immediately in Go.
+          // Block forever so we keep watching and don't exit.
+          <-make(chan bool)
+        }
 
   - p: >
       如果你正在使用 JavaScript 或者 Go API，你可以选择性地提供一个回调函数，该函数将会在
@@ -2444,21 +2715,39 @@ body:
         })
 
       go: |
-        result := api.Build(api.BuildOptions{
-          EntryPoints: []string{"app.js"},
-          Outfile:     "out.js",
-          Bundle:      true,
-          Watch: &api.WatchMode{
-            OnRebuild: func(result api.BuildResult) {
-              if len(result.Errors) > 0 {
-                fmt.Printf("watch build failed: %d errors\n", len(result.Errors))
-              } else {
-                fmt.Printf("watch build succeeded: %d warnings\n", len(result.Warnings))
-              }
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Outfile:     "out.js",
+            Bundle:      true,
+            Write:       true,
+            Watch: &api.WatchMode{
+              OnRebuild: func(result api.BuildResult) {
+                if len(result.Errors) > 0 {
+                  fmt.Printf("watch build failed: %d errors\n", len(result.Errors))
+                } else {
+                  fmt.Printf("watch build succeeded: %d warnings\n", len(result.Warnings))
+                }
+              },
             },
-          },
-        })
-        fmt.Printf("watching...\n")
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          fmt.Printf("watching...\n")
+
+          // Returning from main() exits immediately in Go.
+          // Block forever so we keep watching and don't exit.
+          <-make(chan bool)
+        }
 
   - p: >
       If you want to stop watch mode at some point in the future, you can call
@@ -2472,6 +2761,7 @@ body:
           entryPoints: ['app.js'],
           outfile: 'out.js',
           bundle: true,
+          watch: true,
         }).then(result => {
           console.log('watching...')
 
@@ -2482,17 +2772,32 @@ body:
         })
 
       go: |
-        result := api.Build(api.BuildOptions{
-          EntryPoints: []string{"app.js"},
-          Outfile:     "out.js",
-          Bundle:      true,
-          Watch:       &api.WatchMode{},
-        })
-        fmt.Printf("watching...\n")
+        package main
 
-        time.Sleep(10 * time.Second)
-        result.Stop()
-        fmt.Printf("stopped watching\n")
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+        import "time"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Outfile:     "out.js",
+            Bundle:      true,
+            Write:       true,
+            Watch:       &api.WatchMode{},
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          fmt.Printf("watching...\n")
+
+          time.Sleep(10 * time.Second)
+          result.Stop()
+          fmt.Printf("stopped watching\n")
+        }
 
   - p: >
       为了实现可移植性，esbuild 中的监视模式使用轮询而不是特定于操作系统的文件系统 api 来实现的。
@@ -2625,7 +2930,7 @@ body:
             ...
 
               out.js                                                                    27.4kb  100.0%
-               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js  19.2kb   70.1%
+               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js  19.2kb   70.2%
                ├ node_modules/react/cjs/react.production.min.js                          5.9kb   21.5%
                ├ node_modules/object-assign/index.js                                     962b     3.4%
                ├ example.jsx                                                             137b     0.5%
@@ -2700,7 +3005,7 @@ body:
             ...
 
               out.js ─────────────────────────────────────────────────────────────────── 27.4kb ─ 100.0%
-               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js ─ 19.2kb ── 70.1%
+               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js ─ 19.2kb ── 70.2%
                │  └ node_modules/react-dom/server.browser.js
                │     └ example.jsx
                ├ node_modules/react/cjs/react.production.min.js ───────────────────────── 5.9kb ── 21.5%
@@ -2824,7 +3129,11 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       在资源路径模板中有三个可用占位符：
+=======
+      There are four placeholders that can be used in asset path templates:
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - ul:
       - >
@@ -2851,6 +3160,15 @@ body:
         和 <code>components/<wbr>select/<wbr>icon.png</code> ，在这种情况下，
         你需要使用哈希值来区分这两个都命名为 icon 的资源。
         </p>
+
+    - >
+      `[ext]`
+      <p>
+      This is the file extension of the asset (i.e. everything after the end of
+      the last `.` character). It can be used to put different types of assets
+      into different directories. For example, <code>--asset-names=<wbr>assets/<wbr>[ext]/<wbr>[name]-[hash]</code>
+      might write out an asset named `image.png` as <code>assets/<wbr>png/<wbr>image-CQFGD2NG.png</code>.
+      </p>
 
   - p: >
       资源路径模板不需要包含文件拓展名。资源的原始拓展名将会在模板替换完成后添加到输出路径尾部。
@@ -3047,7 +3365,11 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       在 chunk 路径模板中有两个可用占位符：
+=======
+      There are three placeholders that can be used in chunk path templates:
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - ul:
       - >
@@ -3061,6 +3383,15 @@ body:
         <p>
         这是 chunk 的内容哈希。在生成多个共享代码块的情况下，内容哈希是区分不同 chunk 的必要条件。
         </p>
+
+    - >
+      `[ext]`
+      <p>
+      This is the file extension of the chunk (i.e. everything after the end of
+      the last `.` character). It can be used to put different types of chunks
+      into different directories. For example, <code>--chunk-names=<wbr>chunks/<wbr>[ext]/<wbr>[name]-[hash]</code>
+      might write out a chunk as <code>chunks/<wbr>css/<wbr>chunk-DEFJT7KY.css</code>.
+      </p>
 
   - p: >
       chunk 路径模板不需要包括一个文件拓展名。在模板替换之后，为适当内容类型配置的 
@@ -3082,13 +3413,23 @@ body:
       esbuild 中有颜色的输出就像是这样：
 
   - pre.raw: |
-      <b> &gt; example.js: <span class="color-red">error:</span> Could not resolve "logger" (mark it as external to exclude it from the bundle)</b>
-      <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+      <span class="color-yellow">▲ <span class="bg-yellow">[<span class="color-black">WARNING</span>]</span></span> <b>The "typeof" operator will never evaluate to "null"</b>
 
-      <b> &gt; example.js: <span class="color-purple">warning:</span> The "typeof" operator will never evaluate to "null"</b>
-      <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
-      <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+          example.js:2:16:
+        <span class="color-dim">    2 │ log(typeof x == </span><span class="color-green">"null"</span><span class="color-dim">)</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~</span>
+
+        The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to
+        use "x === null" to test for null.
+
+      <span class="color-red">✘ <span class="bg-red">[<span class="color-white">ERROR</span>]</span></span> <b>Could not resolve "logger"</b>
+
+          example.js:1:16:
+        <span class="color-dim">    1 │ import log from </span><span class="color-green">"logger"</span>
+        <span class="color-dim">      ╵                 </span><span class="color-green">~~~~~~~~</span>
+
+        You can mark the path "logger" as external to exclude it from the bundle, which will remove this
+        error.
 
       1 warning and 1 error
 
@@ -3239,7 +3580,126 @@ body:
       避免这种情况的主要方法是将所有代码都放在 `require` 条件中，而 `import` 条件只是一个轻包装器，
       它调用包上的 `require` ，并使用 ESM 语法重新导出包。
 
+<<<<<<< HEAD
   - h3: 入口名称
+=======
+  - h3: Drop
+
+  - p: >
+      This tells esbuild to edit your source code before building to drop
+      certain constructs. There are currently two possible things that can be
+      dropped:
+
+  - ul:
+    - >
+      `debugger`
+      <p>
+      Passing this flag causes all [`debugger` statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger)
+      to be removed from the output. This is similar to the `drop_debugger: true`
+      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
+      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
+      </p>
+      <p>
+      JavaScript's `debugger` statements cause the active debugger to treat the
+      statement as an automatically-configured breakpoint. Code containing this
+      statement will automatically be paused when the debugger is open. If no
+      debugger is open, the statement does nothing. Dropping these statements
+      from your code just prevents the debugger from automatically stopping
+      when your code runs.
+      </p>
+      <p>
+      You can drop `debugger` statements like this:
+      </p>
+
+  - example:
+      in:
+        app.js: 'debugger'
+
+      cli: |
+        esbuild app.js --drop:debugger
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          drop: ['debugger'],
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Drop:        api.DropDebugger,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - ul:
+    - >
+      `console`
+      <p>
+      Passing this flag causes all [`console` API calls](https://developer.mozilla.org/en-US/docs/Web/API/console#methods)
+      to be removed from the output. This is similar to the `drop_console: true`
+      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
+      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
+      </p>
+      <p>
+      WARNING: Using this flag can introduce bugs into your code! This flag
+      removes the entire call expression including all call arguments. If any
+      of those arguments had important side effects, using this flag will
+      change the behavior of your code. Be very careful when using this flag.
+      </p>
+      <p>
+      If you want to remove console API calls without removing the arguments
+      with side effects (so you do not introduce bugs), you should mark the
+      relevant API calls as [pure](#pure) instead. For example, you can mark
+      `console.log` as pure using <code>--pure:<wbr>console.log</code>. This
+      will cause these API calls to be removed safely when minification is
+      enabled.
+      </p>
+      <p>
+      You can drop `console` API calls like this:
+      </p>
+
+  - example:
+      in:
+        app.js: 'console.log()'
+
+      cli: |
+        esbuild app.js --drop:console
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          drop: ['console'],
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Drop:        api.DropConsole,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - h3: Entry names
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - p: >
       该配置项控制与每一个入口文件相对应的输出文件的名称。它使用带有占位符的模板来配置输出路径，
@@ -3284,7 +3744,11 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       在入口路径模板中有三个可用占位符：
+=======
+      There are four placeholders that can be used in entry path templates:
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - ul:
       - >
@@ -3321,6 +3785,16 @@ body:
         你可以使用 [metafile](#metafile) 中的信息来确定哪个输出文件路径对应于哪个输入入口点，这样你就知道要在
         `<script>` 标签中引入哪个路径。
         </p>
+
+    - >
+      `[ext]`
+      <p>
+      This is the file extension that the entry point file will be written out to
+      (i.e. the [out extension](#out-extension) setting, not the original file
+      extension). It can be used to put different types of entry points into different
+      directories. For example, <code>--entry-names=<wbr>entries/<wbr>[ext]/<wbr>[name]</code>
+      might write the output file for `app.ts` to <code>entries/<wbr>js/<wbr>app.js</code>.
+      </p>
 
   - p: >
       入口路径模板不需要包含一个文件拓展名。根据文件类型，适当的 [out 扩展名](#out-extension) 将在模板替换
@@ -4128,6 +4602,333 @@ body:
         }
       }
 
+  - h3: Mangle props
+
+  - warning: >
+      **Using this feature can break your code in subtle ways.** Do not use this
+      feature unless you know what you are doing, and you know exactly how it
+      will affect both your code and all of your dependencies.
+
+  - p: >
+      This setting lets you pass a regular expression to esbuild to tell
+      esbuild to automatically rename all properties that match this regular
+      expression. It's useful when you want to minify certain property names
+      in your code either to make the generated code smaller or to somewhat
+      obfuscate your code's intent.
+
+  - p: >
+      Here's an example that uses the regular expression `_$` to mangle all
+      properties ending in an underscore, such as `foo_`. This mangles
+      <code>print({ <wbr>foo_: 0 <wbr>}.foo_)</code>
+      into <code>print({ <wbr>a: 0 <wbr>}.a)</code>:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --mangle-props=_$
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          mangleProps: /_$/,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            MangleProps: "_$",
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Only mangling properties that end in an underscore is a reasonable
+      heuristic because normal JS code doesn't typically contain identifiers
+      like that. Browser APIs also don't use this naming convention so this
+      also avoids conflicts with browser APIs. If you want to avoid mangling
+      names such as [`__defineGetter__`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/__defineGetter__)
+      you could consider using a more complex regular expression such as
+      `[^_]_$` (i.e. must end in a non-underscore followed by an underscore).
+
+  - p: >
+      This is a separate setting instead of being part of the [minify](#minify)
+      setting because it's an unsafe transformation that does not work on
+      arbitrary JavaScript code. It only works if the provided regular
+      expression matches all of the properties that you want mangled and does
+      not match any of the properties that you don't want mangled. It also only
+      works if you do not under any circumstances reference a mangled property
+      indirectly. For example, it means you can't use `obj[prop]` to reference a
+      property where `prop` is a string containing the property name. Specifically
+      the following syntax constructs are the only ones eligible for property mangling:
+
+  - table: |
+      | Syntax                           | Example                                   |
+      |----------------------------------|-------------------------------------------|
+      | Dot property accesses            | `x.foo_`                                  |
+      | Dot optional chains              | `x?.foo_`                                 |
+      | Object properties                | `x = { foo_: y }`                         |
+      | Object methods                   | `x = { foo_() {} }`                       |
+      | Class fields                     | `class x { foo_ = y }`                    |
+      | Class methods                    | `class x { foo_() {} }`                   |
+      | Object destructuring bindings    | `let { foo_: x } = y`                     |
+      | Object destructuring assignments | `({ foo_: x } = y)`                       |
+      | JSX element member expression    | `<X.foo_></X.foo_>`                       |
+      | JSX attribute names              | `<X foo_={y} />`                          |
+      | TypeScript namespace exports     | `namespace x { export let foo_ = y }`     |
+      | TypeScript parameter properties  | `class x { constructor(public foo_) {} }` |
+
+  - p: >
+      When using this feature, keep in mind that property names are only
+      consistently mangled within a single esbuild API call but not across
+      esbuild API calls. Each esbuild API call does an independent property
+      mangling operation so output files generated by two different API calls
+      may mangle the same property to two different names, which could cause
+      the resulting code to behave incorrectly.
+
+  - h4#mangle-quoted: >
+      Quoted properties
+
+  - p: >
+      By default, esbuild doesn't modify the contents of string literals. This means
+      you can avoid property mangling for an individual property by quoting it
+      as a string. However, you must consistently use quotes or no quotes for
+      a given property everywhere for this to work. For example,
+      <code>print({ <wbr>foo_: 0 <wbr>}.foo_)</code> will be mangled into
+      <code>print({ <wbr>a: 0 <wbr>}.a)</code> while
+      <code>print({ <wbr>'foo_': 0 <wbr>}['foo_'])</code> will not be mangled.
+
+  - p: >
+      If you would like for esbuild to also mangle the contents of string literals,
+      you can explicitly enable that behavior like this:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --mangle-props=_$ --mangle-quoted
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          mangleProps: /_$/,
+          mangleQuoted: true,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:  []string{"app.js"},
+            MangleProps:  "_$",
+            MangleQuoted: api.MangleQuotedTrue,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Enabling this makes the following syntax constructs also eligible for property
+      mangling:
+
+  - table: |
+      | Syntax                                  | Example                   |
+      |-----------------------------------------|---------------------------|
+      | Quoted property accesses                | `x['foo_']`               |
+      | Quoted optional chains                  | `x?.['foo_']`             |
+      | Quoted object properties                | `x = { 'foo_': y }`       |
+      | Quoted object methods                   | `x = { 'foo_'() {} }`     |
+      | Quoted class fields                     | `class x { 'foo_' = y }`  |
+      | Quoted class methods                    | `class x { 'foo_'() {} }` |
+      | Quoted object destructuring bindings    | `let { 'foo_': x } = y`   |
+      | Quoted object destructuring assignments | `({ 'foo_': x } = y)`     |
+      | String literals to the left of `in`     | `'foo_' in x`             |
+
+  - h4#reserve-props: >
+      Preventing renaming
+
+  - p: >
+      If you would like to exclude certain properties from mangling, you can
+      reserve them with an additional setting. For example, this uses the
+      regular expression `^__.*__$` to reserve all properties that start and
+      end with two underscores, such as `__foo__`:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --mangle-props=_$ "--reserve-props=^__.*__$"
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          mangleProps: /_$/,
+          reserveProps: /^__.*__$/,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:  []string{"app.js"},
+            MangleProps:  "_$",
+            ReserveProps: "^__.*__$",
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - h4#mangle-cache: >
+      Persisting renaming decisions
+
+  - p: >
+      Advanced usage of the property mangling feature involves storing the
+      mapping from original name to mangled name in a persistent cache. When
+      enabled, all mangled property renamings are recorded in the cache during
+      the initial build. Subsequent builds reuse the renamings stored in the
+      cache and add additional renamings for any newly-added properties. This
+      has a few consequences:
+
+  - ul:
+    - >
+      <p>
+      You can customize what mangled properties are renamed to by editing the
+      cache before passing it to esbuild.
+      </p>
+
+    - >
+      <p>
+      The cache serves as a list of all properties that were mangled. You can
+      easily scan it to see if there are any unexpected property renamings.
+      </p>
+
+    - >
+      <p>
+      You can disable mangling for individual properties by setting the renamed
+      value to `false` instead of to a string. This is similar to the [reserve props](#reserve-props)
+      setting but on a per-property basis.
+      </p>
+
+    - >
+      <p>
+      You can ensure consistent renaming between builds (e.g. a main-thread
+      file and a web worker, or a library and a plugin). Without this feature,
+      each build would do an independent renaming operation and the mangled
+      property names likely wouldn't be consistent.
+      </p>
+
+  - p: >
+      For example, consider the following input file:
+
+  - pre.js: |
+      console.log({
+        someProp_: 1,
+        customRenaming_: 2,
+        disabledRenaming_: 3
+      });
+
+  - p: >
+      If we want `customRenaming_` to be renamed to `cR_` and we don't want
+      `disabledRenaming_` to be renamed at all, we can pass the following
+      mangle cache JSON to esbuild:
+
+  - pre.json: |
+      {
+        "customRenaming_": "cR_",
+        "disabledRenaming_": false
+      }
+
+  - p: >
+      The mangle cache JSON can be passed to esbuild like this:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --mangle-props=_$ --mangle-cache=cache.json
+
+      js: |
+        let result = require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          mangleProps: /_$/,
+          mangleCache: {
+            customRenaming_: "cR_",
+            disabledRenaming_: false
+          },
+        })
+
+        console.log('updated mangle cache:', result.mangleCache)
+
+      go: |
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            MangleProps: "_$",
+            MangleCache: map[string]interface{}{
+              "customRenaming_":   "cR_",
+              "disabledRenaming_": false,
+            },
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          fmt.Println("updated mangle cache:", result.MangleCache)
+        }
+
+  - p: >
+      When property naming is enabled, that will result in the following
+      output file:
+
+  - pre.js: |
+      console.log({
+        a: 1,
+        cR_: 2,
+        disabledRenaming_: 3
+      });
+
+  - p: >
+      And the following updated mangle cache:
+
+  - pre.json: |
+      {
+        "customRenaming_": "cR_",
+        "disabledRenaming_": false,
+        "someProp_": "a"
+      }
+
   - h3: Metafile
 
   - p: >
@@ -4479,45 +5280,59 @@ body:
       这个名字本质上只是“如果不用就可以删除”的抽象简写。
 
   - p: >
+<<<<<<< HEAD
       一些表达式，比如JSX和某些内置全局变量，在 esbuild 中会自动注释为 `/* @__PURE__ */`。
       你也可以配置其他的全局变量标记为 `/* @__PURE__ */`。例如，你可以将全局的 `console.log` 函数标记为这样，
       只要结果没有被使用，当 bundle 被缩小时，它就会自动从你的 bundle 中删除。
 
   - p: >
       值得一提的是，注释的效果只扩展到调用本身，而不扩展到参数。关于副作用的参数仍然保存：
+=======
+      Some expressions such as JSX and certain built-in globals are automatically
+      annotated as `/* @__PURE__ */` in esbuild. You can also configure additional
+      globals to be marked `/* @__PURE__ */` as well. For example, you can mark
+      the global <code>document.<wbr>createElement</code> function as such to have
+      it be automatically removed from your bundle when the bundle is minified as
+      long as the result isn't used.
+
+  - p: >
+      It's worth mentioning that the effect of the annotation only extends to
+      the call itself, not to the arguments. Arguments with side effects are
+      still kept even when minification is enabled:
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - example:
       cli:
         - $: |
-            echo 'console.log("foo:", foo())' | esbuild --pure:console.log
+            echo 'document.createElement(elemName())' | esbuild --pure:document.createElement
         - expect: |
-            /* @__PURE__ */ console.log("foo:", foo());
+            /* @__PURE__ */ document.createElement(elemName());
         - $: |
-            echo 'console.log("foo:", foo())' | esbuild --pure:console.log --minify
+            echo 'document.createElement(elemName())' | esbuild --pure:document.createElement --minify
         - expect: |
-            foo();
+            elemName();
 
       js:
         - $: |
-            let js = 'console.log("foo:", foo())'
+            let js = 'document.createElement(elemName())'
         - $: |
             require('esbuild').transformSync(js, {
-              pure: ['console.log'],
+              pure: ['document.createElement'],
             })
         - expect: |
             {
-              code: '/* @__PURE__ */ console.log("foo:", foo());\n',
+              code: '/* @__PURE__ */ document.createElement(elemName());\n',
               map: '',
               warnings: []
             }
         - $: |
             require('esbuild').transformSync(js, {
-              pure: ['console.log'],
+              pure: ['document.createElement'],
               minify: true,
             })
         - expect: |
             {
-              code: 'foo();\n',
+              code: 'elemName();\n',
               map: '',
               warnings: []
             }
@@ -4529,10 +5344,10 @@ body:
         import "github.com/evanw/esbuild/pkg/api"
 
         func main() {
-          js := "console.log('foo:', foo())"
+          js := "document.createElement(elemName())"
 
           result1 := api.Transform(js, api.TransformOptions{
-            Pure: []string{"console.log"},
+            Pure: []string{"document.createElement"},
           })
 
           if len(result1.Errors) == 0 {
@@ -4540,7 +5355,7 @@ body:
           }
 
           result2 := api.Transform(js, api.TransformOptions{
-            Pure:         []string{"console.log"},
+            Pure:         []string{"document.createElement"},
             MinifySyntax: true,
           })
 
@@ -4548,6 +5363,14 @@ body:
             fmt.Printf("%s", result2.Code)
           }
         }
+
+  - p: >
+      Note that if you are trying to remove all calls to `console` API methods
+      such as `console.log` and also want to remove the evaluation of arguments
+      with side effects, there is a special case available for this: you can use
+      the [drop feature](#drop) instead of marking `console` API calls as pure.
+      However, this mechanism is specific to the `console` API and doesn't work
+      with other call expressions.
 
   - h3: Resolve extensions
 
@@ -4592,7 +5415,15 @@ body:
           }
         }
 
-  - h3: Source Root
+  - p: >
+      Note that esbuild deliberately does not include the new `.mjs` and `.cjs`
+      extensions in this list. Node's resolution algorithm doesn't treat these
+      as implicit file extensions, so esbuild doesn't either. If you want to
+      import files with these extensions you should either explicitly add the
+      extensions in your import paths or change this setting to include the
+      additional extensions that you want to be implicit.
+
+  - h3: Source root
 
   - p: >
       该特性仅在启用 [source maps](#sourcemap) 时才相关。它允许你在 source map 中设置 `sourceRoot` 字段的值，
@@ -4681,7 +5512,7 @@ body:
           }
         }
 
-  - h3: Sources Content
+  - h3: Sources content
 
   - p: >
       使用 source map 格式的 [第三版](https://sourcemaps.info/spec.html) 生成 [source maps](#sourcemap)，
@@ -4861,10 +5692,21 @@ body:
       one();
 
   - p: >
+<<<<<<< HEAD
       通过这种方式，esbuild 将只打包你实际使用的部分库，这有时可以节省大量的大小。
       注意，esbuild的 tree shaking 实现依赖于使用 ECMAScript 模块 `import`和 `export` 语句。
       它不能与 CommonJS 模块一起工作。npm 上的许多库都包含了这两种格式，esbuild 会在默认情况下选择适合 tree shaking 
       的格式。你可以使用 [main fields](#main-fields) 配置项自定义 esbuild 选择的格式。
+=======
+      This way esbuild will only bundle the parts of your packages that you
+      actually use, which can sometimes be a substantial size savings. Note
+      that esbuild's tree shaking implementation relies on the use of ECMAScript
+      module `import` and `export` statements. It does not work with CommonJS
+      modules. Many packages on npm include both formats and esbuild tries to
+      pick the format that works with tree shaking by default. You can
+      customize which format esbuild picks using the [main fields](#main-fields)
+      and/or [conditions](#conditions) options depending on the package.
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - p: >
       由于 JavaScript 是一门动态语言，对于编译器来说确定未使用的代码是一件很困难的事情，所以
@@ -4965,7 +5807,10 @@ body:
           }
         }
 
+  - h4: Tree shaking and side effects
+
   - p: >
+<<<<<<< HEAD
       启用该配置意味着 esbuild 不再支持 `/* @__PURE__ */` 注释与 `sideEffects` 字段。
       然而它仍会对未用到的导入做自动 tree shaking，因为这不会依赖开发者注释。理想情况下，
       这个标志只是一个临时的解决方案。你应该向包的维护者报告这些问题以修复它们，
@@ -4975,6 +5820,69 @@ body:
       side-effect annotations. If you are bundling code with annotations that
       have been authored incorrectly, you may need to [ignore annotations](#ignore-annotations)
       to make sure the bundled code is correct.
+=======
+      The side effect detection used for tree shaking is conservative, meaning
+      that esbuild only considers code removable as dead code if it can be sure
+      that there are no hidden side effects. For example, primitive literals
+      such as `12.34` and `"abcd"` are side-effect free and can be removed while
+      expressions such as `"ab" + cd` and `foo.bar` are not side-effect free
+      (joining strings invokes `toString()` which can have side effects, and
+      member access can invoke a getter which can also have side effects). Even
+      referencing a global identifier is considered to be a side effect because
+      it will throw a `ReferenceError` if there is no global with that name.
+      Here's an example:
+
+  - pre.js: |
+      // These are considered side-effect free
+      let a = 12.34;
+      let b = "abcd";
+      let c = { a: a };
+
+      // These are not considered side-effect free
+      // since they could cause some code to run
+      let x = "ab" + cd;
+      let y = foo.bar;
+      let z = { [x]: x };
+
+  - p: >
+      Sometimes it's desirable to allow some code to be tree shaken even if that
+      code can't be automatically determined to have no side effects. This can
+      be done with a [pure annotation comment](#pure) which tells esbuild to
+      trust the author of the code that there are no side effects within the
+      annotated code. The annotation comment is `/* @__PURE__ */` and can only
+      precede a new or call expression. You can annotate an immediately-invoked
+      function expression and put arbitrary side effects inside the function
+      body:
+
+  - pre.js: |
+      // This is considered side-effect free due to
+      // the annotation, and will be removed if unused
+      let gammaTable = /* @__PURE__ */ (() => {
+        // Side-effect detection is skipped in here
+        let table = new Uint8Array(256);
+        for (let i = 0; i < 256; i++)
+          table[i] = Math.pow(i / 255, 2.2) * 255;
+        return table;
+      })();
+
+  - p: >
+      While the fact that `/* @__PURE__ */` only works on call expressions
+      can sometimes make code more verbose, a big benefit of this syntax is
+      that it's portable across many other tools in the JavaScript ecosystem
+      including the popular [UglifyJS](github.com/mishoo/uglifyjs) and
+      [Terser](github.com/terser/terser) JavaScript minifiers (which are
+      used by other major tools including [Webpack](github.com/webpack/webpack)
+      and [Parcel](https://github.com/parcel-bundler/parcel)).
+
+  - p: >
+      Note that the annotations cause esbuild to assume that the annotated
+      code is side-effect free. If the annotations are wrong and the code
+      actually does have important side effects, these annotations can result
+      in broken code. If you are bundling third-party code with annotations
+      that have been authored incorrectly, you may need to enable
+      [ignoring annotations](#ignore-annotations) to make sure the bundled
+      code is correct.
+>>>>>>> dbf6f25169410c0711a89e63086cd091006b00ae
 
   - h3: Tsconfig
 
