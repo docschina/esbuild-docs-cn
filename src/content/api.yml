@@ -18,6 +18,15 @@ body:
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
 
+  - p: >
+      If you are using the command-line API, it may be helpful to know that the
+      flags come in one of three forms: `--foo`, `--foo=bar`, or `--foo:bar`.
+      The form `--foo` is used for enabling boolean flags such as [`--minify`](#minify),
+      the form `--foo=bar` is used for flags that have a single value and are
+      only specified once such as [`--platform=`](#platform), and the form
+      `--foo:bar` is used for flags that have multiple values and can be
+      re-specified multiple times such as [`--external:`](#external).
+
   - h2: Transform API
 
   - p: >
@@ -66,31 +75,31 @@ body:
       transform API 可以使用以下配置项：
 
   - available-options:
-    - Banner
-    - Charset
-    - Color
-    - Define
-    - Footer
-    - Format
-    - Global name
-    - Ignore annotations
-    - JSX
-    - JSX factory
-    - JSX fragment
-    - Keep names
-    - Legal comments
-    - Loader
-    - Log level
-    - Log limit
-    - Minify
-    - Pure
-    - Source Root
-    - Sourcefile
-    - Sourcemap
-    - Sources Content
-    - Target
-    - Tree shaking
-    - Tsconfig raw
+      - Banner
+      - Charset
+      - Color
+      - Define
+      - Footer
+      - Format
+      - Global name
+      - Ignore annotations
+      - JSX
+      - JSX factory
+      - JSX fragment
+      - Keep names
+      - Legal comments
+      - Loader
+      - Log level
+      - Log limit
+      - Minify
+      - Pure
+      - Source Root
+      - Sourcefile
+      - Sourcemap
+      - Sources Content
+      - Target
+      - Tree shaking
+      - Tsconfig raw
 
   - h2: Build API
 
@@ -155,59 +164,59 @@ body:
       build API 可以使用以下配置项：
 
   - available-options:
-    - Allow overwrite
-    - Analyze
-    - Asset names
-    - Banner
-    - Bundle
-    - Charset
-    - Chunk names
-    - Color
-    - Conditions
-    - Define
-    - Entry names
-    - Entry points
-    - External
-    - Footer
-    - Format
-    - Global name
-    - Ignore annotations
-    - Incremental
-    - Inject
-    - JSX
-    - JSX factory
-    - JSX fragment
-    - Keep names
-    - Legal comments
-    - Loader
-    - Log level
-    - Log limit
-    - Main fields
-    - Metafile
-    - Minify
-    - Node paths
-    - Out extension
-    - Outbase
-    - Outdir
-    - Outfile
-    - Platform
-    - Preserve symlinks
-    - Public path
-    - Pure
-    - Resolve extensions
-    - Serve
-    - Source Root
-    - Sourcefile
-    - Sourcemap
-    - Sources Content
-    - Splitting
-    - Stdin
-    - Target
-    - Tree shaking
-    - Tsconfig
-    - Watch
-    - Working directory
-    - Write
+      - Allow overwrite
+      - Analyze
+      - Asset names
+      - Banner
+      - Bundle
+      - Charset
+      - Chunk names
+      - Color
+      - Conditions
+      - Define
+      - Entry names
+      - Entry points
+      - External
+      - Footer
+      - Format
+      - Global name
+      - Ignore annotations
+      - Incremental
+      - Inject
+      - JSX
+      - JSX factory
+      - JSX fragment
+      - Keep names
+      - Legal comments
+      - Loader
+      - Log level
+      - Log limit
+      - Main fields
+      - Metafile
+      - Minify
+      - Node paths
+      - Out extension
+      - Outbase
+      - Outdir
+      - Outfile
+      - Platform
+      - Preserve symlinks
+      - Public path
+      - Pure
+      - Resolve extensions
+      - Serve
+      - Source Root
+      - Sourcefile
+      - Sourcemap
+      - Sources Content
+      - Splitting
+      - Stdin
+      - Target
+      - Tree shaking
+      - Tsconfig
+      - Watch
+      - Working directory
+      - Write
 
   - h2: 一般配置项
 
@@ -221,10 +230,10 @@ body:
 
   - example:
       in:
-        in.js: '1 + 2'
+        in.js: "1 + 2"
 
       cli: |
-          esbuild in.js --bundle
+        esbuild in.js --bundle
 
       js:
         - $: |
@@ -264,24 +273,39 @@ body:
       在一个入口起点文件中引入所有文件，
       然后就像打包一个文件那样将它们打包。
 
+  - h4: Non-analyzable imports
+
   - p: >
-      Also note that bundling only works with statically-defined imports
+      Bundling with esbuild only works with statically-defined imports
       (i.e. when the import path is a string literal). Imports that are
       defined at run-time (i.e. imports that depend on run-time code
       evaluation) are not bundled, since bundling is a compile-time
-      operation. If you need to bundle code that does this, you will
-      likely need to use another bundler instead of esbuild. For example:
+      operation. For example:
 
   - pre.js: |
-      // Static imports (will be bundled by esbuild)
+      // Analyzable imports (will be bundled by esbuild)
       import 'pkg';
       import('pkg');
       require('pkg');
 
-      // Dynamic imports (will not be bundled by esbuild)
+      // Non-analyzable imports (will not be bundled by esbuild)
       import(`pkg/${foo}`);
       require(`pkg/${foo}`);
       ['pkg'].map(require);
+
+  - p: >
+      The way to work around this issue is to mark the package containing this
+      problematic code as [external](#external) so that it's not included in
+      the bundle. You will then need to ensure that a copy of the external
+      package is available to your bundled code at run-time.
+
+  - p: >
+      Some bundlers such as [Webpack](https://webpack.js.org/) try to support
+      this by including all potentially-reachable files in the bundle and then
+      emulating a file system at run-time. However, run-time file system
+      emulation is out of scope and will not be implemented in esbuild. If you
+      really need to bundle code that does this, you will likely need to use
+      another bundler instead of esbuild.
 
   - h3: Define
 
@@ -448,8 +472,8 @@ body:
 
   - example:
       in:
-        home.ts: '1 + 2'
-        settings.ts: '1 + 2'
+        home.ts: "1 + 2"
+        settings.ts: "1 + 2"
 
       cli: |
         esbuild home.ts settings.ts --bundle --outdir=out
@@ -491,11 +515,11 @@ body:
       options:
 
   - ul:
-    - '[Entry names](#entry-names)'
-    - '[Out extension](#out-extension)'
-    - '[Outbase](#outbase)'
-    - '[Outdir](#outdir)'
-    - '[Outfile](#outfile)'
+      - "[Entry names](#entry-names)"
+      - "[Out extension](#out-extension)"
+      - "[Outbase](#outbase)"
+      - "[Outdir](#outdir)"
+      - "[Outfile](#outfile)"
 
   - p: >
       In addition, you can also specify a fully custom output path for each
@@ -503,8 +527,8 @@ body:
 
   - example:
       in:
-        home.js: '1 + 2'
-        settings.js: '1 + 2'
+        home.js: "1 + 2"
+        settings.js: "1 + 2"
 
       cli: |
         esbuild out1=home.js out2=settings.js --bundle --outdir=out
@@ -759,15 +783,15 @@ body:
       如果你从其他模块 `import`，那么这是自动进行的。否则：
 
   - ul:
-    - >
-      在浏览器中，你可以使用 <code>&lt;script <wbr>src="<wbr>file.js" <wbr>type="<wbr>module"&gt;<wbr>&lt;/script&gt;</code> 加载模块。
-      <br>&nbsp; 
+      - >
+        在浏览器中，你可以使用 <code>&lt;script <wbr>src="<wbr>file.js" <wbr>type="<wbr>module"&gt;<wbr>&lt;/script&gt;</code> 加载模块。
+        <br>&nbsp;
 
-    - >
-      在 node 环境中，你可以使用 <code>node <wbr>--experimental-<wbr>modules <wbr>file.mjs</code> 加载模块。
-      请注意 node 需要 `.mjs` 拓展名，除非你在 `package.json` 文件中配置了 <code>"type": <wbr>"module"</code> 。
-      你可以使用 esbuild 中的 [out extension](#out-extension) 设置来自定义生成文件的拓展名。
-      你可以点击 [这里](https://nodejs.org/api/esm.html) 获取更多关于使用 ECMAScript modules 的内容。
+      - >
+        在 node 环境中，你可以使用 <code>node <wbr>--experimental-<wbr>modules <wbr>file.mjs</code> 加载模块。
+        请注意 node 需要 `.mjs` 拓展名，除非你在 `package.json` 文件中配置了 <code>"type": <wbr>"module"</code> 。
+        你可以使用 esbuild 中的 [out extension](#out-extension) 设置来自定义生成文件的拓展名。
+        你可以点击 [这里](https://nodejs.org/api/esm.html) 获取更多关于使用 ECMAScript modules 的内容。
 
   - h3: Inject
 
@@ -793,7 +817,7 @@ body:
   - example:
       in:
         process-shim.js: 'export let process = { cwd: () => "" }'
-        entry.js: 'console.log(process.cwd())'
+        entry.js: "console.log(process.cwd())"
 
       cli: |
         esbuild entry.js --bundle --inject:./process-shim.js --outfile=out.js
@@ -857,7 +881,7 @@ body:
   - example:
       in:
         process-shim.js: 'export function dummy_process_cwd() { return "" }'
-        entry.js: 'console.log(process.cwd())'
+        entry.js: "console.log(process.cwd())"
 
       cli: |
         esbuild entry.js --bundle --define:process.cwd=dummy_process_cwd --inject:./process-shim.js --outfile=out.js
@@ -1310,85 +1334,85 @@ body:
       当时用 esbuild 作为压缩器时需要记住以下几点：
 
   - ul:
-    - >
-      <p>
-      当启用压缩时也可能也需要设置 [target](#target) 配置项 。默认情况下，
-      esbuild 利用现代 JavaScript 特性使你的代码变得更小。例如，
-      <code>a ===<wbr> undefined<wbr> || a ===<wbr> null<wbr> ? 1 : a</code>
-      可以被压缩为 <code>a ?? 1</code>。如果你不想让 esbuild 在压缩是利用现代 JavaScript 特性，
-      你应该使用一个更老的语言目标，例如 <code>--target=es6</code>。
-      </p>
+      - >
+        <p>
+        当启用压缩时也可能也需要设置 [target](#target) 配置项 。默认情况下，
+        esbuild 利用现代 JavaScript 特性使你的代码变得更小。例如，
+        <code>a ===<wbr> undefined<wbr> || a ===<wbr> null<wbr> ? 1 : a</code>
+        可以被压缩为 <code>a ?? 1</code>。如果你不想让 esbuild 在压缩是利用现代 JavaScript 特性，
+        你应该使用一个更老的语言目标，例如 <code>--target=es6</code>。
+        </p>
 
-    - >
-      <p>
-      对于所有的 JavaScript 代码，
-      压缩不是 100% 安全的。
-      这对 esbuild 和其他流行的 JavaScript 压缩器，
-      例如 [terser](https://github.com/terser/terser) 是真实存在的。
-      特别地，esbuild 并不是为了保存函数上调用 `.toString()` 的值而设计的。
-      原因是如果所有函数中的所有代码都要逐字保存的话，
-      压缩会变得非常困难并且实际上是没有用的。
-      然而，这意味着依赖于 `.toString()` 返回值的 JavaScript 代码
-      在压缩过程中可能会中断。
-      例如，在 [Angular](https://angular.io/) 框架中一些模式在代码压缩时会中断，
-      因为 Angular 使用 `.toString()` 来读取函数的参数名称。
-      一个解决方案是使用 [明确的注释替代](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation)。
-      </p>
+      - >
+        <p>
+        对于所有的 JavaScript 代码，
+        压缩不是 100% 安全的。
+        这对 esbuild 和其他流行的 JavaScript 压缩器，
+        例如 [terser](https://github.com/terser/terser) 是真实存在的。
+        特别地，esbuild 并不是为了保存函数上调用 `.toString()` 的值而设计的。
+        原因是如果所有函数中的所有代码都要逐字保存的话，
+        压缩会变得非常困难并且实际上是没有用的。
+        然而，这意味着依赖于 `.toString()` 返回值的 JavaScript 代码
+        在压缩过程中可能会中断。
+        例如，在 [Angular](https://angular.io/) 框架中一些模式在代码压缩时会中断，
+        因为 Angular 使用 `.toString()` 来读取函数的参数名称。
+        一个解决方案是使用 [明确的注释替代](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation)。
+        </p>
 
-    - >
-      <p>
-      默认情况下，esbuild 不会在函数和类对象上保留 `.name` 的值。这是因为大多数代码不会依赖该属性，
-      并且使用更短的名称是一个重要的大小优化。然而，一些代码确实依赖 `.name` 属性来注册和绑定。
-      如果你需要依赖该属性，你应该启用 [keep names](#keep-names) 配置项。
-      </p>
+      - >
+        <p>
+        默认情况下，esbuild 不会在函数和类对象上保留 `.name` 的值。这是因为大多数代码不会依赖该属性，
+        并且使用更短的名称是一个重要的大小优化。然而，一些代码确实依赖 `.name` 属性来注册和绑定。
+        如果你需要依赖该属性，你应该启用 [keep names](#keep-names) 配置项。
+        </p>
 
-    - |
-      <p>
-      使用某些 JavaScript 特性可以禁用 esbuild 的许多优化，包括压缩。
-      具体来说，直接使用 `eval` 和/或 `with` 语句可以阻止 esbuild 将标识符重命名为更小的名称，
-      因为这些特性会导致标识符绑定在运行时而不是编译时发生。
-      这几乎总是无意的，而且只发生在人们不知道什么是直接 eval 以及它为什么不好的情况下。
-      </p>
-      <p>
-      如果你正在考虑像这样写一段代码：
-      </p>
-      <pre>
-      // 直接使用 eval （将会禁用整个文件的压缩）
-      let result = eval(something)
-      </pre>
-      <p>
-      你应该这样写，你的代码才能被压缩：
-      </p>
-      <pre>
-      // 间接使用 eval （对周围的代码没有副作用）
-      let result = (0, eval)(something)
-      </pre>
-      <p>
-      [这里](/content-types/#direct-eval) 可以获取关于直接使用 `eval` 以及可用选择的更多信息。
-      </p>
+      - |
+        <p>
+        使用某些 JavaScript 特性可以禁用 esbuild 的许多优化，包括压缩。
+        具体来说，直接使用 `eval` 和/或 `with` 语句可以阻止 esbuild 将标识符重命名为更小的名称，
+        因为这些特性会导致标识符绑定在运行时而不是编译时发生。
+        这几乎总是无意的，而且只发生在人们不知道什么是直接 eval 以及它为什么不好的情况下。
+        </p>
+        <p>
+        如果你正在考虑像这样写一段代码：
+        </p>
+        <pre>
+        // 直接使用 eval （将会禁用整个文件的压缩）
+        let result = eval(something)
+        </pre>
+        <p>
+        你应该这样写，你的代码才能被压缩：
+        </p>
+        <pre>
+        // 间接使用 eval （对周围的代码没有副作用）
+        let result = (0, eval)(something)
+        </pre>
+        <p>
+        [这里](/content-types/#direct-eval) 可以获取关于直接使用 `eval` 以及可用选择的更多信息。
+        </p>
 
-    - >
-      <p>
-      esbuild 中的压缩算法还没有进行高级代码优化。特别是，下面的代码优化对 JavaScript 是
-      有可能的，但不是由 esbuild 完成的（不是一个详尽的列表）：
-      </p>
-      <ul>
-        <li>消除函数体中的 dead-code</li>
-        <li>函数内联</li>
-        <li>Cross-statement 常数传播</li>
-        <li>对象形状建模</li>
-        <li>Allocation sinking</li>
-        <li>Method devirtualization</li>
-        <li>Symbolic execution</li>
-        <li>JSX 表达式提升</li>
-        <li>TypeScript 枚举检测和内联</li>
-      </ul>
-      <p>
-      如果你的代码使用的模式要求某些形式的代码优化是紧凑的，或者如果你正在为你的用例搜索最佳的
-      JavaScript 压缩算法，你应该考虑使用其他工具。实现这些高级代码优化的一些工具示例包括
-      [Terser](https://github.com/terser/terser#readme) 和
-      [Google Closure Compiler](https://github.com/google/closure-compiler#readme)。
-      </p>
+      - >
+        <p>
+        esbuild 中的压缩算法还没有进行高级代码优化。特别是，下面的代码优化对 JavaScript 是
+        有可能的，但不是由 esbuild 完成的（不是一个详尽的列表）：
+        </p>
+        <ul>
+          <li>消除函数体中的 dead-code</li>
+          <li>函数内联</li>
+          <li>Cross-statement 常数传播</li>
+          <li>对象形状建模</li>
+          <li>Allocation sinking</li>
+          <li>Method devirtualization</li>
+          <li>Symbolic execution</li>
+          <li>JSX 表达式提升</li>
+          <li>TypeScript 枚举检测和内联</li>
+        </ul>
+        <p>
+        如果你的代码使用的模式要求某些形式的代码优化是紧凑的，或者如果你正在为你的用例搜索最佳的
+        JavaScript 压缩算法，你应该考虑使用其他工具。实现这些高级代码优化的一些工具示例包括
+        [Terser](https://github.com/terser/terser#readme) 和
+        [Google Closure Compiler](https://github.com/google/closure-compiler#readme)。
+        </p>
 
   - h3: Outdir
 
@@ -1397,7 +1421,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --outdir=out
@@ -1449,7 +1473,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --outfile=out.js
@@ -1487,7 +1511,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --platform=node
@@ -1523,90 +1547,90 @@ body:
       当 platform 设置为 `browser`（默认值）时：
 
   - ul:
-    - >
-      <p>
-      默认的输出 [格式](#format) 为 `iife`，将生成的 JavaScript 代码包裹在立即执行函数表达式中，
-      以阻止变量泄露到全局作用域中。 
-      </p>
-    - >
-      <p>
-      如果一个包在 `package.json` 文件中
-      的[`browser`](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)
-      配置配置了一个 map，esbuild 将会使用该 map 替换指定的文件或模块为对浏览器友好的版本。
-      例如，例如，一个包可能会用 [`path-browserify`](https://www.npmjs.com/package/path-browserify) 替换
-      [`path`](https://nodejs.org/api/path.html)。
-      </p>
-    - >
-      <p>
-      [main fields](#main-fields) 设置为 <code>browser,<wbr>module,<wbr>main</code>，
-      但是会有一些额外的特殊行为。如果你个包支持 `module` 与 `main`，但是不支持 `browser`，
-      那么当使用 `require()` 导入时，将使用 `main` 而不是 `module`。
-      此行为通过将函数赋值给 `module.exports` 来改善与导出函数的 CommonJS 模块的兼容性。
-      </p>
-    - >
-      <p>
-      [conditions](#conditions) 设置自动包含了 `browser` 情况。
-      这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于浏览器代码的方式。
-      </p>
-    - >
-      <p>
-      All <code>process.<wbr>env.<wbr>NODE_ENV</code> expressions are automatically
-      [defined](#define) to `"production"` if all [minification](#minify)
-      options are enabled and `"development"` otherwise. This only happens if
-      `process`, `process.env`, and `process.env.NODE_ENV` are not already
-      defined. This substitution is necessary to avoid React-based code crashing
-      instantly (since `process` is a node API, not a web API).
-      </p>
+      - >
+        <p>
+        默认的输出 [格式](#format) 为 `iife`，将生成的 JavaScript 代码包裹在立即执行函数表达式中，
+        以阻止变量泄露到全局作用域中。 
+        </p>
+      - >
+        <p>
+        如果一个包在 `package.json` 文件中
+        的[`browser`](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)
+        配置配置了一个 map，esbuild 将会使用该 map 替换指定的文件或模块为对浏览器友好的版本。
+        例如，例如，一个包可能会用 [`path-browserify`](https://www.npmjs.com/package/path-browserify) 替换
+        [`path`](https://nodejs.org/api/path.html)。
+        </p>
+      - >
+        <p>
+        [main fields](#main-fields) 设置为 <code>browser,<wbr>module,<wbr>main</code>，
+        但是会有一些额外的特殊行为。如果你个包支持 `module` 与 `main`，但是不支持 `browser`，
+        那么当使用 `require()` 导入时，将使用 `main` 而不是 `module`。
+        此行为通过将函数赋值给 `module.exports` 来改善与导出函数的 CommonJS 模块的兼容性。
+        </p>
+      - >
+        <p>
+        [conditions](#conditions) 设置自动包含了 `browser` 情况。
+        这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于浏览器代码的方式。
+        </p>
+      - >
+        <p>
+        All <code>process.<wbr>env.<wbr>NODE_ENV</code> expressions are automatically
+        [defined](#define) to `"production"` if all [minification](#minify)
+        options are enabled and `"development"` otherwise. This only happens if
+        `process`, `process.env`, and `process.env.NODE_ENV` are not already
+        defined. This substitution is necessary to avoid React-based code crashing
+        instantly (since `process` is a node API, not a web API).
+        </p>
 
   - p: >
       当 platform 设置为 `node` 时：
 
   - ul:
-    - >
-      <p>
-      默认输出 [格式](#format) 为 `cjs`，代表 CommonJS（node 使用的模块格式）。
-      ES6-风格的导出使用的 `export` 语句将会被转换为 CommonJS `exports` 对象中的 getters。
-      </p>
-    - >
-      <p>
-      所有诸如 `fs` 的 [内置 node 模块](https://nodejs.org/docs/latest/api/) 会被自动标记为
-      [external](#external)，因此在打包器尝试打包他们时不会导致错误。
-      </p>
-    - >
-      <p>
-      [main 字段](#main-fields) 设置为 <code>main,<wbr>module</code>。
-      这意味着 tree shaking 操作可能不会发生在同时提供 `module` 和 `main` 的包中，
-      因为 tree shaking 操作只适用于 ECMAScript 模块，而不适用于 CommonJS 模块。
-      </p>
-      <p>
-      不幸的是，一些包将 `module` 视为 "browser code" 而不是 "ECMAScript module code"，
-      因此，这种默认行为是兼容性所必需的。如果你想要启用 tree shaking 并且知道这样做是安全的，
-      那么你可以手动将 [main 字段](#main-fields) 设置为 <code>module,<wbr>main</code>。
-      </p>
-    - >
-      <p>
-      [conditions](#conditions) 设置自动包含 `node` 情况。
-      这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于 node 端代码的方式。
-      </p>
+      - >
+        <p>
+        默认输出 [格式](#format) 为 `cjs`，代表 CommonJS（node 使用的模块格式）。
+        ES6-风格的导出使用的 `export` 语句将会被转换为 CommonJS `exports` 对象中的 getters。
+        </p>
+      - >
+        <p>
+        所有诸如 `fs` 的 [内置 node 模块](https://nodejs.org/docs/latest/api/) 会被自动标记为
+        [external](#external)，因此在打包器尝试打包他们时不会导致错误。
+        </p>
+      - >
+        <p>
+        [main 字段](#main-fields) 设置为 <code>main,<wbr>module</code>。
+        这意味着 tree shaking 操作可能不会发生在同时提供 `module` 和 `main` 的包中，
+        因为 tree shaking 操作只适用于 ECMAScript 模块，而不适用于 CommonJS 模块。
+        </p>
+        <p>
+        不幸的是，一些包将 `module` 视为 "browser code" 而不是 "ECMAScript module code"，
+        因此，这种默认行为是兼容性所必需的。如果你想要启用 tree shaking 并且知道这样做是安全的，
+        那么你可以手动将 [main 字段](#main-fields) 设置为 <code>module,<wbr>main</code>。
+        </p>
+      - >
+        <p>
+        [conditions](#conditions) 设置自动包含 `node` 情况。
+        这将改变 `package.json` 文件中 `exports` 字段如何被解释为偏好特定于 node 端代码的方式。
+        </p>
 
   - p: >
       当 platform 设置为 `neutral` 时：
 
   - ul:
-    - >
-      <p>
-      默认输出 [格式](#format) 为 `esm`，使用 ECMAScript 2015 (即 ES6) 中引入的 `export` 语法。
-      如果默认值不合适的话你可以改变输出格式。
-      </p>
-    - >
-      <p>
-      [main 字段](#main-fields) 默认设置为空。如果你想使用 npm 风格的包，
-      你可能需要将其配置为其他内容，比如将 node 使用的 main 字段配置为 `main`。
-      </p>
-    - >
-      <p>
-      [conditions](#conditions) 设置不会自动包含任何平台特定值。
-      </p>
+      - >
+        <p>
+        默认输出 [格式](#format) 为 `esm`，使用 ECMAScript 2015 (即 ES6) 中引入的 `export` 语法。
+        如果默认值不合适的话你可以改变输出格式。
+        </p>
+      - >
+        <p>
+        [main 字段](#main-fields) 默认设置为空。如果你想使用 npm 风格的包，
+        你可能需要将其配置为其他内容，比如将 node 使用的 main 字段配置为 `main`。
+        </p>
+      - >
+        <p>
+        [conditions](#conditions) 设置不会自动包含任何平台特定值。
+        </p>
 
   - p: >
       可以查看 [为浏览器打包](/getting-started/#bundling-for-the-browser)
@@ -1619,9 +1643,9 @@ body:
       在浏览器中重新加载代码之前手动重新运行 esbuild 是很不方便的。有几种方法可以自动完成：
 
   - ul:
-    - 当一个文件发生更改时使用 [监听模式](#watch) 重新运行 esbuild
-    - 将你的文本编辑器配置为每次保存代码重新运行 esbuild
-    - 使用一个对于每次请求都会重新构建的 web 服务器来为你的代码提供服务
+      - 当一个文件发生更改时使用 [监听模式](#watch) 重新运行 esbuild
+      - 将你的文本编辑器配置为每次保存代码重新运行 esbuild
+      - 使用一个对于每次请求都会重新构建的 web 服务器来为你的代码提供服务
 
   - p: >
       此 API 调用使用的是最后一种方法。serve API 与 [build API](#build-api) 调用很相似，
@@ -1640,7 +1664,7 @@ body:
   - p: >
       有两个不同的方法来使用 serve API：
 
-  - h4#serve-everything: '方法 1：为 esbuild 构建出的所有内容提供服务'
+  - h4#serve-everything: "方法 1：为 esbuild 构建出的所有内容提供服务"
 
   - p: >
       通过这种方法，你为 esbuild 提供一个名为 servedir 的目录，除了 esbuild 生成的文件之外，还提供了额外的内容。
@@ -1662,7 +1686,7 @@ body:
           outdir: 'www/js',
           bundle: true,
         }).then(server => {
-          // Call "stop" on the web server when you're done
+          // Call "stop" on the web server to stop serving
           server.stop()
         })
 
@@ -1675,7 +1699,7 @@ body:
           Bundle:      true,
         })
 
-        // Call "stop" on the web server when you're done
+        // Call "stop" on the web server to stop serving
         server.Stop()
 
   - p: >
@@ -1700,7 +1724,7 @@ body:
       端口号默认自动设置为大于等于 8000 的一个开放端口。端口号会在 API 调用时返回（或者使用 CLI 时会打印在终端中），
       这样你就可以知道应该访问哪一个 URL。如果有必要的话，端口号可以被指定（下面会详细描述）。
 
-  - h4#serve-generated: '方法 2: 仅为 esbuild 生成的文件提供服务'
+  - h4#serve-generated: "方法 2: 仅为 esbuild 生成的文件提供服务"
 
   - p: >
       使用该方法，你只需要告诉 esbuild 为 [`outdir`](#outdir) 中的内容提供服务，而不会让其为额外的内容提供服务。
@@ -1722,7 +1746,7 @@ body:
           bundle: true,
           outfile: 'out.js',
         }).then(server => {
-          // Call "stop" on the web server when you're done
+          // Call "stop" on the web server to stop serving
           server.stop()
         })
 
@@ -1735,7 +1759,7 @@ body:
           Outfile:     "out.js",
         })
 
-        // Call "stop" on the web server when you're done
+        // Call "stop" on the web server to stop serving
         server.Stop()
 
   - p: >
@@ -1801,47 +1825,47 @@ body:
         }
 
   - ul:
-    - >
-      `port`
-      <p>
-      可以选择在这里配置 HTTP 端口。如果省略，它将默认使用一个开放端口，优先级为 8000 端口。
-      你可以在命令行中通过使用 `--serve=8000` 而不仅仅是 `--serve` 来设置端口。
-      </p>
+      - >
+        `port`
+        <p>
+        可以选择在这里配置 HTTP 端口。如果省略，它将默认使用一个开放端口，优先级为 8000 端口。
+        你可以在命令行中通过使用 `--serve=8000` 而不仅仅是 `--serve` 来设置端口。
+        </p>
 
-    - >
-      `host`
-      <p>
-      默认情况下，esbuild 在所有的 IPv4 网络接口中有效。
-      这对应着 `0.0.0.0` 的 host。如果你想要配置一个不同的 host（例如，仅在 `127.0.0.1` 回路中提供服务而不向网络公开任何信息），
-      你可以使用该参数指定 host。你可以在命令行中通过使用 <code>--serve=<wbr>127.0.0.1:<wbr>8000</code>
-      而不仅仅是 `--serve` 来设置 host。
-      </p>
-      <p>
-      如果你需要使用 IPv6 而不是 IPv4，你仅需要指定一个 IPv6 host 地址。
-      在 IPv6 中与 `127.0.0.1` 回路接口等效的是 `::1`，并且与 `0.0.0.0` 通用接口等效的是 `::`。
-      如果你正在使用命令行将 host 设置为 IPv6 地址，你需要用方括号将 IPv6 地址括起来，以区别地址中
-      的冒号和分隔主机和端口的冒号，就像这样： <code>--serve=<wbr>[::]:<wbr>8000</code>。
-      </p>
+      - >
+        `host`
+        <p>
+        默认情况下，esbuild 在所有的 IPv4 网络接口中有效。
+        这对应着 `0.0.0.0` 的 host。如果你想要配置一个不同的 host（例如，仅在 `127.0.0.1` 回路中提供服务而不向网络公开任何信息），
+        你可以使用该参数指定 host。你可以在命令行中通过使用 <code>--serve=<wbr>127.0.0.1:<wbr>8000</code>
+        而不仅仅是 `--serve` 来设置 host。
+        </p>
+        <p>
+        如果你需要使用 IPv6 而不是 IPv4，你仅需要指定一个 IPv6 host 地址。
+        在 IPv6 中与 `127.0.0.1` 回路接口等效的是 `::1`，并且与 `0.0.0.0` 通用接口等效的是 `::`。
+        如果你正在使用命令行将 host 设置为 IPv6 地址，你需要用方括号将 IPv6 地址括起来，以区别地址中
+        的冒号和分隔主机和端口的冒号，就像这样： <code>--serve=<wbr>[::]:<wbr>8000</code>。
+        </p>
 
-    - >
-      `servedir`
-      <p>
-      这是 esbuild 的 HTTP 服务器提供的额外内容目录，当传入的请求与生成的任何输出文件路径不匹配时，它将代替 404。
-      这使你可以将 esbuild 用作通用的本地 web 服务器。例如，使用 <code>esbuild <wbr>--servedir=.</code>
-      在 `localhost` 为当前文件夹提供服务。在前面关于不同方法的部分中，对使用 `servedir` 进行了更详细的描述。
-      </p>
+      - >
+        `servedir`
+        <p>
+        这是 esbuild 的 HTTP 服务器提供的额外内容目录，当传入的请求与生成的任何输出文件路径不匹配时，它将代替 404。
+        这使你可以将 esbuild 用作通用的本地 web 服务器。例如，使用 <code>esbuild <wbr>--servedir=.</code>
+        在 `localhost` 为当前文件夹提供服务。在前面关于不同方法的部分中，对使用 `servedir` 进行了更详细的描述。
+        </p>
 
-    - >
-      `onRequest`
-      <p>
-      对每个传入的请求调用一次，并提供有关请求的一些信息。
-      CLI 使用该回调为每一个请求打印日志信息。time 字段是为该请求生成数据的时间，
-      但是它不包括向客户端发送请求流的时间。
-      </p>
-      <p>
-      请注意这会在请求完成后调用。使用该回调以任何形式修改请求是不可能的。
-      如果你想要这样做，你应该 [在 esbuild 之前设置一个代理](#customizing-server-behavior)。
-      </p>
+      - >
+        `onRequest`
+        <p>
+        对每个传入的请求调用一次，并提供有关请求的一些信息。
+        CLI 使用该回调为每一个请求打印日志信息。time 字段是为该请求生成数据的时间，
+        但是它不包括向客户端发送请求流的时间。
+        </p>
+        <p>
+        请注意这会在请求完成后调用。使用该回调以任何形式修改请求是不可能的。
+        如果你想要这样做，你应该 [在 esbuild 之前设置一个代理](#customizing-server-behavior)。
+        </p>
 
   - p: >
       serve API 调用的第二个参数是每个请求都会调用的底层构建 API 的常规配置项集合。
@@ -1869,34 +1893,34 @@ body:
         }
 
   - ul:
-    - >
-      `port`
-      <p>
-      这个是最终被 web 服务器使用的端口。如果你没有指定一个端口的话你将想要使用它，因为 esbuild
-      将最终挑选一个随机开放端口，并且你需要知道它选择了那个段扩才能连接到它。
-      如果你正在使用 CLI，这个端口号将会被打印在终端的 stderr 中。
-      </p>
+      - >
+        `port`
+        <p>
+        这个是最终被 web 服务器使用的端口。如果你没有指定一个端口的话你将想要使用它，因为 esbuild
+        将最终挑选一个随机开放端口，并且你需要知道它选择了那个段扩才能连接到它。
+        如果你正在使用 CLI，这个端口号将会被打印在终端的 stderr 中。
+        </p>
 
-    - >
-      `host`
-      <p>
-      这个是最终被 web 服务器使用的 host。它将是
-      `0.0.0.0`（即 服务所有可用的网络接口），除非配置了一个自定义 host。
-      </p>
+      - >
+        `host`
+        <p>
+        这个是最终被 web 服务器使用的 host。它将是
+        `0.0.0.0`（即 服务所有可用的网络接口），除非配置了一个自定义 host。
+        </p>
 
-    - >
-      `wait`
-      <p>
-      只要 socket 打开，serve API 调用会立即返回。这个 `wait` 返回值提供了一种方法，可以在 web 服务器
-      由于网络错误或者由于将来某个时间点停止调用而终止是通知它。
-      </p>
+      - >
+        `wait`
+        <p>
+        只要 socket 打开，serve API 调用会立即返回。这个 `wait` 返回值提供了一种方法，可以在 web 服务器
+        由于网络错误或者由于将来某个时间点停止调用而终止是通知它。
+        </p>
 
-    - >
-      `stop`
-      <p>
-      当你不需要它清理资源时，你可以调用该回调以停止 web 服务器。
-      这将会立即终止所有打开的链接，并且唤醒所有等待 `wait` 返回值的代码。
-      </p>
+      - >
+        `stop`
+        <p>
+        当你不需要它清理资源时，你可以调用该回调以停止 web 服务器。
+        这将会立即终止所有打开的链接，并且唤醒所有等待 `wait` 返回值的代码。
+        </p>
 
   - h4: 自定义服务器行为
 
@@ -1960,10 +1984,10 @@ body:
       你可以使用代理做很多事情，就像下面的举例：
 
   - ul:
-    - 插入你自己的 404 页面（上面的示例）
-    - 自定义路由与文件系统中文件之间的映射关系
-    - 重定向一些路由到 API 服务器而不是到 esbuild
-    - 使用自签名证书添加 HTTPS 支持
+      - 插入你自己的 404 页面（上面的示例）
+      - 自定义路由与文件系统中文件之间的映射关系
+      - 重定向一些路由到 API 服务器而不是到 esbuild
+      - 使用自签名证书添加 HTTPS 支持
 
   - p: >
       如果你有更高级的需求的话，你也可以使用诸如 [NGINX](https://nginx.org/en/docs/beginners_guide.html#proxy) 一样真正的代理。
@@ -1988,6 +2012,19 @@ body:
   - p: >
       启用 source map 将会伴随着任何一个生成的 `.js` 文件生成一个 `.js.map` 文件，并且在
       `.js` 文件底部添加特殊的 `//# sourceMappingURL=` 注释以指向 `.js.map` 文件。
+      There are four different modes for source map generation:
+
+  - div: >
+      <ol start="1"><li>
+      <code>linked</code>
+      <p>
+      This mode means the source map is generated into a separate `.js.map`
+      output file alongside the `.js` output file, and the `.js` output file contains
+      a special `//# sourceMappingURL=` comment that points to the `.js.map` output file.
+      That way the browser knows where to find the source map for a given file
+      when you open the debugger. Use `linked` source map mode like this:
+      </p>
+      </li></ol>
 
       There are four different modes for source map generation:
 
@@ -2005,7 +2042,7 @@ body:
 
   - example:
       in:
-        app.ts: 'let x: number = 1'
+        app.ts: "let x: number = 1"
 
       cli: |
         esbuild app.ts --sourcemap --outfile=out.js
@@ -2040,9 +2077,16 @@ body:
       如果输入的文件本身包含特殊 `//# sourceMappingURL=` 注释，esbuild 将会自动尝试解析
       链接的 source map。如果成功的话，生成的源映射中的映射将一路映射回输入源映射中引用的原始源代码。
 
-  - p: >
-      如果你想在生成的 `.js` 中省略特殊 `//# sourceMappingURL=` 注释，但是你仍想生成 `.js.map` 文件，
-      你应该设置 source map 模式为 `external`：
+  - div: >
+      <ol start="2"><li>
+      <code>external</code>
+      <p>
+      This mode means the source map is generated into a separate `.js.map`
+      output file alongside the `.js` output file, but unlike `linked` mode the `.js`
+      output file does not contain a `//# sourceMappingURL=` comment. Use `external`
+      source map mode like this:
+      </p>
+      </li></ol>
 
   - div: >
       <ol start="2"><li>
@@ -2057,7 +2101,7 @@ body:
 
   - example:
       in:
-        app.ts: 'let x: number = 1'
+        app.ts: "let x: number = 1"
 
       cli: |
         esbuild app.ts --sourcemap=external --outfile=out.js
@@ -2109,7 +2153,7 @@ body:
 
   - example:
       in:
-        app.ts: 'let x: number = 1'
+        app.ts: "let x: number = 1"
 
       cli: |
         esbuild app.ts --sourcemap=inline --outfile=out.js
@@ -2162,7 +2206,7 @@ body:
 
   - example:
       in:
-        app.ts: 'let x: number = 1'
+        app.ts: "let x: number = 1"
 
       cli: |
         esbuild app.ts --sourcemap=both --outfile=out.js
@@ -2211,9 +2255,9 @@ body:
       这里是如何启用浏览器开发者工具中 source map 设置的方式：
 
   - ul:
-      - 'Chrome: ⚙ → Enable JavaScript source maps'
-      - 'Safari: ⚙ → Sources → Enable source maps'
-      - 'Firefox: ··· → Enable Source Maps'
+      - "Chrome: ⚙ → Enable JavaScript source maps"
+      - "Safari: ⚙ → Sources → Enable source maps"
+      - "Firefox: ··· → Enable Source Maps"
 
   - p: >
       在 node 环境中，source map 在 [version v12.12.0](https://nodejs.org/en/blog/release/v12.12.0/) 版本之后原生支持。
@@ -2260,8 +2304,8 @@ body:
 
   - example:
       in:
-        home.ts: '1 + 2'
-        about.ts: '1 + 2'
+        home.ts: "1 + 2"
+        about.ts: "1 + 2"
 
       cli: |
         esbuild home.ts about.ts --bundle --splitting --outdir=out --format=esm
@@ -2312,7 +2356,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --target=es2020,chrome58,firefox57,safari11,edge16,node12
@@ -2376,8 +2420,11 @@ body:
   - example:
       noCheck: true
 
-      cli: |
-        esbuild app.js --outfile=out.js --bundle --watch
+      cli:
+        - $: |
+            esbuild app.js --outfile=out.js --bundle --watch
+        - expect: |
+            [watch] build finished, watching for changes...
 
       js: |
         require('esbuild').build({
@@ -2386,8 +2433,7 @@ body:
           bundle: true,
           watch: true,
         }).then(result => {
-          // Call "stop" on the result when you're done
-          result.stop()
+          console.log('watching...')
         })
 
       go: |
@@ -2397,9 +2443,7 @@ body:
           Bundle:      true,
           Watch:       &api.WatchMode{},
         })
-
-        // Call "stop" on the result when you're done
-        result.Stop()
+        fmt.Printf("watching...\n")
 
   - p: >
       如果你正在使用 JavaScript 或者 Go API，你可以选择性地提供一个回调函数，该函数将会在
@@ -2420,8 +2464,7 @@ body:
             },
           },
         }).then(result => {
-          // Call "stop" on the result when you're done
-          result.stop()
+          console.log('watching...')
         })
 
       go: |
@@ -2439,9 +2482,41 @@ body:
             },
           },
         })
+        fmt.Printf("watching...\n")
 
-        // Call "stop" on the result when you're done
+  - p: >
+      If you want to stop watch mode at some point in the future, you can call
+      "stop" on the result object to terminate the file watcher:
+
+  - example:
+      noCheck: true
+
+      js: |
+        require('esbuild').build({
+          entryPoints: ['app.js'],
+          outfile: 'out.js',
+          bundle: true,
+        }).then(result => {
+          console.log('watching...')
+
+          setTimeout(() => {
+            result.stop()
+            console.log('stopped watching')
+          }, 10 * 1000)
+        })
+
+      go: |
+        result := api.Build(api.BuildOptions{
+          EntryPoints: []string{"app.js"},
+          Outfile:     "out.js",
+          Bundle:      true,
+          Watch:       &api.WatchMode{},
+        })
+        fmt.Printf("watching...\n")
+
+        time.Sleep(10 * time.Second)
         result.Stop()
+        fmt.Printf("stopped watching\n")
 
   - p: >
       为了实现可移植性，esbuild 中的监视模式使用轮询而不是特定于操作系统的文件系统 api 来实现的。
@@ -2466,7 +2541,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       js: |
         let result = require('esbuild').buildSync({
@@ -2518,7 +2593,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --outdir=. --allow-overwrite
@@ -2727,6 +2802,182 @@ body:
   - h3: 资源名称
 
   - p: >
+      Using the analyze feature generates an easy-to-read report about the contents of your bundle:
+
+  - example:
+      install:
+        react: "17.0.2"
+        react-dom: "17.0.2"
+
+      in:
+        example.jsx: |
+          import * as React from 'react'
+          import * as Server from 'react-dom/server'
+
+          let Greet = () => <h1>Hello, world!</h1>
+          console.log(Server.renderToString(<Greet />))
+
+      cli:
+        - $: |
+            esbuild --bundle example.jsx --outfile=out.js --minify --analyze
+
+        - expect: |
+            ...
+
+              out.js                                                                    27.4kb  100.0%
+               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js  19.2kb   70.1%
+               ├ node_modules/react/cjs/react.production.min.js                          5.9kb   21.5%
+               ├ node_modules/object-assign/index.js                                     962b     3.4%
+               ├ example.jsx                                                             137b     0.5%
+               ├ node_modules/react-dom/server.browser.js                                 50b     0.2%
+               └ node_modules/react/index.js                                              50b     0.2%
+
+      js: |
+        (async () => {
+          let esbuild = require('esbuild')
+
+          let result = await esbuild.build({
+            entryPoints: ['example.jsx'],
+            outfile: 'out.js',
+            minify: true,
+            metafile: true,
+          })
+
+          let text = await esbuild.analyzeMetafile(result.metafile)
+          console.log(text)
+        })()
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "fmt"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:       []string{"example.jsx"},
+            Outfile:           "out.js",
+            MinifyWhitespace:  true,
+            MinifyIdentifiers: true,
+            MinifySyntax:      true,
+            Metafile:          true,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          text := api.AnalyzeMetafile(result.Metafile, api.AnalyzeMetafileOptions{})
+          fmt.Printf("%s", text)
+        }
+
+  - p: >
+      The information shows which input files ended up in each output file as
+      well as the percentage of the output file they ended up taking up. If you
+      would like additional information, you can enable the "verbose" mode.
+      This currently shows the import path from the entry point to each input
+      file which tells you why a given input file is being included in the bundle:
+
+  - example:
+      install:
+        react: "17.0.2"
+        react-dom: "17.0.2"
+
+      in:
+        example.jsx: |
+          import * as React from 'react'
+          import * as Server from 'react-dom/server'
+
+          let Greet = () => <h1>Hello, world!</h1>
+          console.log(Server.renderToString(<Greet />))
+
+      cli:
+        - $: |
+            esbuild --bundle example.jsx --outfile=out.js --minify --analyze=verbose
+
+        - expect: |
+            ...
+
+              out.js ─────────────────────────────────────────────────────────────────── 27.4kb ─ 100.0%
+               ├ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js ─ 19.2kb ── 70.1%
+               │  └ node_modules/react-dom/server.browser.js
+               │     └ example.jsx
+               ├ node_modules/react/cjs/react.production.min.js ───────────────────────── 5.9kb ── 21.5%
+               │  └ node_modules/react/index.js
+               │     └ example.jsx
+               ├ node_modules/object-assign/index.js ──────────────────────────────────── 962b ──── 3.4%
+               │  └ node_modules/react-dom/cjs/react-dom-server.browser.production.min.js
+               │     └ node_modules/react-dom/server.browser.js
+               │        └ example.jsx
+               ├ example.jsx ──────────────────────────────────────────────────────────── 137b ──── 0.5%
+               ├ node_modules/react-dom/server.browser.js ──────────────────────────────── 50b ──── 0.2%
+               │  └ example.jsx
+               └ node_modules/react/index.js ───────────────────────────────────────────── 50b ──── 0.2%
+                  └ example.jsx
+
+      js: |
+        (async () => {
+          let esbuild = require('esbuild')
+
+          let result = await esbuild.build({
+            entryPoints: ['example.jsx'],
+            outfile: 'out.js',
+            minify: true,
+            metafile: true,
+          })
+
+          let text = await esbuild.analyzeMetafile(result.metafile, {
+            verbose: true,
+          })
+          console.log(text)
+        })()
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "fmt"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints:       []string{"example.jsx"},
+            Outfile:           "out.js",
+            MinifyWhitespace:  true,
+            MinifyIdentifiers: true,
+            MinifySyntax:      true,
+            Metafile:          true,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+
+          text := api.AnalyzeMetafile(result.Metafile, api.AnalyzeMetafileOptions{
+            Verbose: true,
+          })
+          fmt.Printf("%s", text)
+        }
+
+  - p: >
+      This analysis is just a visualization of the information that can be found
+      in the [metafile](#metafile). If this analysis doesn't exactly suit your
+      needs, you are welcome to build your own visualization using the information
+      in the metafile.
+
+  - p: >
+      Note that this formatted analysis summary is intended for humans, not
+      machines. The specific formatting may change over time which will likely
+      break any tools that try to parse it. You should not write a tool to parse
+      this data. You should be using the information in the [JSON metadata file](#metafile)
+      instead. Everything in this visualization is derived from the JSON metadata
+      so you are not losing out on any information by not parsing esbuild's
+      formatted analysis summary.
+
+  - h3: 资源名称
+
+  - p: >
       当 [loader](#loader) 设置为 [`file`](/content-types/#external-file) 时，该配置项
       控制额外生成的文件名称。它使用带有占位符的模板来配置输出路径，当生成输出路径时，占位符将被特定
       于文件的值替换。例如，例如，指定 <code>assets/<wbr>[name]-<wbr>[hash]</code> 的资源名
@@ -2736,7 +2987,7 @@ body:
   - example:
       in:
         app.js: 'import "./file.png"'
-        file.png: 'a png file'
+        file.png: "a png file"
 
       cli: |
         esbuild app.js --asset-names=assets/[name]-[hash] --loader:.png=file --bundle --outdir=out
@@ -2776,30 +3027,30 @@ body:
       在资源路径模板中有三个可用占位符：
 
   - ul:
-    - >
-      `[dir]`
-      <p>
-      This is the relative path from the directory containing the asset file to
-      the [outbase](#outbase) directory. Its purpose is to help asset output
-      paths look more aesthetically pleasing by mirroring the input directory
-      structure inside of the output directory.
-      </p>
+      - >
+        `[dir]`
+        <p>
+        This is the relative path from the directory containing the asset file to
+        the [outbase](#outbase) directory. Its purpose is to help asset output
+        paths look more aesthetically pleasing by mirroring the input directory
+        structure inside of the output directory.
+        </p>
 
-    - >
-      `[name]`
-      <p>
-      这是不带拓展名的原始资源文件名称。例如，如果一个资源原来名为 `image.png`，然后模板中的
-      `[name]` 就会被 `image` 替换。没有必要使用该占位符；它的存在只是为了提供对人类友好的资源
-      名称，使调试更容易。
-      </p>
+      - >
+        `[name]`
+        <p>
+        这是不带拓展名的原始资源文件名称。例如，如果一个资源原来名为 `image.png`，然后模板中的
+        `[name]` 就会被 `image` 替换。没有必要使用该占位符；它的存在只是为了提供对人类友好的资源
+        名称，使调试更容易。
+        </p>
 
-    - >
-      `[hash]`
-      <p>
-      这是资源的内容哈希，可以避免命名冲突。例如，你的代码可能会导入 <code>components/<wbr>button/<wbr>icon.png</code>
-      和 <code>components/<wbr>select/<wbr>icon.png</code> ，在这种情况下，
-      你需要使用哈希值来区分这两个都命名为 icon 的资源。
-      </p>
+      - >
+        `[hash]`
+        <p>
+        这是资源的内容哈希，可以避免命名冲突。例如，你的代码可能会导入 <code>components/<wbr>button/<wbr>icon.png</code>
+        和 <code>components/<wbr>select/<wbr>icon.png</code> ，在这种情况下，
+        你需要使用哈希值来区分这两个都命名为 icon 的资源。
+        </p>
 
   - p: >
       资源路径模板不需要包含文件拓展名。资源的原始拓展名将会在模板替换完成后添加到输出路径尾部。
@@ -2814,7 +3065,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --banner:js=//comment --banner:css=/*comment*/
@@ -2930,23 +3181,23 @@ body:
       一些警告：
 
   - ul:
-    - >
-      <p>
-      这还不会转义嵌入在正则表达式中的非 ASCII 字符。这是因为 esbuild 目前根本不解析正则表达式的内容。
-      尽管有这个限制，但还是添加了这个标志，因为它对于不包含这种情况的代码仍然有用。
-      </p>
-    - >
-      <p>
-      此标志不适用于注释。我认为在注释中保留非 ASCII 数据应该没有问题，因为即使编码是错误的，
-      运行时环境也应该完全忽略所有注释的内容。例如，[V8 的博文](https://v8.dev/blog/scanner) 
-      提到了一种优化，可以完全避免对评论内容进行解码。esbuild 会剔除除与许可相关的所有注释。
-      </p>
-    - >
-      <p>
-      此选项同时适用于所有输出文件类型（JavaScript、CSS 和 JSON）。因此，如果你配置你的 web 
-      服务器发送正确的 <code>Content-<wbr>Type</code> 头，并希望使用 UTF-8 字符集，
-      请确保你的 web 服务器配置为将 `.js` 和 `.css`文件都作为 UTF-8 处理。
-      </p>
+      - >
+        <p>
+        这还不会转义嵌入在正则表达式中的非 ASCII 字符。这是因为 esbuild 目前根本不解析正则表达式的内容。
+        尽管有这个限制，但还是添加了这个标志，因为它对于不包含这种情况的代码仍然有用。
+        </p>
+      - >
+        <p>
+        此标志不适用于注释。我认为在注释中保留非 ASCII 数据应该没有问题，因为即使编码是错误的，
+        运行时环境也应该完全忽略所有注释的内容。例如，[V8 的博文](https://v8.dev/blog/scanner) 
+        提到了一种优化，可以完全避免对评论内容进行解码。esbuild 会剔除除与许可相关的所有注释。
+        </p>
+      - >
+        <p>
+        此选项同时适用于所有输出文件类型（JavaScript、CSS 和 JSON）。因此，如果你配置你的 web 
+        服务器发送正确的 <code>Content-<wbr>Type</code> 头，并希望使用 UTF-8 字符集，
+        请确保你的 web 服务器配置为将 `.js` 和 `.css`文件都作为 UTF-8 处理。
+        </p>
 
   - h3: Chunk 名称
 
@@ -2959,7 +3210,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --chunk-names=chunks/[name]-[hash] --bundle --outdir=out --splitting --format=esm
@@ -2999,17 +3250,17 @@ body:
       在 chunk 路径模板中有两个可用占位符：
 
   - ul:
-    - >
-      `[name]`
-      <p>
-      目前这将始终是 `chunk`，尽管这个占位符在将来的版本中可能会有额外的值。
-      </p>
+      - >
+        `[name]`
+        <p>
+        目前这将始终是 `chunk`，尽管这个占位符在将来的版本中可能会有额外的值。
+        </p>
 
-    - >
-      `[hash]`
-      <p>
-      这是 chunk 的内容哈希。在生成多个共享代码块的情况下，内容哈希是区分不同 chunk 的必要条件。
-      </p>
+      - >
+        `[hash]`
+        <p>
+        这是 chunk 的内容哈希。在生成多个共享代码块的情况下，内容哈希是区分不同 chunk 的必要条件。
+        </p>
 
   - p: >
       chunk 路径模板不需要包括一个文件拓展名。在模板替换之后，为适当内容类型配置的 
@@ -3087,7 +3338,7 @@ body:
       in:
         src/app.js: 'import "pkg"'
         src/node_modules/pkg/package.json: '{ "exports": { "custom1": "./foo.js" } }'
-        src/node_modules/pkg/foo.js: 'console.log(123)'
+        src/node_modules/pkg/foo.js: "console.log(123)"
 
       cli: |
         esbuild src/app.js --bundle --conditions=custom1,custom2
@@ -3151,35 +3402,35 @@ body:
   - p: >
       默认情况下，esbuild 有五种内置特定行为，并且不能被禁用：
   - ul:
-    - >
-      `default`
-      <p>
-      该条件总处于激活状态。它的目的是放在最后，让你在没有其他条件应用时提供兜底。
-      </p>
-    - >
-      `import`
-      <p>
-      该条件仅在通过 ESM `import` 声明或者 `import()` 表达式导入路径时生效。
-      可以用来提供特定于 ESM 的代码。
-      </p>
-    - >
-      `require`
-      <p>
-      该条件仅在通过 CommonJS `require()` 调用导入路径时生效。
-      可以用来提供特定于 CommonJS 的代码。
-      </p>
-    - >
-      `browser`
-      <p>
-      该条件仅在 esbuild 的 [platform](#platform) 设置为 `browser` 有效。
-      可以用来提供特定于浏览器的代码。
-      </p>
-    - >
-      `node`
-      <p>
-      该条件仅在 esbuild 的 [platform](#platform) 设置为 `node` 有效。
-      可以用来提供特定于 node 的代码。
-      </p>
+      - >
+        `default`
+        <p>
+        该条件总处于激活状态。它的目的是放在最后，让你在没有其他条件应用时提供兜底。
+        </p>
+      - >
+        `import`
+        <p>
+        该条件仅在通过 ESM `import` 声明或者 `import()` 表达式导入路径时生效。
+        可以用来提供特定于 ESM 的代码。
+        </p>
+      - >
+        `require`
+        <p>
+        该条件仅在通过 CommonJS `require()` 调用导入路径时生效。
+        可以用来提供特定于 CommonJS 的代码。
+        </p>
+      - >
+        `browser`
+        <p>
+        该条件仅在 esbuild 的 [platform](#platform) 设置为 `browser` 有效。
+        可以用来提供特定于浏览器的代码。
+        </p>
+      - >
+        `node`
+        <p>
+        该条件仅在 esbuild 的 [platform](#platform) 设置为 `node` 有效。
+        可以用来提供特定于 node 的代码。
+        </p>
 
   - p: >
       请注意当你使用 `require` 与 `import` 条件时，_你的包可能会在 bundle 过程中多次终止！_
@@ -3198,7 +3449,7 @@ body:
 
   - example:
       in:
-        src/main-app/app.js: '1 + 2'
+        src/main-app/app.js: "1 + 2"
 
       cli: |
         esbuild src/main-app/app.js --entry-names=[dir]/[name]-[hash] --outbase=src --bundle --outdir=out
@@ -3236,40 +3487,40 @@ body:
       在入口路径模板中有三个可用占位符：
 
   - ul:
-    - >
-      `[dir]`
-      <p>
-      这是从包含输入入口点文件的目录到 [outbase](#outbase) 目录的相对路径。
-      它的目的是帮助你避免不同子目录中命名相同的入口点之间的冲突。
-      </p>
-      <p>
-      例如，如果有两个入口点
-      <code>src/<wbr>pages/<wbr>home/<wbr>index.ts</code> 与
-      <code>src/<wbr>pages/<wbr>about/<wbr>index.ts</code>，outbase 文件夹为 `src`，
-      入口名称模板为 `[dir]/[name]`，输出文件夹将会包含 <code>pages/<wbr>home/<wbr>index.js</code> 与
-      <code>pages/<wbr>about/<wbr>index.js</code>。如果入口名称模板仅被设置为 `[name]`，打包将会失败，
-      因为在输出文件夹中包含两个相同输出路径的输出文件。
-      </p>
+      - >
+        `[dir]`
+        <p>
+        这是从包含输入入口点文件的目录到 [outbase](#outbase) 目录的相对路径。
+        它的目的是帮助你避免不同子目录中命名相同的入口点之间的冲突。
+        </p>
+        <p>
+        例如，如果有两个入口点
+        <code>src/<wbr>pages/<wbr>home/<wbr>index.ts</code> 与
+        <code>src/<wbr>pages/<wbr>about/<wbr>index.ts</code>，outbase 文件夹为 `src`，
+        入口名称模板为 `[dir]/[name]`，输出文件夹将会包含 <code>pages/<wbr>home/<wbr>index.js</code> 与
+        <code>pages/<wbr>about/<wbr>index.js</code>。如果入口名称模板仅被设置为 `[name]`，打包将会失败，
+        因为在输出文件夹中包含两个相同输出路径的输出文件。
+        </p>
 
-    - >
-      `[name]`
-      <p>
-      这是不带拓展名的原始入口文件名称。例如，如果入口文件名为 `app.js`，那么模板中的 `[name]` 将会被
-      替换为 `app`。
-      </p>
+      - >
+        `[name]`
+        <p>
+        这是不带拓展名的原始入口文件名称。例如，如果入口文件名为 `app.js`，那么模板中的 `[name]` 将会被
+        替换为 `app`。
+        </p>
 
-    - >
-      `[hash]`
-      <p>
-      这是输出文件的内容哈希，可以用来最大化利用浏览器缓存。在你的入口点名称中添加 `[hash]`，
-      这就意味着 esbuild 会计算与相应输出文件有关系的所有内容的哈希值（如果 [代码分隔](#splitting) 
-      激活状态，也包括他导入的任何输出文件）。当且仅当与该输出文件相关的任何输入文件被更改时哈希值才会发生变化。
-      </p>
-      <p>
-      之后，你可以让 web 服务器告诉浏览器永久缓存这些文件（你可以说它们从现在起过期很长一段时间，比如一年）。
-      你可以使用 [metafile](#metafile) 中的信息来确定哪个输出文件路径对应于哪个输入入口点，这样你就知道要在
-      `<script>` 标签中引入哪个路径。
-      </p>
+      - >
+        `[hash]`
+        <p>
+        这是输出文件的内容哈希，可以用来最大化利用浏览器缓存。在你的入口点名称中添加 `[hash]`，
+        这就意味着 esbuild 会计算与相应输出文件有关系的所有内容的哈希值（如果 [代码分隔](#splitting) 
+        激活状态，也包括他导入的任何输出文件）。当且仅当与该输出文件相关的任何输入文件被更改时哈希值才会发生变化。
+        </p>
+        <p>
+        之后，你可以让 web 服务器告诉浏览器永久缓存这些文件（你可以说它们从现在起过期很长一段时间，比如一年）。
+        你可以使用 [metafile](#metafile) 中的信息来确定哪个输出文件路径对应于哪个输入入口点，这样你就知道要在
+        `<script>` 标签中引入哪个路径。
+        </p>
 
   - p: >
       入口路径模板不需要包含一个文件拓展名。根据文件类型，适当的 [out 扩展名](#out-extension) 将在模板替换
@@ -3285,7 +3536,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --footer:js=//comment --footer:css=/*comment*/
@@ -3430,23 +3681,23 @@ body:
       of side-effect annotations that esbuild supports:
 
   - ul:
-    - >
-      <p>
-      Inline `/* @__PURE__ */` comments before function calls tell esbuild that
-      the function call can be removed if the resulting value isn't used. See
-      the [pure](#pure) API option for more information.
-      </p>
+      - >
+        <p>
+        Inline `/* @__PURE__ */` comments before function calls tell esbuild that
+        the function call can be removed if the resulting value isn't used. See
+        the [pure](#pure) API option for more information.
+        </p>
 
-    - >
-      <p>
-      The `sideEffects` field in `package.json` can be used to tell esbuild
-      which files in your package can be removed if all imports from that
-      file end up being unused. This is a convention from Webpack and many
-      libraries published to npm already have this field in their package
-      definition. You can learn more about this field in
-      [Webpack's documentation](https://webpack.js.org/guides/tree-shaking/)
-      for this field.
-      </p>
+      - >
+        <p>
+        The `sideEffects` field in `package.json` can be used to tell esbuild
+        which files in your package can be removed if all imports from that
+        file end up being unused. This is a convention from Webpack and many
+        libraries published to npm already have this field in their package
+        definition. You can learn more about this field in
+        [Webpack's documentation](https://webpack.js.org/guides/tree-shaking/)
+        for this field.
+        </p>
 
   - p: >
       These annotations can be problematic because the compiler depends
@@ -3464,10 +3715,10 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
-          esbuild app.js --bundle --ignore-annotations
+        esbuild app.js --bundle --ignore-annotations
 
       js: |
         require('esbuild').buildSync({
@@ -3513,25 +3764,25 @@ body:
       增量构建 API 目前使用两种形式的缓存：
 
   - ul:
-    - >
-      <p>
-      文件存储在内存中，如果文件 metadata 自上次构建以来没有更改，则不会从文件系统中重新读取文件。
-      此优化仅适用于文件系统路径。它不适用于由 [插件](/plugins/) 创建的虚拟模块。
-      </p>
+      - >
+        <p>
+        文件存储在内存中，如果文件 metadata 自上次构建以来没有更改，则不会从文件系统中重新读取文件。
+        此优化仅适用于文件系统路径。它不适用于由 [插件](/plugins/) 创建的虚拟模块。
+        </p>
 
-    - >
-      <p>
-      解析后的 [ASTs](https://en.wikipedia.org/wiki/Abstract_syntax_tree) 存储在内存中，
-      如果文件内容自上次构建以来没有更改，则可以避免重新解析 AST。
-      除了文件系统模块之外，这个优化还适用于插件创建的虚拟模块，只要虚拟模块路径保持不变。
-      </p>
+      - >
+        <p>
+        解析后的 [ASTs](https://en.wikipedia.org/wiki/Abstract_syntax_tree) 存储在内存中，
+        如果文件内容自上次构建以来没有更改，则可以避免重新解析 AST。
+        除了文件系统模块之外，这个优化还适用于插件创建的虚拟模块，只要虚拟模块路径保持不变。
+        </p>
 
   - p: >
       下面是如何进行增量构建：
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       js: |
         async function example() {
@@ -3785,7 +4036,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --minify --keep-names
@@ -3821,27 +4072,28 @@ body:
   - h3: Legal comments
 
   - p: >
-      A "legal comment" is considered to be any statement-level comment that
-      contains `@license` or `@preserve` or that starts with `//!` or `/*!`.
-      These comments are preserved in output files by default since that
-      follows the intent of the original authors of the code. However, this
-      behavior can be configured by using one of the following options:
+      A "legal comment" is considered to be any statement-level comment in JS
+      or rule-level  comment in CSS that contains `@license` or `@preserve` or
+      that starts with `//!` or `/*!`. These comments are preserved in output
+      files by default since that follows the intent of the original authors
+      of the code. However, this behavior can be configured by using one of
+      the following options:
 
   - ul:
-    - >
-      <p>`none`<br>Do not preserve any legal comments.</p>
+      - >
+        <p>`none`<br>Do not preserve any legal comments.</p>
 
-    - >
-      <p>`inline`<br>Preserve all legal comments.</p>
+      - >
+        <p>`inline`<br>Preserve all legal comments.</p>
 
-    - >
-      <p>`eof`<br>Move all legal comments to the end of the file.</p>
+      - >
+        <p>`eof`<br>Move all legal comments to the end of the file.</p>
 
-    - >
-      <p>`linked`<br>Move all legal comments to a `.LEGAL.txt` file and link to them with a comment.</p>
+      - >
+        <p>`linked`<br>Move all legal comments to a `.LEGAL.txt` file and link to them with a comment.</p>
 
-    - >
-      <p>`external`<br>Move all legal comments to a `.LEGAL.txt` file but to not link to them.</p>
+      - >
+        <p>`external`<br>Move all legal comments to a `.LEGAL.txt` file but to not link to them.</p>
 
   - p: >
       The default behavior is `eof` when [bundle](#bundle) is enabled and
@@ -3849,7 +4101,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --legal-comments=eof
@@ -3878,10 +4130,11 @@ body:
         }
 
   - p: >
-      Note that "statement-level" means the comment must appear in a context
-      where multiple statements are allowed such as in the top-level scope or
-      in a statement block. So comments inside expressions are not considered
-      license comments.
+      Note that "statement-level" for JS and "rule-level" for CSS means the
+      comment must appear in a context where multiple statements or rules
+      are allowed such as in the top-level scope or in a statement or rule
+      block. So comments inside expressions or at the declaration level are
+      not considered license comments.
 
   - h3: 日志级别
 
@@ -3890,23 +4143,23 @@ body:
       六个日志级别分别是：
 
   - ul:
-    - >
-      <p>`silent`<br>Do not show any log output.</p>
-    - >
-      <p>`error`<br>Only show errors.</p>
-    - >
-      <p>`warning`<br>Only show warnings and errors.</p>
-    - >
-      <p>`info`<br>Show warnings, errors, and an output file summary. This is
-      the default log level.</p>
-    - >
-      <p>`debug`<br>Log everything from `info` and some additional messages
-      that may help you debug a broken bundle. This log level has a performance
-      impact and some of the messages may be false positives, so this information
-      is not shown by default.</p>
-    - >
-      <p>`verbose`<br>This generates a torrent of log messages and was added to
-      debug issues with file system drivers. It's not intended for general use.</p>
+      - >
+        <p>`silent`<br>Do not show any log output.</p>
+      - >
+        <p>`error`<br>Only show errors.</p>
+      - >
+        <p>`warning`<br>Only show warnings and errors.</p>
+      - >
+        <p>`info`<br>Show warnings, errors, and an output file summary. This is
+        the default log level.</p>
+      - >
+        <p>`debug`<br>Log everything from `info` and some additional messages
+        that may help you debug a broken bundle. This log level has a performance
+        impact and some of the messages may be false positives, so this information
+        is not shown by default.</p>
+      - >
+        <p>`verbose`<br>This generates a torrent of log messages and was added to
+        debug issues with file system drivers. It's not intended for general use.</p>
 
   - p: >
       你可以通过如下方式设置日志级别：
@@ -3951,7 +4204,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --log-limit=0
@@ -3989,37 +4242,37 @@ body:
       通常至少有三个这样的字段：
 
   - ul:
-    - >
-      `main`
-      <p>
-      这是对于所有用于 node 中的包的 [标准字段](https://docs.npmjs.com/files/package.json#main)。
-      `main` 这个名字被硬编码到 node 的模块解析逻辑中。因为它是用于与 node 一起使用的，
-      所以可以合理地预期该字段中的文件路径是 commonjs 风格的模块。
-      </p>
+      - >
+        `main`
+        <p>
+        这是对于所有用于 node 中的包的 [标准字段](https://docs.npmjs.com/files/package.json#main)。
+        `main` 这个名字被硬编码到 node 的模块解析逻辑中。因为它是用于与 node 一起使用的，
+        所以可以合理地预期该字段中的文件路径是 commonjs 风格的模块。
+        </p>
 
-    - >
-      `module`
-      <p>
-      这个字段来自于一个关于如何将 ECMAScript 模块集成到 node 中的[提案](https://github.com/dherman/defense-of-dot-js/blob/f31319be735b21739756b87d551f6711bd7aa283/proposal.md)。
-      正因如此，可以合理地预期该字段中的文件路径是 ECMAScript 风格的模块。该提案没有被 node 接收（node 使用 <code>"type": <wbr>"module"</code>），
-      但是它被主流打包器采纳，因为 ECMAScript 风格的模块可以更好的 [tree shaking](#tree-shaking) 或者无用代码移除。
-      </p>
-      <p>
-      对包的作者：一些包错误的将 `module` 字段设置为了特定于浏览器的代码，`main` 字段的是
-      特定于 node 端的代码。很有可能因为 node 忽略了 `module` 字段并且人们通常只对特定于
-      浏览器的代码使用打包器。然而，打包特定于 node 的代码也很有价值（例如 它减少了下载和引导时间），
-      并且那些把特定于浏览器的代码放到 `module` 中的包，会使捆绑器无法有效地进行 tree shaking 操作。
-      如果你正在尝试发布特定于浏览器的代码，请使用 `browser` 字段。
-      </p>
+      - >
+        `module`
+        <p>
+        这个字段来自于一个关于如何将 ECMAScript 模块集成到 node 中的[提案](https://github.com/dherman/defense-of-dot-js/blob/f31319be735b21739756b87d551f6711bd7aa283/proposal.md)。
+        正因如此，可以合理地预期该字段中的文件路径是 ECMAScript 风格的模块。该提案没有被 node 接收（node 使用 <code>"type": <wbr>"module"</code>），
+        但是它被主流打包器采纳，因为 ECMAScript 风格的模块可以更好的 [tree shaking](#tree-shaking) 或者无用代码移除。
+        </p>
+        <p>
+        对包的作者：一些包错误的将 `module` 字段设置为了特定于浏览器的代码，`main` 字段的是
+        特定于 node 端的代码。很有可能因为 node 忽略了 `module` 字段并且人们通常只对特定于
+        浏览器的代码使用打包器。然而，打包特定于 node 的代码也很有价值（例如 它减少了下载和引导时间），
+        并且那些把特定于浏览器的代码放到 `module` 中的包，会使捆绑器无法有效地进行 tree shaking 操作。
+        如果你正在尝试发布特定于浏览器的代码，请使用 `browser` 字段。
+        </p>
 
-    - >
-      `browser`
-      <p>
-      这个字段来自于[一个提案](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)，
-      该提案允许打包器替换特定于 node 端的文件或者模块为他们的浏览器友好版本
-      它允许你指定另一个特定于浏览器的入口点。
-      请注意，包可以同时使用 `browser` 和 `module` 字段（见下面的说明）。
-      </p>
+      - >
+        `browser`
+        <p>
+        这个字段来自于[一个提案](https://gist.github.com/defunctzombie/4339901/49493836fb873ddaa4b8a7aa0ef2352119f69211)，
+        该提案允许打包器替换特定于 node 端的文件或者模块为他们的浏览器友好版本
+        它允许你指定另一个特定于浏览器的入口点。
+        请注意，包可以同时使用 `browser` 和 `module` 字段（见下面的说明）。
+        </p>
 
   - p: >
       默认的 main 字段依赖于当前 [platform](#platform) 设置，本质上是
@@ -4028,7 +4281,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --main-fields=module,main
@@ -4083,7 +4336,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --metafile=meta.json --outfile=out.js
@@ -4167,7 +4420,7 @@ body:
   - example:
       in:
         app.js: 'import {x} from "test"'
-        someDir/test.js: 'export let x'
+        someDir/test.js: "export let x"
 
       cli: |
         NODE_PATH=someDir esbuild app.js --bundle --outfile=out.js
@@ -4214,7 +4467,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --outdir=dist --out-extension:.js=.mjs
@@ -4260,8 +4513,8 @@ body:
 
   - example:
       in:
-        src/pages/home/index.ts: '1 + 2'
-        src/pages/about/index.ts: '3 + 4'
+        src/pages/home/index.ts: "1 + 2"
+        src/pages/about/index.ts: "3 + 4"
 
       cli: |
         esbuild src/pages/home/index.ts src/pages/about/index.ts --bundle --outdir=out --outbase=src
@@ -4312,7 +4565,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --bundle --preserve-symlinks --outfile=out.js
@@ -4507,10 +4760,10 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
-          esbuild app.js --bundle --resolve-extensions=.ts,.js
+        esbuild app.js --bundle --resolve-extensions=.ts,.js
 
       js: |
         require('esbuild').buildSync({
@@ -4551,7 +4804,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild app.js --sourcemap --source-root=https://raw.githubusercontent.com/some/repo/v1.2.3/
@@ -4590,7 +4843,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         cat app.js | esbuild --sourcefile=example.js --sourcemap
@@ -4654,7 +4907,7 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
         esbuild --bundle app.js --sourcemap --sources-content=false
@@ -4703,7 +4956,7 @@ body:
 
   - example:
       in:
-        another-file.js: 'export let foo = 123'
+        another-file.js: "export let foo = 123"
 
       cli: |
         echo 'export * from "./another-file"' | esbuild --bundle --sourcefile=imaginary-file.js --loader=ts --format=cjs
@@ -4818,19 +5071,19 @@ body:
       社区发展出了某些注释来帮助编译器确定哪些代码是未使用的。目前 esbuild 支持两种 tree-shaking 注释：
 
   - ul:
-    - >
-      <p>
-      函数调用前的行内 `/* @__PURE__ */` 注释告诉 esbuild 该函数调用如果在结果没有被使用的情况下可以被移除。
-      查看 [pure](#pure) API 配置项获取更多信息。
-      </p>
+      - >
+        <p>
+        函数调用前的行内 `/* @__PURE__ */` 注释告诉 esbuild 该函数调用如果在结果没有被使用的情况下可以被移除。
+        查看 [pure](#pure) API 配置项获取更多信息。
+        </p>
 
-    - >
-      <p>
-      `package.json` 中的 `sideEffects` 字段也可以用来告诉 esbuild 在你的包中的哪些文件
-      在始终没有使用的情况下可以被移除。这是一个来自 webpack 的公约，并且很多发布到 npm 的库已经在
-      其包定义中包含此字段。你可以在 [Webpack 的文档](https://webpack.js.org/guides/tree-shaking/)
-      中了解到更多关于该字段的信息。
-      </p>
+      - >
+        <p>
+        `package.json` 中的 `sideEffects` 字段也可以用来告诉 esbuild 在你的包中的哪些文件
+        在始终没有使用的情况下可以被移除。这是一个来自 webpack 的公约，并且很多发布到 npm 的库已经在
+        其包定义中包含此字段。你可以在 [Webpack 的文档](https://webpack.js.org/guides/tree-shaking/)
+        中了解到更多关于该字段的信息。
+        </p>
 
   - p: >
       这些注释可能会产生问题，因为编译器完全依赖于开发人员来确保准确性，而开发人员偶尔会发布带有
@@ -4847,12 +5100,17 @@ body:
       tree shaking is disabled. You can force-enable tree shaking by setting it
       to `true`:
 
+      By default, tree shaking is only enabled either when [bundling](#bundle)
+      is enabled or when the output [format](#format) is set to `iife`, otherwise
+      tree shaking is disabled. You can force-enable tree shaking by setting it
+      to `true`:
+
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
-          esbuild app.js --tree-shaking=true
+        esbuild app.js --tree-shaking=true
 
       js: |
         require('esbuild').buildSync({
@@ -4883,10 +5141,10 @@ body:
 
   - example:
       in:
-        app.js: '1 + 2'
+        app.js: "1 + 2"
 
       cli: |
-          esbuild app.js --tree-shaking=false
+        esbuild app.js --tree-shaking=false
 
       js: |
         require('esbuild').buildSync({
@@ -4923,6 +5181,11 @@ body:
       have been authored incorrectly, you may need to [ignore annotations](#ignore-annotations)
       to make sure the bundled code is correct.
 
+      Note that tree shaking automatically takes into account user-specified
+      side-effect annotations. If you are bundling code with annotations that
+      have been authored incorrectly, you may need to [ignore annotations](#ignore-annotations)
+      to make sure the bundled code is correct.
+
   - h3: Tsconfig
 
   - p: >
@@ -4932,11 +5195,11 @@ body:
 
   - example:
       in:
-        app.ts: '1 + 2'
-        custom-tsconfig.json: '{}'
+        app.ts: "1 + 2"
+        custom-tsconfig.json: "{}"
 
       cli: |
-          esbuild app.ts --bundle --tsconfig=custom-tsconfig.json
+        esbuild app.ts --bundle --tsconfig=custom-tsconfig.json
 
       js: |
         require('esbuild').buildSync({
@@ -4973,7 +5236,7 @@ body:
 
   - example:
       cli: |
-          echo 'class Foo { foo }' | esbuild --loader=ts --tsconfig-raw='{"compilerOptions":{"useDefineForClassFields":true}}'
+        echo 'class Foo { foo }' | esbuild --loader=ts --tsconfig-raw='{"compilerOptions":{"useDefineForClassFields":true}}'
 
       js: |
         let ts = 'class Foo { foo }'
@@ -5018,7 +5281,7 @@ body:
 
   - example:
       in:
-        file.js: 'export let foo = 123'
+        file.js: "export let foo = 123"
 
       js: |
         require('esbuild').buildSync({
@@ -5063,6 +5326,11 @@ body:
       但是，它阻塞了主线程，所以如果你在此期间有其他工作要执行，你就不希望使用它。
       这也是唯一不能使用插件的选项（因为插件是异步的）。它是这样的：
 
+  - h4: Sync API
+
+  - p: >
+      Synchronous API calls return their results inline:
+
   - pre.js: |
       let esbuild = require('esbuild')
       let result1 = esbuild.transformSync(code, options)
@@ -5073,7 +5341,31 @@ body:
       在宿主进程中的所有调用之间共享。主机使用自定义二进制协议通过 stdin、stdout 和 stderr 管道与子进程通信。
       如果你只需要运行esbuild一次，但又需要在后台做其他工作，那么这是理想的。
       它还允许你并发地运行许多 esbuild API 调用，然后将这些调用分散到所有可用的核心上，以获得最佳性能。
-      使用它看起来像这样：
+      使用它看起来像这样：      
+      Pros:
+
+  - ul:
+    - >
+      Avoiding promises can result in cleaner code
+    - >
+      Works in situations that must be synchronous such as within
+      <a href="https://nodejs.org/api/modules.html#requireextensions"><code>require<wbr>.extensions</code></a>
+
+  - p: >
+      Cons:
+
+  - ul:
+    - >
+      You can't use [plugins](/plugins/) with the synchronous API since plugins are asynchronous
+    - >
+      It blocks the current thread so you can't perform other work in the meantime
+    - >
+      Using the synchronous API prevents esbuild from parallelizing esbuild API calls
+
+  - h4: Async API
+
+  - p: >
+      Asynchronous API calls return their results using a promise:
 
   - pre.js: |
       let esbuild = require('esbuild')
@@ -5081,6 +5373,30 @@ body:
       esbuild.build(options).then(result => { ... })
 
   - h3: 在浏览器中运行
+
+  - p: >
+      Pros:
+
+  - ul:
+    - >
+      You can use [plugins](/plugins/) with the asynchronous API
+    - >
+      The current thread is not blocked so you can perform other work in the meantime
+    - >
+      You can run many simultaneous esbuild API calls concurrently which are
+      then spread across all available CPUs for maximum performance
+
+  - p: >
+      Cons:
+
+  - ul:
+    - >
+      Using promises can result in messier code, especially in CommonJS where
+      [top-level await](https://v8.dev/features/top-level-await) is not available
+    - >
+      Doesn't work in situations that must be synchronous such as within
+      <a href="https://nodejs.org/api/modules.html#requireextensions"><code>require<wbr>.extensions</code></a>
+
   - p: >
       esbuild API 也可以在 Web Worker 中使用 WebAssembly 运行。为了使用它你需要安装
       `esbuild-wasm` 而不是 `esbuild`：

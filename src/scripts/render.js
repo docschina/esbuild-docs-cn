@@ -364,7 +364,6 @@ function generateMain(key, main) {
   let apiCallsForOption = {}
   let benchmarkCount = 0
   let h2 = null
-  let h3 = null
 
   return main.body.map(({ tag, value }) => {
     let cssID = ''

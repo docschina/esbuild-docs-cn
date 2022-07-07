@@ -129,12 +129,10 @@ body:
 
   - figcaption: JavaScript benchmark
   - benchmark:
-      '[esbuild](https://github.com/evanw/esbuild)': 0.37
-      '[esbuild](https://github.com/evanw/esbuild) (1 thread)': 1.61
-      '[rollup](https://github.com/rollup/rollup) + [terser](https://github.com/terser/terser)': 37.79
-      '[parcel](https://github.com/parcel-bundler/parcel) 2': 39.28
-      '[webpack](https://github.com/webpack/webpack) 4': 43.07
-      '[webpack](https://github.com/webpack/webpack) 5': 55.25
+      '[esbuild](https://esbuild.github.io/)': 0.33
+      '[parcel 2](https://parceljs.org/)': 32.48
+      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 34.95
+      '[webpack 5](https://webpack.js.org/)': 41.53
 
   - p: >
       此 benchmark 通过复制 [three.js](https://github.com/mrdoob/three.js) 库 10 次，
@@ -144,14 +142,12 @@ body:
       使用 `make bench-three`。
 
   - table: |
-      | Bundler            |    Time | Relative slowdown | Absolute speed | Output size |
-      | :----------------- | ------: | ----------------: | -------------: | ----------: |
-      | esbuild            |   0.37s |                1x |  1479.6 kloc/s |      5.81mb |
-      | esbuild (1 thread) |   1.61s |                4x |   340.0 kloc/s |      5.81mb |
-      | rollup + terser    |  37.79s |              102x |    14.5 kloc/s |      5.81mb |
-      | parcel 2           |  39.28s |              106x |    13.9 kloc/s |      5.87mb |
-      | webpack 4          |  43.07s |              116x |    12.7 kloc/s |      5.97mb |
-      | webpack 5          |  55.25s |              149x |     9.9 kloc/s |      5.84mb |
+      | Bundler         |    Time | Relative slowdown | Absolute speed | Output size |
+      | :-------------- | ------: | ----------------: | -------------: | ----------: |
+      | esbuild         |   0.33s |                1x |  1658.9 kloc/s |      5.80mb |
+      | parcel 2        |  32.48s |               98x |    16.9 kloc/s |      5.87mb |
+      | rollup + terser |  34.95s |              106x |    15.7 kloc/s |      5.81mb |
+      | webpack 5       |  41.53s |              126x |    13.2 kloc/s |      5.84mb |
 
   - p: >
       每次报告的数据均为三次中最好的一次。
@@ -162,16 +158,13 @@ body:
       <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code> 的选项。
       Parcel 则相对简单，使用默认选项即可。数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
       目前为 547,441 行。
-      测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
+      测试环境为一台 6 核，16gb 内存，[macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) 禁用的 2019 款 MacBook Pro。
 
   - figcaption: TypeScript benchmark
   - benchmark:
-      '[esbuild](https://github.com/evanw/esbuild)': 0.11
-      '[esbuild](https://github.com/evanw/esbuild) (1 thread)': 0.40
-      '[webpack](https://github.com/webpack/webpack) 4': 19.14
-      '[parcel](https://github.com/parcel-bundler/parcel) 1': 22.41
-      '[webpack](https://github.com/webpack/webpack) 5': 25.61
-      '[parcel](https://github.com/parcel-bundler/parcel) 2': 31.39
+      '[esbuild](https://esbuild.github.io/)': 0.10
+      '[parcel 2](https://parceljs.org/)': 8.73
+      '[webpack 5](https://webpack.js.org/)': 18.89
 
   - p: >
       此 benchmark 则选用 [Rome](https://github.com/facebookexperimental/rome)，
@@ -181,14 +174,11 @@ body:
       你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，使用 `make bench-rome`。
 
   - table: |
-      | Bundler            |    Time | Relative slowdown | Absolute speed | Output size |
-      | :----------------- | ------: | ----------------: | -------------: | ----------: |
-      | esbuild            |   0.11s |                1x |  1198.5 kloc/s |      0.97mb |
-      | esbuild (1 thread) |   0.40s |                4x |   329.6 kloc/s |      0.97mb |
-      | webpack 4          |  19.14s |              174x |     6.9 kloc/s |      1.26mb |
-      | parcel 1           |  22.41s |              204x |     5.9 kloc/s |      1.56mb |
-      | webpack 5          |  25.61s |              233x |     5.1 kloc/s |      1.26mb |
-      | parcel 2           |  31.39s |              285x |     4.2 kloc/s |      0.97mb |
+      | Bundler   |    Time | Relative slowdown | Absolute speed | Output size |
+      | :-------- | ------: | ----------------: | -------------: | ----------: |
+      | esbuild   |   0.10s |                1x |  1318.4 kloc/s |      0.97mb |
+      | parcel 2  |   8.73s |               87x |    15.1 kloc/s |      0.97mb |
+      | webpack 5 |  18.89s |              189x |     7.0 kloc/s |      1.27mb |
 
   - p: >
       每次报告的数据均为三次中最好的一次。
