@@ -13,18 +13,10 @@ body:
       因为他们的工作方式不同。
 
   - p: >
-<<<<<<< HEAD
       如果你是用的是 JavaScript，请务必阅读下面的 [JS 特殊细节](#js-specific-details) 章节。
       你也可以查看 esbuild 的 [TypeScript 类型定义](https://github.com/evanw/esbuild/blob/master/lib/types.ts)
       作为参考，这会对你有帮助。如果正在使用 Go 语言，请务必阅读自动生成的
        [Go 文档](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api)。
-=======
-      If you are using JavaScript be sure to check out the
-      [JS-specific details](#js-specific-details) section below. You may also
-      find the [TypeScript type definitions](https://github.com/evanw/esbuild/blob/master/lib/shared/types.ts)
-      for esbuild helpful as a reference. If you are using Go be sure to check
-      out the automatically generated [Go documentation](https://pkg.go.dev/github.com/evanw/esbuild/pkg/api).
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - p: >
       If you are using the command-line API, it may be helpful to know that the
@@ -83,7 +75,6 @@ body:
       transform API 可以使用以下配置项：
 
   - available-options:
-<<<<<<< HEAD
       - Banner
       - Charset
       - Color
@@ -109,35 +100,6 @@ body:
       - Target
       - Tree shaking
       - Tsconfig raw
-=======
-    - Banner
-    - Charset
-    - Color
-    - Define
-    - Drop
-    - Footer
-    - Format
-    - Global name
-    - Ignore annotations
-    - JSX
-    - JSX factory
-    - JSX fragment
-    - Keep names
-    - Legal comments
-    - Loader
-    - Log level
-    - Log limit
-    - Mangle props
-    - Minify
-    - Pure
-    - Source root
-    - Sourcefile
-    - Sourcemap
-    - Sources content
-    - Target
-    - Tree shaking
-    - Tsconfig raw
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - h2: Build API
 
@@ -202,7 +164,6 @@ body:
       build API 可以使用以下配置项：
 
   - available-options:
-<<<<<<< HEAD
       - Allow overwrite
       - Analyze
       - Asset names
@@ -256,63 +217,6 @@ body:
       - Watch
       - Working directory
       - Write
-=======
-    - Allow overwrite
-    - Analyze
-    - Asset names
-    - Banner
-    - Bundle
-    - Charset
-    - Chunk names
-    - Color
-    - Conditions
-    - Define
-    - Drop
-    - Entry names
-    - Entry points
-    - External
-    - Footer
-    - Format
-    - Global name
-    - Ignore annotations
-    - Incremental
-    - Inject
-    - JSX
-    - JSX factory
-    - JSX fragment
-    - Keep names
-    - Legal comments
-    - Loader
-    - Log level
-    - Log limit
-    - Main fields
-    - Mangle props
-    - Metafile
-    - Minify
-    - Node paths
-    - Out extension
-    - Outbase
-    - Outdir
-    - Outfile
-    - Platform
-    - Preserve symlinks
-    - Public path
-    - Pure
-    - Resolve extensions
-    - Serve
-    - Source root
-    - Sourcefile
-    - Sourcemap
-    - Sources content
-    - Splitting
-    - Stdin
-    - Target
-    - Tree shaking
-    - Tsconfig
-    - Watch
-    - Working directory
-    - Write
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - h2: 一般配置项
 
@@ -731,17 +635,11 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
       你也可以在外部（external）路径中使用 `*` 通配符标记所有符合该模式的为外部（external）。
       例如，你可以使用 `*.png` 移除所有的 `.png` 文件或者使用 `/images/*` 移除所有路径以
       `/images/` 开头的路径。当在 外部（external）路径中使用 `*` 通配符时，
       该模式将应用于源代码中的原始路径，而不是解析为实际文件系统路径后的路径。
       这允许你匹配不是真实文件系统路径的路径。
-=======
-      You can also use the `*` wildcard character in an external path to mark
-      all files matching that pattern as external. For example, you can use
-      `*.png` to remove all `.png` files or `/images/*` to remove all paths
-      starting with `/images/`.
 
   - p: >
       External paths are applied both before and after path resolution, which
@@ -780,7 +678,6 @@ body:
       instead is treated as a package path and is not checked for after
       path resolution ends.
       </p>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - h3: Format
 
@@ -1486,7 +1383,6 @@ body:
         你应该使用一个更老的语言目标，例如 <code>--target=es6</code>。
         </p>
 
-<<<<<<< HEAD
       - >
         <p>
         对于所有的 JavaScript 代码，
@@ -1502,45 +1398,6 @@ body:
         因为 Angular 使用 `.toString()` 来读取函数的参数名称。
         一个解决方案是使用 [明确的注释替代](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation)。
         </p>
-=======
-    - >
-      <p>
-      The character escape sequence `\n` will be replaced with a newline
-      character in JavaScript template literals. String literals will also be
-      converted into template literals if the [target](#target) supports them
-      and if doing so would result in smaller output. **This is not a bug.**
-      Minification means you are asking for smaller output, and the escape
-      sequence `\n` takes two bytes while the newline character takes one byte.
-      </p>
-
-    - >
-      <p>
-      By default esbuild won't minify the names of top-level declarations. This
-      is because esbuild doesn't know what you will be doing with the output.
-      You might be injecting the minified code into the middle of some other
-      code, in which case minifying top-level declaration names would be unsafe.
-      Setting an output [format](#format) (or enabling [bundling](#bundle),
-      which picks an output format for you if you haven't set one) tells
-      esbuild that the output will be run within its own scope, which means
-      it's then safe to minify top-level declaration names.
-      </p>
-
-    - >
-      <p>
-      Minification is not safe for 100% of all JavaScript code. This is true
-      for esbuild as well as for other popular JavaScript minifiers such as
-      [terser](https://github.com/terser/terser). In particular, esbuild is
-      not designed to preserve the value of calling `.toString()` on a
-      function. The reason for this is because if all code inside all
-      functions had to be preserved verbatim, minification would hardly do
-      anything at all and would be virtually useless. However, this means that
-      JavaScript code relying on the return value of `.toString()` will likely
-      break when minified. For example, some patterns in the [AngularJS](https://angularjs.org/)
-      framework break when code is minified because AngularJS uses `.toString()`
-      to read the argument names of functions. A workaround is to use [explicit
-      annotations instead](https://docs.angularjs.org/api/auto/service/$injector#injection-function-annotation).
-      </p>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
       - >
         <p>
@@ -3259,11 +3116,7 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
-      在资源路径模板中有三个可用占位符：
-=======
-      There are four placeholders that can be used in asset path templates:
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+      在资源路径模板中有四个可用占位符：
 
   - ul:
       - >
@@ -3495,11 +3348,7 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
-      在 chunk 路径模板中有两个可用占位符：
-=======
-      There are three placeholders that can be used in chunk path templates:
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+      在 chunk 路径模板中有三个可用占位符：
 
   - ul:
       - >
@@ -3710,126 +3559,7 @@ body:
       避免这种情况的主要方法是将所有代码都放在 `require` 条件中，而 `import` 条件只是一个轻包装器，
       它调用包上的 `require` ，并使用 ESM 语法重新导出包。
 
-<<<<<<< HEAD
   - h3: 入口名称
-=======
-  - h3: Drop
-
-  - p: >
-      This tells esbuild to edit your source code before building to drop
-      certain constructs. There are currently two possible things that can be
-      dropped:
-
-  - ul:
-    - >
-      `debugger`
-      <p>
-      Passing this flag causes all [`debugger` statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger)
-      to be removed from the output. This is similar to the `drop_debugger: true`
-      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
-      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
-      </p>
-      <p>
-      JavaScript's `debugger` statements cause the active debugger to treat the
-      statement as an automatically-configured breakpoint. Code containing this
-      statement will automatically be paused when the debugger is open. If no
-      debugger is open, the statement does nothing. Dropping these statements
-      from your code just prevents the debugger from automatically stopping
-      when your code runs.
-      </p>
-      <p>
-      You can drop `debugger` statements like this:
-      </p>
-
-  - example:
-      in:
-        app.js: 'debugger'
-
-      cli: |
-        esbuild app.js --drop:debugger
-
-      js: |
-        require('esbuild').buildSync({
-          entryPoints: ['app.js'],
-          drop: ['debugger'],
-        })
-
-      go: |
-        package main
-
-        import "github.com/evanw/esbuild/pkg/api"
-        import "os"
-
-        func main() {
-          result := api.Build(api.BuildOptions{
-            EntryPoints: []string{"app.js"},
-            Drop:        api.DropDebugger,
-          })
-
-          if len(result.Errors) > 0 {
-            os.Exit(1)
-          }
-        }
-
-  - ul:
-    - >
-      `console`
-      <p>
-      Passing this flag causes all [`console` API calls](https://developer.mozilla.org/en-US/docs/Web/API/console#methods)
-      to be removed from the output. This is similar to the `drop_console: true`
-      flag available in the popular [UglifyJS](https://github.com/mishoo/UglifyJS)
-      and [Terser](https://github.com/terser/terser) JavaScript minifiers.
-      </p>
-      <p>
-      WARNING: Using this flag can introduce bugs into your code! This flag
-      removes the entire call expression including all call arguments. If any
-      of those arguments had important side effects, using this flag will
-      change the behavior of your code. Be very careful when using this flag.
-      </p>
-      <p>
-      If you want to remove console API calls without removing the arguments
-      with side effects (so you do not introduce bugs), you should mark the
-      relevant API calls as [pure](#pure) instead. For example, you can mark
-      `console.log` as pure using <code>--pure:<wbr>console.log</code>. This
-      will cause these API calls to be removed safely when minification is
-      enabled.
-      </p>
-      <p>
-      You can drop `console` API calls like this:
-      </p>
-
-  - example:
-      in:
-        app.js: 'console.log()'
-
-      cli: |
-        esbuild app.js --drop:console
-
-      js: |
-        require('esbuild').buildSync({
-          entryPoints: ['app.js'],
-          drop: ['console'],
-        })
-
-      go: |
-        package main
-
-        import "github.com/evanw/esbuild/pkg/api"
-        import "os"
-
-        func main() {
-          result := api.Build(api.BuildOptions{
-            EntryPoints: []string{"app.js"},
-            Drop:        api.DropConsole,
-          })
-
-          if len(result.Errors) > 0 {
-            os.Exit(1)
-          }
-        }
-
-  - h3: Entry names
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - p: >
       该配置项控制与每一个入口文件相对应的输出文件的名称。它使用带有占位符的模板来配置输出路径，
@@ -3874,11 +3604,7 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
-      在入口路径模板中有三个可用占位符：
-=======
-      There are four placeholders that can be used in entry path templates:
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+      在入口路径模板中有四个可用占位符：
 
   - ul:
       - >

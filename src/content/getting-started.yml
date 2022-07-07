@@ -5,15 +5,8 @@ body:
   - h2: 安装 esbuild <#install-esbuild>
 
   - p: >
-<<<<<<< HEAD
       首先，下载并本地安装 esbuild，
       可以通过 npm 安装预编译的原生可执行文件：
-=======
-      First, download and install the esbuild command locally. A prebuilt
-      native executable can be installed using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
-      (which is automatically installed when you install the [node](https://nodejs.org/)
-      JavaScript runtime):
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - pre: |
       npm install esbuild
@@ -275,18 +268,10 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
       有时由于某些原因，你所使用的包中的代码无法被打包。
       一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
       此时可以通过将该包设置为外部 [external](/api/#external) 包来实现：
-=======
-      You also may not want to bundle your dependencies with esbuild. There
-      are many node-specific features that esbuild doesn't support while
-      bundling such as `__dirname`, `import.meta.url`, `fs.readFileSync`,
-      and `*.node` native binary modules. You can exclude all of your
-      dependencies from the bundle by marking them as [external](/api/#external):
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - example:
       in:
@@ -324,9 +309,6 @@ body:
           }
         }
 
-<<<<<<< HEAD
-  - h2: 其他安装方式 <#other-ways-to-install>
-=======
   - p: >
       If you do this, your dependencies must still be present on the file
       system at run-time since they are no longer included in the bundle.
@@ -377,8 +359,7 @@ body:
       performance cost and can sometimes be 10x slower than the `esbuild` package,
       so you may also not want to do that.
 
-  - h2: Other ways to install
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+  - h2: 其他安装方式 <#other-ways-to-install>
 
   - p: >
       推荐安装 esbuild 的方式是[使用 npm 安装原生可执行文件](#install-esbuild)。
@@ -448,13 +429,8 @@ body:
 
   - ol:
     - |
-<<<<<<< HEAD
       安装 Go 编译器：
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
-=======
-      Install the Go compiler:
-      <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
     - |
       下载源码：
@@ -514,7 +490,6 @@ body:
       完整表格如下：
 
   - table: |
-<<<<<<< HEAD
       | 包名                      | 操作系统   | 架构            |
       |--------------------------|-----------|----------------|
       | `esbuild-android-arm64`  | `android` | `arm64`        |
@@ -544,7 +519,7 @@ body:
       因为这种方式对现有的 esbuild 版本永久有效，
       因为发布到 npm 的包是不可变的。
       另一个缺点是你没法使用原生版本的[插件](/plugins/)。
-=======
+
       | Package name                                                                     | OS                   | Architecture           | Download                                                                                                                         |
       |----------------------------------------------------------------------------------|----------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------|
       | [`esbuild-android-arm64`](https://www.npmjs.org/package/esbuild-android-arm64)   | `android`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-android-arm64/-/esbuild-android-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
@@ -583,4 +558,3 @@ body:
       <br>
       <sup>2</sup> This architecture is not on [node's list of supported architectures](https://nodejs.org/api/process.html#processarch)
       </footer>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
