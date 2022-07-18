@@ -13,7 +13,10 @@ body:
       native executable can be installed using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
       (which is automatically installed when you install the [node](https://nodejs.org/)
       JavaScript runtime):
+<<<<<<< HEAD
 >>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+=======
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - pre: |
       npm install esbuild
@@ -142,12 +145,23 @@ body:
   - h2: 针对浏览器环境的构建 <#bundling-for-the-browser>
 
   - p: >
+<<<<<<< HEAD
       构建工具默认为浏览器输出代码，
       所以无需额外配置就可以完成构建。
       对于开发版本，你可能需要使用 `--sourcemap` 以启用 source map，
       对于生产版本，你可能需要使用 `--minify` 启用压缩。
       有时，你可能还需要为你支持的浏览器配置目标环境。
       所以具体命令会像如下所示：
+=======
+      The bundler outputs code for the browser by default, so no additional
+      configuration is necessary to get started. For development builds you
+      probably want to enable [source maps](/api/#sourcemap) with `--sourcemap`,
+      and for production builds you probably want to enable [minification](/api/#minify)
+      with `--minify`. You probably also want to configure the [target](/api/#target)
+      environment for the browsers you support so that JavaScript syntax which is
+      too new will be transformed into older JavaScript syntax. All of that might
+      looks something like this:
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - example:
       in:
@@ -194,6 +208,7 @@ body:
         }
 
   - p: >
+<<<<<<< HEAD
       有时，你使用的包可能会引入另一个只能在 node 上运行的包，
       例如 node 内置的 `path` 包。
       当发生这种情况时，你可以通过在 `package.json` 中使用 
@@ -213,6 +228,14 @@ body:
       并成功打包。
       未定义的全局变量在简单情况下可以用 [define](/api/#define) 功能代替，
       如遇到更复杂的情况，可以用 [inject](/api/#inject) 功能代替。
+=======
+      Some npm packages you want to use may not be designed to be run in the
+      browser. Sometimes you can use esbuild's configuration options to
+      work around certain issues and successfully bundle the package anyway.
+      Undefined globals can be replaced with either the [define](/api/#define)
+      feature in simple cases or the [inject](/api/#inject) feature in more
+      complex cases.
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - h2: 针对 Node 环境的打包 <#bundling-for-node>
 
@@ -233,8 +256,14 @@ body:
       此设置也会禁用 `package.json` 中的 browser 字段。
 
   - p: >
+<<<<<<< HEAD
       如果你在代码中使用了较新的 JavaScript 语法，而这些语法在你的 node 版本中无法运行，
       你会需要配置 node 的目标版本：
+=======
+      If your code uses newer JavaScript syntax that doesn't work in your
+      version of node, you will want to configure the [target](/api/#target)
+      version of node:
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - example:
       in:
@@ -276,17 +305,23 @@ body:
 
   - p: >
 <<<<<<< HEAD
+<<<<<<< HEAD
       有时由于某些原因，你所使用的包中的代码无法被打包。
       一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
       或者，你可能因为某些原因想把一个包从构建中剔除。
       此时可以通过将该包设置为外部 [external](/api/#external) 包来实现：
 =======
+=======
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
       You also may not want to bundle your dependencies with esbuild. There
       are many node-specific features that esbuild doesn't support while
       bundling such as `__dirname`, `import.meta.url`, `fs.readFileSync`,
       and `*.node` native binary modules. You can exclude all of your
       dependencies from the bundle by marking them as [external](/api/#external):
+<<<<<<< HEAD
 >>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+=======
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - example:
       in:
@@ -325,8 +360,11 @@ body:
         }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   - h2: 其他安装方式 <#other-ways-to-install>
 =======
+=======
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
   - p: >
       If you do this, your dependencies must still be present on the file
       system at run-time since they are no longer included in the bundle.
@@ -432,6 +470,30 @@ body:
       child process is still running.
 
   - p: >
+      If you would like to use esbuild's WebAssembly implementation instead of
+      esbuild's native implementation with Deno, you can do that by importing
+      `wasm.js` instead of `mod.js` like this:
+
+  - pre.js: |
+      import * as esbuild from 'https://deno.land/x/esbuild@vCURRENT_ESBUILD_VERSION/wasm.js'
+      const ts = 'let test: boolean = true'
+      const result = await esbuild.transform(ts, { loader: 'ts' })
+      console.log('result:', result)
+
+  - p: >
+      Using WebAssembly instead of native means you do not need to specify Deno's
+      `--allow-run` permission, and WebAssembly the only option in situations where
+      the file system is unavailable such as with [Deno Deploy](https://deno.com/deploy).
+      However, keep in mind that the WebAssembly version of esbuild is a lot
+      slower than the native version. Another thing to know about WebAssembly
+      is that Deno currently has a bug where process termination is unnecessarily
+      delayed until all loaded WebAssembly modules are fully optimized, which
+      can take many seconds. You may want to manually call `Deno.exit(0)` after
+      your code is done if you are writing a short-lived script that uses
+      esbuild's WebAssembly implementation so that your code exits in a
+      reasonable timeframe.
+
+  - p: >
       **Why this is not recommended:**
       Deno is newer than node, less widely used, and supports fewer platforms
       than node, so node is recommended as the primary way to run esbuild.
@@ -449,12 +511,17 @@ body:
   - ol:
     - |
 <<<<<<< HEAD
+<<<<<<< HEAD
       安装 Go 编译器：
       <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
 =======
       Install the Go compiler:
       <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
 >>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+=======
+      Install the Go compiler:
+      <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
     - |
       下载源码：
@@ -515,6 +582,7 @@ body:
 
   - table: |
 <<<<<<< HEAD
+<<<<<<< HEAD
       | 包名                      | 操作系统   | 架构            |
       |--------------------------|-----------|----------------|
       | `esbuild-android-arm64`  | `android` | `arm64`        |
@@ -534,6 +602,29 @@ body:
       | `esbuild-windows-32`     | `win32`   | `ia32`         |
       | `esbuild-windows-64`     | `win32`   | `x64`          |
       | `esbuild-windows-arm64`  | `win32`   | `arm64`        |
+=======
+      | Package name                                                                     | OS                   | Architecture           | Download                                                                                                                         |
+      |----------------------------------------------------------------------------------|----------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+      | [`esbuild-android-arm64`](https://www.npmjs.org/package/esbuild-android-arm64)   | `android`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-android-arm64/-/esbuild-android-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-darwin-64`](https://www.npmjs.org/package/esbuild-darwin-64)           | `darwin`             | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-darwin-arm64`](https://www.npmjs.org/package/esbuild-darwin-arm64)     | `darwin`             | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-arm64/-/esbuild-darwin-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>     |
+      | [`esbuild-freebsd-64`](https://www.npmjs.org/package/esbuild-freebsd-64)         | `freebsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-64/-/esbuild-freebsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-freebsd-arm64`](https://www.npmjs.org/package/esbuild-freebsd-arm64)   | `freebsd`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-32`](https://www.npmjs.org/package/esbuild-linux-32)             | `linux`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-32/-/esbuild-linux-32-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-linux-64`](https://www.npmjs.org/package/esbuild-linux-64)             | `linux`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-linux-arm`](https://www.npmjs.org/package/esbuild-linux-arm)           | `linux`              | `arm`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm/-/esbuild-linux-arm-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-linux-arm64`](https://www.npmjs.org/package/esbuild-linux-arm64)       | `linux`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm64/-/esbuild-linux-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>       |
+      | [`esbuild-linux-mips64le`](https://www.npmjs.org/package/esbuild-linux-mips64le) | `linux`              | `mips64el`<sup>2</sup> | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-mips64le/-/esbuild-linux-mips64le-CURRENT_ESBUILD_VERSION.tgz"></a> |
+      | [`esbuild-linux-ppc64le`](https://www.npmjs.org/package/esbuild-linux-ppc64le)   | `linux`              | `ppc64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-riscv64`](https://www.npmjs.org/package/esbuild-linux-riscv64)   | `linux`              | `riscv64`<sup>2</sup>  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-riscv64/-/esbuild-linux-riscv64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+      | [`esbuild-linux-s390x`](https://www.npmjs.org/package/esbuild-linux-s390x)       | `linux`              | `s390x`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-s390x/-/esbuild-linux-s390x-CURRENT_ESBUILD_VERSION.tgz"></a>       |
+      | [`esbuild-netbsd-64`](https://www.npmjs.org/package/esbuild-netbsd-64)           | `netbsd`<sup>1</sup> | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-netbsd-64/-/esbuild-netbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
+      | [`esbuild-openbsd-64`](https://www.npmjs.org/package/esbuild-openbsd-64)         | `openbsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-openbsd-64/-/esbuild-openbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-sunos-64`](https://www.npmjs.org/package/esbuild-sunos-64)             | `sunos`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-sunos-64/-/esbuild-sunos-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
+      | [`esbuild-windows-32`](https://www.npmjs.org/package/esbuild-windows-32)         | `win32`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-32/-/esbuild-windows-32-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-windows-64`](https://www.npmjs.org/package/esbuild-windows-64)         | `win32`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
+      | [`esbuild-windows-arm64`](https://www.npmjs.org/package/esbuild-windows-arm64)   | `win32`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-arm64/-/esbuild-windows-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
 
   - p: >
       **为什么不推荐这种方式：**
@@ -583,4 +674,7 @@ body:
       <br>
       <sup>2</sup> This architecture is not on [node's list of supported architectures](https://nodejs.org/api/process.html#processarch)
       </footer>
+<<<<<<< HEAD
 >>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+=======
+>>>>>>> c24f50ef06bd96144452566e9680aeb957a8c1ce
