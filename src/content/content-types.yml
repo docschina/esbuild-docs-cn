@@ -56,15 +56,15 @@ body:
       | [Nullish coalescing](https://github.com/tc39/proposal-nullish-coalescing)           | `es2020`                             | `a ?? b`                   |
       | [`import.meta`](https://github.com/tc39/proposal-import-meta)                       | `es2020`                             | `import.meta`              |
       | [Logical assignment operators](https://github.com/tc39/proposal-logical-assignment) | `es2021`                             | `a ??= b`                  |
-      | [Class instance fields](https://github.com/tc39/proposal-class-fields)              | `esnext`                             | `class { x }`              |
-      | [Static class fields](https://github.com/tc39/proposal-static-class-features)       | `esnext`                             | `class { static x }`       |
-      | [Private instance methods](https://github.com/tc39/proposal-private-methods)        | `esnext`                             | `class { #x() {} }`        |
-      | [Private instance fields](https://github.com/tc39/proposal-class-fields)            | `esnext`                             | `class { #x }`             |
-      | [Private static methods](https://github.com/tc39/proposal-static-class-features)    | `esnext`                             | `class { static #x() {} }` |
-      | [Private static fields](https://github.com/tc39/proposal-static-class-features)     | `esnext`                             | `class { static #x }`      |
-      | [Ergonomic brand checks](https://github.com/tc39/proposal-private-fields-in-in)     | `esnext`                             | `#x in y`                  |
+      | [Class instance fields](https://github.com/tc39/proposal-class-fields)              | `es2022`                             | `class { x }`              |
+      | [Static class fields](https://github.com/tc39/proposal-static-class-features)       | `es2022`                             | `class { static x }`       |
+      | [Private instance methods](https://github.com/tc39/proposal-private-methods)        | `es2022`                             | `class { #x() {} }`        |
+      | [Private instance fields](https://github.com/tc39/proposal-class-fields)            | `es2022`                             | `class { #x }`             |
+      | [Private static methods](https://github.com/tc39/proposal-static-class-features)    | `es2022`                             | `class { static #x() {} }` |
+      | [Private static fields](https://github.com/tc39/proposal-static-class-features)     | `es2022`                             | `class { static #x }`      |
+      | [Ergonomic brand checks](https://github.com/tc39/proposal-private-fields-in-in)     | `es2022`                             | `#x in y`                  |
+      | [Class static blocks](https://github.com/tc39/proposal-class-static-block)          | `es2022`                             | `class { static {} }`      |
       | [Import assertions](https://github.com/tc39/proposal-import-assertions)             | `esnext`                             | `import "x" assert {}`     |
-      | [Class static blocks](https://github.com/tc39/proposal-class-static-block)          | `esnext`                             | `class { static {} }`      |
 
   - p: >
       These syntax features are currently always passed through un-transformed:
@@ -75,9 +75,9 @@ body:
       | [Asynchronous iteration](https://github.com/tc39/proposal-async-iteration)                                             | `es2018`                             | `for await (let x of y) {}` |
       | [Async generators](https://github.com/tc39/proposal-async-iteration)                                                   | `es2018`                             | `async function* foo() {}`  |
       | [BigInt](https://github.com/tc39/proposal-bigint)                                                                      | `es2020`                             | `123n`                      |
+      | [Top-level await](https://github.com/tc39/proposal-top-level-await)                                                    | `es2022`                             | `await import(x)`           |
+      | [Arbitrary module namespace identifiers](https://github.com/bmeck/proposal-arbitrary-module-namespace-identifiers)     | `es2022`                             | `export {foo as 'f o o'}`   |
       | [Hashbang grammar](https://github.com/tc39/proposal-hashbang)                                                          | `esnext`                             | `#!/usr/bin/env node`       |
-      | [Top-level await](https://github.com/tc39/proposal-top-level-await)                                                    | `esnext`                             | `await import(x)`           |
-      | [Arbitrary module namespace identifiers](https://github.com/bmeck/proposal-arbitrary-module-namespace-identifiers)     | `esnext`                             | `export {foo as 'f o o'}`   |
 
   - p: >
       See also [the list of finished ECMAScript proposals](https://github.com/tc39/proposals/blob/master/finished-proposals.md)
@@ -328,10 +328,18 @@ body:
       code in the ESM format that has a `default` export is converted to the
       CommonJS format, and then that CommonJS code is imported into another
       module in ESM format, there are two different interpretations of what
+<<<<<<< HEAD
       should happen that are both widely-used (the [Babel](babeljs.io/) way
       and the [Node](nodejs.org/) way). This is very unfortunate because it
       causes endless compatibility headaches, especially since JavaScript
       libraries are often authored in ESM and published as CommonJS.
+=======
+      should happen that are both widely-used (the [Babel](https://babeljs.io/)
+      way and the [Node](https://nodejs.org/) way). This is very unfortunate
+      because it causes endless compatibility headaches, especially since
+      JavaScript libraries are often authored in ESM and published as
+      CommonJS.
+>>>>>>> e7011b341a3dd8d497a48bba26ecfe90b451cc46
 
   - p: >
       When esbuild [bundles](/api/#bundle) code that does this, it has to
@@ -564,15 +572,21 @@ body:
 
   - ul:
     - >
+      [`alwaysStrict`](https://www.typescriptlang.org/tsconfig#alwaysStrict)
+    - >
       [`baseUrl`](https://www.typescriptlang.org/tsconfig#baseUrl)
     - >
       [`extends`](https://www.typescriptlang.org/tsconfig#extends)
     - >
       [`importsNotUsedAsValues`](https://www.typescriptlang.org/tsconfig#importsNotUsedAsValues)
     - >
+      [`jsx`](https://www.typescriptlang.org/tsconfig#jsx)
+    - >
       [`jsxFactory`](https://www.typescriptlang.org/tsconfig#jsxFactory)
     - >
       [`jsxFragmentFactory`](https://www.typescriptlang.org/tsconfig#jsxFragmentFactory)
+    - >
+      [`jsxImportSource`](https://www.typescriptlang.org/tsconfig#jsxImportSource)
     - >
       [`paths`](https://www.typescriptlang.org/tsconfig#paths)
     - >
@@ -584,8 +598,9 @@ body:
       <p>
       Note: TypeScript silently shipped a breaking change in version 4.3.2 where
       if the `useDefineForClassFields` option is not specified, it defaults to
-      `true` if you specify <code>target: <wbr>"ESNext"</code>. Before version 4.3.2, the
-      `useDefineForClassFields` option always defaulted to `false`.
+      `true` if you specify <code>target: <wbr>"ESNext"</code> (and later on
+      also <code>target: <wbr>"ES2022"</code> or newer). Before version 4.3.2,
+      the `useDefineForClassFields` option always defaulted to `false`.
       The latest version of esbuild has been updated to reflect the behavior
       of TypeScript version 4.3.2. If you need the old behavior, make sure to
       specify <code>useDefineForClassFields: <wbr>false</code> in addition to <code>target: <wbr>"ESNext"</code>.
@@ -692,39 +707,23 @@ body:
 
   - p: >
       If you would like to avoid having to manually `import` your JSX library
-      into each file, you can use esbuild's [inject](/api/#inject) feature to
-      automatically import it into every file. This feature is a general-purpose
-      polyfill mechanism that replaces references to global variables with an
-      export from the injected file. In this case we can use it to replace
-      references to the `React` variable with exports from the `react` package.
-
-  - p: >
-      First, create a file called <code>react-<wbr>shim.js</code> that
-      re-exports everything from the `react` package in an export called
-      `React`:
-
-  - pre.js: |
-      // react-shim.js
-      import * as React from 'react'
-      export { React }
-
-  - p: >
-      Then use esbuild's [inject feature](/api/#inject) to inject this into
-      each file:
+      into each file, you may be able to do this by setting esbuild's
+      [JSX](/api/#jsx) transform to `automatic`, which generates import
+      statements for you. Keep in mind that this also completely changes
+      how the JSX transform works, so it may break your code if you are
+      using a JSX library that's not React. Doing that looks like this:
 
   - example:
       in:
-        react-shim.js: 'export let React = {createElement() {}}'
-        app.jsx: 'console.log(<div/>)'
+        app.jsx: '<a/>'
 
       cli: |
-        esbuild app.jsx --bundle --inject:./react-shim.js --outfile=out.js
+        esbuild app.jsx --jsx=automatic
 
       js: |
         require('esbuild').buildSync({
           entryPoints: ['app.jsx'],
-          bundle: true,
-          inject: ['./react-shim.js'],
+          jsx: 'automatic',
           outfile: 'out.js',
         })
 
@@ -737,43 +736,14 @@ body:
         func main() {
           result := api.Build(api.BuildOptions{
             EntryPoints: []string{"app.jsx"},
-            Bundle:      true,
-            Inject:      []string{"./react-shim.js"},
+            JSXMode:     api.JSXModeAutomatic,
             Outfile:     "out.js",
-            Write:       true,
           })
 
           if len(result.Errors) > 0 {
             os.Exit(1)
           }
         }
-
-  - p: >
-      Since the inject feature is a general-purpose code injection mechanism,
-      it can be used with any JSX transform library, not just with React.
-
-  - p: >
-      **Important:**
-      The `export` statement is required. Do not remove it. The inject feature
-      injects an `import` statement to `react-shim.js` at the top of each file
-      that looks like this:
-
-  - pre.js: |
-      import { /* ... */ } from './react-shim.js'
-
-  - p: >
-      The set of imported names `/* ... */` is automatically generated from
-      the set of unbound references in the file (i.e. `React`) that are equal
-      to the name of an export of the injected file `react-shim.js`. If the
-      injected file doesn't export anything, then the set of imported names
-      stays empty and all unbound references all stay unbound. Code with
-      unbound references to `React` will crash at run-time if there is no
-      variable called `React` in the global scope. This is by design, and
-      happens because of to how ECMAScript modules work. Imports in one module
-      are local to that module and cannot be read from other modules unless
-      they have been exported by that module and imported into the other module.
-      Using `export` in `react-shim.js` with the local variable `React` allows
-      it to be imported into and used by other modules.
 
   - h3: Using JSX without React
 
@@ -864,8 +834,8 @@ body:
   - p: >
       This loader is enabled by default for `.css` files. It loads the file
       as CSS syntax. CSS is a first-class content type in esbuild, which means
-      esbuild can bundle CSS files directly without needing to import your CSS
-      from JavaScript code:
+      esbuild can [bundle](/api/#bundle) CSS files directly without needing to
+      import your CSS from JavaScript code:
 
   - example:
       in:
@@ -953,6 +923,109 @@ body:
           <script src="app.js"></script>
         </head>
       </html>
+<<<<<<< HEAD
+=======
+
+  - h3#css-caveats: CSS caveats
+
+  - p: >
+      You should keep the following things in mind when using CSS with esbuild:
+
+  - h4#css-linting: Limited CSS verification
+  - p: >
+      CSS has a [general syntax specification](https://www.w3.org/TR/css-syntax-3/)
+      that all CSS processors use and then [many specifications](https://www.w3.org/Style/CSS/current-work)
+      that define what specific CSS rules mean. While esbuild understands
+      general CSS syntax and can understand some CSS rules (enough to bundle
+      CSS file together and to minify CSS reasonably well), esbuild does not
+      contain complete knowledge of CSS. This means esbuild takes a "garbage
+      in, garbage out" philosophy toward CSS. If you want to verify that your
+      compiled CSS is free of typos, you should be using a CSS linter in
+      addition to esbuild.
+
+  - h4#css-import-order: >
+      `@import` order matches the browser
+  - p: >
+      The `@import` rule in CSS behaves differently than the `import` keyword
+      in JavaScript. In JavaScript, an `import` means roughly "make sure the
+      imported file is evaluated before this file is evaluated" but in CSS,
+      `@import` means roughly "re-evaluate the imported file again here"
+      instead. For example, consider the following files:
+
+  - ul:
+    - '<code>entry.css</code><pre>@import "foreground.css";<br>@import "background.css";</pre>'
+    - '<code>foreground.css</code><pre>@import "reset.css";<br>body {<br>  color: white;<br>}</pre>'
+    - '<code>background.css</code><pre>@import "reset.css";<br>body {<br>  background: black;<br>}</pre>'
+    - '<code>reset.css</code><pre>body {<br>  color: black;<br>  background: white;<br>}</pre>'
+
+  - p: >
+      Using your intuition from JavaScript, you might think that this code first
+      resets the body to black text on a white background, and then overrides
+      that to white text on a black background. _**This is not what happens.**_
+      Instead, the body will be entirely black (both the foreground and the
+      background). This is because `@import` is supposed to behave as if the
+      import rule was replaced by the imported file<sup id="footnote-use-1"><a href="#footnote-def-1">1</a></sup>
+      (sort of like `#include` in C/C++), which leads to the browser seeing
+      the following code:
+
+  - pre.css: |
+      /* reset.css */
+      body {
+        color: black;
+        background: white;
+      }
+
+      /* foreground.css */
+      body {
+        color: white;
+      }
+
+      /* reset.css */
+      body {
+        color: black;
+        background: white;
+      }
+
+      /* background.css */
+      body {
+        background: black;
+      }
+
+  - p: >
+      which ultimately reduces down to this:
+
+  - pre: |
+      body {
+        color: black;
+        background: black;
+      }
+
+  - p: >
+      This behavior is unfortunate, but esbuild behaves this way because that's
+      how CSS is specified, and that's how CSS works in browsers. This is
+      important to know about because some other commonly-used CSS processing
+      tools such as [`postcss-import`](https://github.com/postcss/postcss-import/issues/462)
+      incorrectly resolve CSS imports in JavaScript order instead of in CSS order.
+      If you are porting CSS code written for those tools to esbuild (or even
+      just switching over to running your CSS code natively in the browser),
+      you may have appearance changes if your code depends on the incorrect
+      import order.
+
+  - p: >
+      <footer>
+      <sup id="footnote-def-1"><a href="#footnote-use-1">1</a></sup>
+      [The specification says](https://www.w3.org/TR/css-cascade-3/#at-import)
+      "user agents must treat the contents of the stylesheet as if they were
+      written in place of the @import rule" but that's not actually how CSS works.
+      If CSS worked that way, then cyclic imports would cause a hang due to
+      infinite expansion. The way it actually works is that an imported CSS
+      file is evaluated once at the **last** duplicate `@import` rule (as
+      compared to JavaScript where an imported JS file is evaluated once at
+      the **first** duplicate `import` statement). This is considered an
+      implementation detail and only really matters when there are import
+      cycles.
+      </footer>
+>>>>>>> e7011b341a3dd8d497a48bba26ecfe90b451cc46
 
   - h2: Text
   - p: 'Loader: `text`'
@@ -1155,6 +1228,12 @@ body:
         }
 
   - h2: External file
+  - p: >
+      There are two different loaders that can be used for external files
+      depending on the behavior you're looking for. Both loaders are
+      described below:
+
+  - h4#file: The `file` loader
   - p: 'Loader: `file`'
 
   - p: >
@@ -1169,8 +1248,10 @@ body:
       document.body.appendChild(image)
 
   - p: >
-      Note that this loader is not enabled by default. You will need to
-      configure it for the appropriate file extension like this:
+      This behavior is intentionally similar to Webpack's
+      [`file-loader`](https://v4.webpack.js.org/loaders/file-loader/)
+      package. Note that this loader is not enabled by default. You will need
+      to configure it for the appropriate file extension like this:
 
   - example:
       in:
@@ -1219,3 +1300,81 @@ body:
       By default the exported string is just the file name. If you would like to
       prepend a base path to the exported string, this can be done with the
       [public path](/api/#public-path) API option.
+
+  - h4#copy: The `copy` loader
+  - p: 'Loader: `copy`'
+
+  - p: >
+      This loader will copy the file to the output directory and rewrite the
+      import path to point to the copied file. This means the import will still
+      exist in the final bundle and the final bundle will still reference the
+      file instead of including the file inside the bundle. This might be useful
+      if you are running additional bundling tools on esbuild's output, if you
+      want to omit a rarely-used data file from the bundle for faster startup
+      performance, or if you want to rely on specific behavior of your runtime
+      that's triggered by an import. For example:
+
+  - pre.js: |
+      import json from './example.json' assert { type: 'json' }
+      console.log(json)
+
+  - p: >
+      If you bundle the above code with the following command:
+
+  - example:
+      in:
+        app.js: |
+          import json from './example.json' assert { type: 'json' }
+          console.log(json)
+        example.json: |
+          'this is some data'
+
+      cli: |
+        esbuild app.js --bundle --loader:.json=copy --outdir=out --format=esm
+
+      js: |
+        require('esbuild').buildSync({
+          entryPoints: ['app.js'],
+          bundle: true,
+          loader: { '.json': 'copy' },
+          outdir: 'out',
+          format: 'esm',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            Bundle:      true,
+            Loader: map[string]api.Loader{
+              ".json": api.LoaderCopy,
+            },
+            Outdir: "out",
+            Write:  true,
+            Format: api.FormatESModule,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      the resulting `out/app.js` file might look something like this:
+
+  - pre.js: |
+      // app.js
+      import json from "./example-PVCBWCM4.json" assert { type: "json" };
+      console.log(json);
+
+  - p: >
+      Notice how the import path has been rewritten to point to the copied file
+      `out/example-PVCBWCM4.json` (a content hash has been added due to the
+      default value of the [asset names](/api/#asset-names) setting), and how
+      the [import assertion](https://v8.dev/features/import-assertions) for JSON
+      has been kept so the runtime will be able to load the JSON file.
