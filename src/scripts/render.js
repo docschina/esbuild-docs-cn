@@ -4,6 +4,7 @@ const md = require('markdown-it')({ html: true })
 const hljs = require('highlight.js')
 const esbuild = require('esbuild')
 const fs = require('fs')
+const os = require('os')
 
 const repoDir = path.dirname(path.dirname(__dirname))
 const scriptsDir = path.join(repoDir, 'src', 'scripts')
@@ -156,7 +157,7 @@ function generateNav(key) {
   return nav.join('')
 }
 
-function renderBenchmarkSVG(entries) {
+function renderBenchmarkSVG(entries, { dark }) {
   let times = Object.entries(entries)
   let max = 0
   for (let [_, time] of times) {
@@ -175,19 +176,11 @@ function renderBenchmarkSVG(entries) {
   let height = topMargin + topHeight + bottomHeight
   let horizontalScale = (rightWidth - 100) / max
   let horizontalStep = max > 90 ? 30 : max > 30 ? 10 : 5
+  let textFill = dark ? ' fill="#C9D1D9"' : ''
   let svg = []
 
   // Begin chart
   svg.push(`<svg width="${width}" height="${height}" fill="black" font-family="sans-serif" font-size="13px" xmlns="http://www.w3.org/2000/svg">`)
-
-  // Github colors in dark mode for the readme
-  svg.push(`  <style>`)
-  svg.push(`    @media (prefers-color-scheme: dark) {`)
-  svg.push(`      #bg { fill: #0D1116; }`)
-  svg.push(`      text { fill: #C9D1D9; }`)
-  svg.push(`    }`)
-  svg.push(`  </style>`)
-  svg.push(`  <rect id="bg" width="${width}" height="${height}" fill="#FFFFFF"/>`)
 
   // Horizontal axis bars
   for (let i = 0; i * horizontalScale < rightWidth; i += horizontalStep) {
@@ -206,15 +199,15 @@ function renderBenchmarkSVG(entries) {
     let bold = i === 0 ? ' font-weight="bold"' : ''
     let label = stripTagsFromMarkdown(name)
     svg.push(`  <rect x="${leftWidth}" y="${barY}" width="${w}" height="${barH}" fill="#FFCF00"/>`)
-    svg.push(`  <text x="${leftWidth - labelMargin}" y="${y + h / 2}" text-anchor="end" dominant-baseline="middle"${bold}>${label}</text>`)
-    svg.push(`  <text x="${leftWidth + labelMargin + w}" y="${y + h / 2}" dominant-baseline="middle"${bold}>${escapeHTML(time.toFixed(2))}s</text>`)
+    svg.push(`  <text x="${leftWidth - labelMargin}" y="${y + h / 2}" text-anchor="end" dominant-baseline="middle"${bold}${textFill}>${label}</text>`)
+    svg.push(`  <text x="${leftWidth + labelMargin + w}" y="${y + h / 2}" dominant-baseline="middle"${bold}${textFill}>${escapeHTML(time.toFixed(2))}s</text>`)
   }
 
   // Horizontal labels
   for (let i = 0; i * horizontalScale < rightWidth; i += horizontalStep) {
     let x = leftWidth + i * horizontalScale
     let y = topMargin + topHeight + labelMargin / 2
-    svg.push(`  <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="hanging">${escapeHTML(i + 's')}</text>`)
+    svg.push(`  <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="hanging"${textFill}>${escapeHTML(i + 's')}</text>`)
   }
 
   // End chart
@@ -360,12 +353,103 @@ function renderExample(kind, value) {
   return hljs.highlight(hljsLang, value.trim()).value
 }
 
-function generateMain(key, main) {
+// Format the example log messages automatically so they are kept up to date
+async function formatMessagesInText(text) {
+  const handler = async (_, input, options) => {
+    const evalExpr = x => new Function('return ' + x.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))()
+    input = evalExpr(input)
+    options = evalExpr(options)
+
+    const { sourcefile, loader, ...remainingOptions } = options
+    let warnings = []
+    let errors = []
+
+    try {
+      const buildOptions = {
+        logLevel: 'silent',
+        write: false,
+        ...remainingOptions,
+      }
+
+      if (typeof input === 'string') {
+        ({ warnings } = await esbuild.build({
+          stdin: { contents: input, sourcefile, loader },
+          ...buildOptions,
+        }))
+      }
+
+      else {
+        const dir = path.join(os.tmpdir(), `esbuild-render-${Math.random().toString(36).slice(2)}`)
+        fs.mkdirSync(dir)
+        try {
+          for (const key in input) {
+            const file = path.join(dir, key)
+            fs.mkdirSync(path.dirname(file), { recursive: true })
+            fs.writeFileSync(file, input[key])
+          }
+          ({ warnings } = await esbuild.build({
+            entryPoints: Object.keys(input).slice(0, 1),
+            absWorkingDir: dir,
+            ...buildOptions,
+          }))
+        } finally {
+          fs.rmSync(dir, { recursive: true })
+        }
+      }
+    } catch (e) {
+      ({ warnings, errors } = e)
+    }
+
+    let result = escapeHTML([].concat(
+      await esbuild.formatMessages(warnings, { kind: 'warning', terminalWidth: 100, color: true }),
+      await esbuild.formatMessages(errors, { kind: 'error', terminalWidth: 100, color: true }),
+    ).join('').trim())
+
+    if (result === '') {
+      const indent = x => ('\n' + x).replace(/\n/g, '\n  ')
+      input = indent(typeof input === 'string' ? input : JSON.stringify(input, null, 2))
+      options = indent(JSON.stringify(options, null, 2))
+      throw new Error(`Unexpectedly got no warnings for this code:\n${input}\n\nwith these options:\n${options}\n`)
+    }
+
+    // Interpret the terminal color escape codes
+    result = '<span>' + result.replace(/\033\[([^m]*)m/g, (_, escape) => {
+      switch (escape) {
+        case '1': return '</span><span style="font-weight:bold">'
+        case '31': return '</span><span class="color-red">'
+        case '32': return '</span><span class="color-green">'
+        case '33': return '</span><span class="color-yellow">'
+        case '37': return '</span><span class="color-dim">'
+        case '41;31': return '</span><span class="bg-red color-red">'
+        case '41;97': return '</span><span class="bg-red color-white">'
+        case '43;33': return '</span><span class="bg-yellow color-yellow">'
+        case '43;30': return '</span><span class="bg-yellow color-black">'
+        case '0': return '</span><span>'
+      }
+      throw new Error(`Unknown escape sequence: ${escape}`)
+    }) + '</span>'
+
+    return result
+  }
+
+  // Use a manual loop instead of "replace" due to "await"
+  let result = ''
+  while (true) {
+    const match = /\{\{ FORMAT_MESSAGES\(('[^']*'|\{(?:[^}']|'[^']*')*\}), (\{(?:[^}]|\{[^}]*\})*\})\) \}\}/g.exec(text)
+    if (!match) break
+    result += text.slice(0, match.index)
+    result += await handler(...match)
+    text = text.slice(match.index + match[0].length)
+  }
+  return result + text
+}
+
+async function generateMain(key, main) {
   let apiCallsForOption = {}
   let benchmarkCount = 0
   let h2 = null
 
-  return main.body.map(({ tag, value }) => {
+  const handler = async ({ tag, value }) => {
     let cssID = ''
     if (typeof value === 'string') value = value.replace(/CURRENT_ESBUILD_VERSION/g, CURRENT_ESBUILD_VERSION)
 
@@ -426,8 +510,10 @@ function generateMain(key, main) {
 
     if (tag === 'benchmark' || tag === 'benchmark.animated') {
       if (key === 'index') {
-        const svg = renderBenchmarkSVG(value);
-        fs.writeFileSync(path.join(repoDir, 'benchmark.svg'), svg);
+        const svgLight = renderBenchmarkSVG(value, { dark: false });
+        const svgDark = renderBenchmarkSVG(value, { dark: true });
+        fs.writeFileSync(path.join(repoDir, 'benchmark-light.svg'), svgLight);
+        fs.writeFileSync(path.join(repoDir, 'benchmark-dark.svg'), svgDark);
       }
 
       return renderBenchmark(value, {
@@ -438,7 +524,7 @@ function generateMain(key, main) {
     }
 
     if (tag === 'pre.raw') {
-      return `<pre>${value.trim()}</pre>`
+      return `<pre>${await formatMessagesInText(value.trim())}</pre>`
     }
 
     if (tag.startsWith('pre.')) {
@@ -490,99 +576,105 @@ function generateMain(key, main) {
       return `<div class="warning">${md.renderInline(value.trim())}</div>`
     }
 
-    return `<${tag}>${md.renderInline(value.trim())}</${tag}>`
-  }).join('')
-}
-
-for (let [key, page] of pages) {
-  let dir = outDir
-  if (key !== 'index') {
-    dir = path.join(dir, key)
-    fs.mkdirSync(dir, { recursive: true })
+    return `<${tag}>${await formatMessagesInText(md.renderInline(value.trim()))}</${tag}>`
   }
 
-  let html = []
-
-  // Begin header
-  html.push(`<!DOCTYPE html>`)
-  html.push(`<html lang="en">`)
-  html.push(`<head>`)
-
-  // Header content
-  html.push(`<meta charset="utf8">`)
-  html.push(`<title>esbuild - ${escapeHTML(page.title)}</title>`)
-  html.push(`<link rel="icon" type="image/svg+xml" href="/favicon.svg">`)
-  html.push(`<meta property="og:title" content="esbuild - ${escapeAttribute(page.title)}"/>`)
-  html.push(`<meta property="og:type" content="website"/>`)
-  html.push(`<style>${minifiedCSS}</style>`)
-  html.push(`<meta name="viewport" content="width=device-width, initial-scale=1">`)
-
-  // End header
-  html.push(`</head>`)
-
-  // Begin body
-  html.push(`<body${key === 'index' ? ' class="index"' : ''}>`)
-  html.push(`<script>${minifiedJS}</script>`)
-
-  // Menu bar
-  html.push(`<div id="menubar">`)
-  html.push(`<a id="menutoggle" href="javascript:void 0" aria-label="Toggle the menu">`)
-  html.push(`<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">`)
-  html.push(`<rect x="15" y="18" width="20" height="2" stroke-width="0"></rect>`)
-  html.push(`<rect x="15" y="24" width="20" height="2" stroke-width="0"></rect>`)
-  html.push(`<rect x="15" y="30" width="20" height="2" stroke-width="0"></rect>`)
-  html.push(`</svg>`)
-  html.push(`</a>`)
-  html.push(`</div>`)
-
-  // Begin menu
-  html.push(`<nav>`)
-  html.push(`<div id="shadow"></div>`)
-  html.push(`<div id="menu">`)
-  html.push(`<a href="/" class="logo">esbuild</a>`)
-  html.push(`<ul>`)
-  html.push(generateNav(key))
-  html.push(`</ul>`)
-  html.push(`<div id="icons">`)
-
-  // View on github
-  html.push(`<a href="https://github.com/evanw/esbuild" aria-label="View this project on GitHub">`)
-  html.push(`<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25">`)
-  html.push(`<path fill-rule="evenodd" stroke-width="0" d="M13 5a8 8 0 00-2.53 15.59c.4.07.55-.17.55`)
-  html.push(`-.38l-.01-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52`)
-  html.push(`-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78`)
-  html.push(`-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2`)
-  html.push(`.82a7.42 7.42 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27`)
-  html.push(`.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A`)
-  html.push(`8.01 8.01 0 0021 13a8 8 0 00-8-8z"></path>`)
-  html.push(`</svg>`)
-  html.push(`</a>`)
-
-  // Toggle dark mode
-  html.push(`<a href="javascript:void 0" id="theme" aria-label="Toggle dark mode">`)
-  html.push(`<svg id="theme-light" width="25" height="25" xmlns="http://www.w3.org/2000/svg">`)
-  html.push(`<path d="M13.5 4v3m9.5 6.5h-3M13.5 23v-3M7 13.5H4M9 9L7 7m13 0l-2 2m2 11l-2-2M7 20l2-2"></path>`)
-  html.push(`<circle cx="13.5" cy="13.5" r="4.5" stroke-width="0"></circle>`)
-  html.push(`</svg>`)
-  html.push(`<svg id="theme-dark" width="25" height="25" xmlns="http://www.w3.org/2000/svg">`)
-  html.push(`<path d="M10.1 6.6a8.08 8.08 0 00.24 11.06 8.08 8.08 0 0011.06.24c-6.46.9-12.2-4.84-11.3-11.3z" stroke-width="0"></path>`)
-  html.push(`</svg>`)
-  html.push(`</a>`)
-
-  // End menu
-  html.push(`</div>`)
-  html.push(`</div>`)
-  html.push(`</nav>`)
-
-  // Main content
-  html.push(`<main>`)
-  html.push(generateMain(key, page))
-  html.push(`</main>`)
-
-  // End body
-  html.push(`</body>`)
-  html.push(`</html>`)
-  html.push(`\n`)
-
-  fs.writeFileSync(path.join(dir, 'index.html'), html.join(''))
+  return (await Promise.all(main.body.map(handler))).join('')
 }
+
+async function main() {
+  for (let [key, page] of pages) {
+    let dir = outDir
+    if (key !== 'index') {
+      dir = path.join(dir, key)
+      fs.mkdirSync(dir, { recursive: true })
+    }
+
+    let html = []
+
+    // Begin header
+    html.push(`<!DOCTYPE html>`)
+    html.push(`<html lang="en">`)
+    html.push(`<head>`)
+
+    // Header content
+    html.push(`<meta charset="utf8">`)
+    html.push(`<title>esbuild - ${escapeHTML(page.title)}</title>`)
+    html.push(`<link rel="icon" type="image/svg+xml" href="/favicon.svg">`)
+    html.push(`<meta property="og:title" content="esbuild - ${escapeAttribute(page.title)}"/>`)
+    html.push(`<meta property="og:type" content="website"/>`)
+    html.push(`<style>${minifiedCSS}</style>`)
+    html.push(`<meta name="viewport" content="width=device-width, initial-scale=1">`)
+
+    // End header
+    html.push(`</head>`)
+
+    // Begin body
+    html.push(`<body${key === 'index' ? ' class="index"' : ''}>`)
+    html.push(`<script>${minifiedJS}</script>`)
+
+    // Menu bar
+    html.push(`<div id="menubar">`)
+    html.push(`<a id="menutoggle" href="javascript:void 0" aria-label="Toggle the menu">`)
+    html.push(`<svg width="50" height="50" xmlns="http://www.w3.org/2000/svg">`)
+    html.push(`<rect x="15" y="18" width="20" height="2" stroke-width="0"></rect>`)
+    html.push(`<rect x="15" y="24" width="20" height="2" stroke-width="0"></rect>`)
+    html.push(`<rect x="15" y="30" width="20" height="2" stroke-width="0"></rect>`)
+    html.push(`</svg>`)
+    html.push(`</a>`)
+    html.push(`</div>`)
+
+    // Begin menu
+    html.push(`<nav>`)
+    html.push(`<div id="shadow"></div>`)
+    html.push(`<div id="menu">`)
+    html.push(`<a href="/" class="logo">esbuild</a>`)
+    html.push(`<ul>`)
+    html.push(generateNav(key))
+    html.push(`</ul>`)
+    html.push(`<div id="icons">`)
+
+    // View on github
+    html.push(`<a href="https://github.com/evanw/esbuild" aria-label="View this project on GitHub">`)
+    html.push(`<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25">`)
+    html.push(`<path fill-rule="evenodd" stroke-width="0" d="M13 5a8 8 0 00-2.53 15.59c.4.07.55-.17.55`)
+    html.push(`-.38l-.01-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52`)
+    html.push(`-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78`)
+    html.push(`-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2`)
+    html.push(`.82a7.42 7.42 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27`)
+    html.push(`.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.15.46.55.38A`)
+    html.push(`8.01 8.01 0 0021 13a8 8 0 00-8-8z"></path>`)
+    html.push(`</svg>`)
+    html.push(`</a>`)
+
+    // Toggle dark mode
+    html.push(`<a href="javascript:void 0" id="theme" aria-label="Toggle dark mode">`)
+    html.push(`<svg id="theme-light" width="25" height="25" xmlns="http://www.w3.org/2000/svg">`)
+    html.push(`<path d="M13.5 4v3m9.5 6.5h-3M13.5 23v-3M7 13.5H4M9 9L7 7m13 0l-2 2m2 11l-2-2M7 20l2-2"></path>`)
+    html.push(`<circle cx="13.5" cy="13.5" r="4.5" stroke-width="0"></circle>`)
+    html.push(`</svg>`)
+    html.push(`<svg id="theme-dark" width="25" height="25" xmlns="http://www.w3.org/2000/svg">`)
+    html.push(`<path d="M10.1 6.6a8.08 8.08 0 00.24 11.06 8.08 8.08 0 0011.06.24c-6.46.9-12.2-4.84-11.3-11.3z" stroke-width="0"></path>`)
+    html.push(`</svg>`)
+    html.push(`</a>`)
+
+    // End menu
+    html.push(`</div>`)
+    html.push(`</div>`)
+    html.push(`</nav>`)
+
+    // Main content
+    html.push(`<main>`)
+    html.push(await generateMain(key, page))
+    html.push(`</main>`)
+
+    // End body
+    html.push(`</body>`)
+    html.push(`</html>`)
+    html.push(`\n`)
+
+    fs.writeFileSync(path.join(dir, 'index.html'), html.join(''))
+  }
+}
+
+main()
