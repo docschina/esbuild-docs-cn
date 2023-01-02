@@ -2,12 +2,6 @@ title: Plugins
 body:
   - h1: Plugins
 
-  - warning: >
-      The plugin API is new and still experimental. It may change in the future
-      before version 1.0.0 of esbuild as new use cases are uncovered. You can
-      follow [the tracking issue](https://github.com/evanw/esbuild/issues/111)
-      for updates about this feature.
-
   - p: >
       The plugin API allows you to inject code into various parts of the build
       process. Unlike the rest of the API, it's not available from the command
@@ -37,7 +31,7 @@ body:
   - h2: Using plugins
   - p: >
       An esbuild plugin is an object with a `name` and a `setup` function. They
-      are passed in an array to the [build API](/api/#build) call. The `setup`
+      are passed in an array to the [build API](/api/#build-api) call. The `setup`
       function is run once for each build API call.
 
   - p: >
@@ -1397,7 +1391,11 @@ body:
 
   - p: >
       When a plugin returns a result from an [on-resolve callback](#on-resolve),
+<<<<<<< HEAD
       the result completely replaces esbuilds built-in path resolution. This gives
+=======
+      the result completely replaces esbuild's built-in path resolution. This gives
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
       the plugin complete control over how path resolution works, but it means
       that the plugin may have to reimplement some of the behavior that esbuild
       already has built-in if it wants to have similar behavior. For example,
@@ -1420,7 +1418,14 @@ body:
           name: 'example',
           setup(build) {
             build.onResolve({ filter: /^example$/ }, async () => {
+<<<<<<< HEAD
               const result = await build.resolve('./foo', { resolveDir: './bar' })
+=======
+              const result = await build.resolve('./foo', {
+                kind: 'import-statement',
+                resolveDir: './bar',
+              })
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
               if (result.errors.length > 0) {
                 return { errors: result.errors }
               }
@@ -1447,7 +1452,14 @@ body:
           Setup: func(build api.PluginBuild) {
             build.OnResolve(api.OnResolveOptions{Filter: `^example$`},
               func(api.OnResolveArgs) (api.OnResolveResult, error) {
+<<<<<<< HEAD
                 result := build.Resolve("./foo", api.ResolveOptions{ResolveDir: "./bar"})
+=======
+                result := build.Resolve("./foo", api.ResolveOptions{
+                  Kind:       api.ResolveJSImportStatement,
+                  ResolveDir: "./bar",
+                })
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
                 if len(result.Errors) > 0 {
                   return api.OnResolveResult{Errors: result.Errors}, nil
                 }
@@ -1536,10 +1548,17 @@ body:
 
       js: |
         interface ResolveOptions {
+<<<<<<< HEAD
           importer?: string;
           namespace?: string;
           resolveDir?: string;
           kind?: ResolveKind;
+=======
+          kind: ResolveKind;
+          importer?: string;
+          namespace?: string;
+          resolveDir?: string;
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
           pluginData?: any;
         }
 
@@ -1554,10 +1573,17 @@ body:
 
       go: |
         type ResolveOptions struct {
+<<<<<<< HEAD
           Importer   string
           Namespace  string
           ResolveDir string
           Kind       ResolveKind
+=======
+          Kind       ResolveKind
+          Importer   string
+          Namespace  string
+          ResolveDir string
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
           PluginData interface{}
         }
 
@@ -1573,6 +1599,20 @@ body:
 
   - ul:
     - >
+<<<<<<< HEAD
+=======
+      `kind`
+      <p>
+      This tells esbuild how the path was imported, which can affect path
+      resolution. For example, [node's path resolution rules](https://nodejs.org/api/packages.html#conditional-exports)
+      say that paths imported using `'require-call'` should respect [conditional
+      package imports](/api/#conditions) in the `"require"` section in `package.json` while paths
+      imported using `'import-statement'` should respect conditional package
+      imports in the `"import"` section instead.
+      </p>
+
+    - >
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
       `importer`
       <p>
       If set, this is interpreted as the path of the module containing this
@@ -1600,6 +1640,7 @@ body:
       </p>
 
     - >
+<<<<<<< HEAD
       `kind`
       <p>
       This tells esbuild how the path was imported, which can affect path
@@ -1611,6 +1652,8 @@ body:
       </p>
 
     - >
+=======
+>>>>>>> 59ca0ad95874172b80c16a3e74d449f5d28656a7
       `pluginData`
       <p>
       This property can be used to pass custom data to whatever [on-resolve callbacks](#on-resolve)
@@ -1936,7 +1979,7 @@ body:
 
   - p: >
       _This example demonstrates: working with binary data, creating
-      virtual; modules using import statements, re-using the same path with
+      virtual modules using import statements, re-using the same path with
       different namespaces._
 
   - p: >
