@@ -5,10 +5,10 @@ index:
     - blockquote: 极速 JavaScript 打包器
 
     - benchmark.animated:
-        '[esbuild](https://esbuild.github.io/)': 0.33
-        '[parcel 2](https://parceljs.org/)': 32.48
-        '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 34.95
-        '[webpack 5](https://webpack.js.org/)': 41.53
+        '[esbuild](https://esbuild.github.io/)': 0.37
+        '[parcel 2](https://parceljs.org/)': 30.50
+        '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 32.07
+        '[webpack 5](https://webpack.js.org/)': 39.70
 
     - figcaption: >
         以上数据：分别是使用各工具的默认配置，
