@@ -17,10 +17,14 @@ body:
     - >
       <p>
 <<<<<<< HEAD
+<<<<<<< HEAD
       它由 [Go](https://golang.org/) 编写，并被编译成原生代码。
 =======
       It's written in [Go](https://go.dev/) and compiles to native code.
 >>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
+=======
+      It's written in [Go](https://go.dev/) and compiles to native code.
+>>>>>>> b431563203d117c4cf9f467481960aeaabcc0fde
       </p>
       <p>
       大多数构建工具都是用 JavaScript 编写的，
@@ -133,10 +137,10 @@ body:
 
   - figcaption: JavaScript benchmark
   - benchmark:
-      '[esbuild](https://esbuild.github.io/)': 0.33
-      '[parcel 2](https://parceljs.org/)': 32.48
-      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 34.95
-      '[webpack 5](https://webpack.js.org/)': 41.53
+      '[esbuild](https://esbuild.github.io/)': 0.37
+      '[parcel 2](https://parceljs.org/)': 30.50
+      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 32.07
+      '[webpack 5](https://webpack.js.org/)': 39.70
 
   - p: >
       此 benchmark 通过复制 [three.js](https://github.com/mrdoob/three.js) 库 10 次，
@@ -148,12 +152,13 @@ body:
   - table: |
       | Bundler         |    Time | Relative slowdown | Absolute speed | Output size |
       | :-------------- | ------: | ----------------: | -------------: | ----------: |
-      | esbuild         |   0.33s |                1x |  1658.9 kloc/s |      5.80mb |
-      | parcel 2        |  32.48s |               98x |    16.9 kloc/s |      5.87mb |
-      | rollup + terser |  34.95s |              106x |    15.7 kloc/s |      5.81mb |
-      | webpack 5       |  41.53s |              126x |    13.2 kloc/s |      5.84mb |
+      | esbuild         |   0.37s |                1x |  1479.6 kloc/s |      5.80mb |
+      | parcel 2        |  30.50s |               80x |    17.9 kloc/s |      5.87mb |
+      | rollup + terser |  32.07s |               84x |    17.1 kloc/s |      5.81mb |
+      | webpack 5       |  39.70s |              104x |    13.8 kloc/s |      5.84mb |
 
   - p: >
+<<<<<<< HEAD
       每次报告的数据均为三次中最好的一次。
       我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap</code> 来运行 esbuild
       （单线程时则使用 `GOMAXPROCS=1`）。
@@ -163,26 +168,45 @@ body:
       Parcel 则相对简单，使用默认选项即可。数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
       目前为 547,441 行。
       测试环境为一台 6 核，16gb 内存，[macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) 禁用的 2019 款 MacBook Pro。
+=======
+      Each time reported is the best of three runs. I'm running esbuild with
+      <code>--bundle <wbr>--minify <wbr>--sourcemap</code>. I used the
+      <a href="https://github.com/rollup/plugins/tree/master/packages/terser"><code>@rollup/<wbr>plugin-<wbr>terser</code></a>
+      plugin because Rollup itself doesn't support minification. Webpack 5 uses
+      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>.
+      Parcel 2 uses the default options. Absolute speed is based on the total
+      line count including comments and blank lines, which is currently 547,441.
+      The tests were done on a 6-core 2019 MacBook Pro with 16gb of RAM and with
+      [macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) disabled.
+>>>>>>> b431563203d117c4cf9f467481960aeaabcc0fde
 
   - figcaption: TypeScript benchmark
   - benchmark:
       '[esbuild](https://esbuild.github.io/)': 0.10
-      '[parcel 2](https://parceljs.org/)': 8.73
-      '[webpack 5](https://webpack.js.org/)': 18.89
+      '[parcel 2](https://parceljs.org/)': 8.18
+      '[webpack 5](https://webpack.js.org/)': 15.96
 
   - p: >
+<<<<<<< HEAD
       此 benchmark 则选用 [Rome](https://github.com/facebookexperimental/rome)，
       来模拟构建一个大型的 TypeScript 代码库。
       所有代码必须合并成一个带有 source map，
       且被压缩过的 bundle，并且此 bundle 必须正常运行。
       你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，使用 `make bench-rome`。
+=======
+      This benchmark uses the old [Rome](https://github.com/rome/tools) code base
+      (prior to their Rust rewrite) to approximate a large TypeScript codebase. All
+      code must be combined into a single minified bundle with source maps and the
+      resulting bundle must work correctly. The benchmark can be run with
+      `make bench-rome` in the [esbuild repo](https://github.com/evanw/esbuild).
+>>>>>>> b431563203d117c4cf9f467481960aeaabcc0fde
 
   - table: |
       | Bundler   |    Time | Relative slowdown | Absolute speed | Output size |
       | :-------- | ------: | ----------------: | -------------: | ----------: |
       | esbuild   |   0.10s |                1x |  1318.4 kloc/s |      0.97mb |
-      | parcel 2  |   8.73s |               87x |    15.1 kloc/s |      0.97mb |
-      | webpack 5 |  18.89s |              189x |     7.0 kloc/s |      1.27mb |
+      | parcel 2  |   8.18s |               82x |    16.1 kloc/s |      0.97mb |
+      | webpack 5 |  15.96s |              160x |     8.3 kloc/s |      1.27mb |
 
   - p: >
       每次报告的数据均为三次中最好的一次。
@@ -200,11 +224,21 @@ body:
       目前为 131,836 行。测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
 
   - p: >
+<<<<<<< HEAD
       此结果集并未包含 Rollup，因为我没办法让其正常工作。
       我尝试了 <code>rollup-<wbr>plugin-<wbr>typescript</code>，
       <code>@rollup/<wbr>plugin-<wbr>typescript</code>，以及
       <code>@rollup/<wbr>plugin-<wbr>sucrase</code>，
       但他们都因为与 TypeScript 编译相关的原因而无法正常工作。
+=======
+      The results don't include Rollup because I couldn't get it to work for
+      reasons relating to TypeScript compilation. I tried
+      <a href="https://github.com/rollup/plugins/tree/master/packages/typescript"><code>@rollup/<wbr>plugin-<wbr>typescript</code></a>
+      but you can't disable type checking, and I tried
+      <a href="https://github.com/rollup/plugins/tree/master/packages/sucrase"><code>@rollup/<wbr>plugin-<wbr>sucrase</code></a>
+      but there's no way to provide a `tsconfig.json` file (which is required
+      for correct path resolution).
+>>>>>>> b431563203d117c4cf9f467481960aeaabcc0fde
 
   - h2: 即将发布的路线图 <#upcoming-roadmap>
 
@@ -295,6 +329,7 @@ body:
     - >
       **API 稳定性**
       <p>
+<<<<<<< HEAD
       尽管 esbuild 的版本尚未达到 1.0.0，
       但我们仍然努力保持着 API 的稳定性。
       补丁版本的目的是为了向后兼容变化，
@@ -302,6 +337,14 @@ body:
       （正如 [npm 所推荐的](https://docs.npmjs.com/misc/semver)那样）。
       如果你计划使用 esbuild 投入生产使用，
       你应该锁住确切的版本（最安全的方式）或者锁住主要版本和次要版本（只接受向后兼容的升级）。
+=======
+      Even though esbuild's version is not yet 1.0.0, effort is still made to
+      keep the API stable. Patch versions are intended for backwards-compatible
+      changes and minor versions are intended for backwards-incompatible changes.
+      If you plan to use esbuild for something real, you should either pin the
+      exact version (maximum safety) or pin the major and minor versions (only
+      accept backwards-compatible upgrades).
+>>>>>>> b431563203d117c4cf9f467481960aeaabcc0fde
       </p>
 
     - >
@@ -338,3 +381,43 @@ body:
       请谨记 esbuild 并不是一个能满足所有前端需求的
       一体化解决方案。
       </p>
+
+  - h2: Anti-virus software
+
+  - p: >
+      Since esbuild is written in native code, anti-virus software can sometimes
+      incorrectly flag it as a virus. _This does not mean esbuild is a virus._ I
+      do not publish malicious code and I take supply chain security very seriously.
+
+  - p: >
+      Virtually all of esbuild's code is first-party code except for [one dependency](https://github.com/evanw/esbuild/blob/main/go.mod)
+      on Google's set of supplemental Go packages. My development work is done
+      on different machine that is isolated from the one I use to publish builds.
+      I have done additional work to ensure that esbuild's published builds are
+      completely reproducible and after every release, published builds are
+      [automatically compared](https://github.com/evanw/esbuild/blob/main/.github/workflows/validate.yml)
+      to ones locally-built in an unrelated environment to ensure that they are
+      bitwise identical (i.e. that the Go compiler itself has not been compromised).
+      You can also build esbuild from source yourself and compare your build artifacts
+      to the published ones to independently verify this.
+
+  - p: >
+      Having to deal with false-positives is an unfortunate reality of using
+      anti-virus software. Here are some possible workarounds if your anti-virus
+      won't let you use esbuild:
+
+  - ul:
+    - >
+      Ignore your anti-virus software and remove esbuild from quarantine
+
+    - >
+      Report the specific esbuild native executable as a false-positive to your
+      anti-virus software vendor
+
+    - >
+      Use [`esbuild-wasm`](/getting-started/#wasm) instead of `esbuild` to
+      bypass your anti-virus software (which likely won't flag WebAssembly
+      files the same way it flags native executables)
+
+    - >
+      Use another build tool instead of esbuild
