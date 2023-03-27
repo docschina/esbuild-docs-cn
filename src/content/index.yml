@@ -1,14 +1,21 @@
 index:
+<<<<<<< HEAD
   title: 极速 JavaScript 打包器
   body:
     - h1: esbuild 中文文档
     - blockquote: 极速 JavaScript 打包器
+=======
+  title: An extremely fast bundler for the web
+  body:
+    - h1: esbuild
+    - blockquote: An extremely fast bundler for the web
+>>>>>>> b8cbbf304aad2feb999d6ddf68a68b7f3e83991f
 
     - benchmark.animated:
-        '[esbuild](https://esbuild.github.io/)': 0.33
-        '[parcel 2](https://parceljs.org/)': 32.48
-        '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 34.95
-        '[webpack 5](https://webpack.js.org/)': 41.53
+        '[esbuild](https://esbuild.github.io/)': 0.37
+        '[parcel 2](https://parceljs.org/)': 30.50
+        '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 32.07
+        '[webpack 5](https://webpack.js.org/)': 39.70
 
     - figcaption: >
         以上数据：分别是使用各工具的默认配置，
@@ -25,6 +32,7 @@ index:
 
     - p: '主要特性：'
     - ul:
+<<<<<<< HEAD
       - '极快的速度，无需缓存'
       - '支持 ES6 和 CommonJS 模块'
       - '支持对 ES6 模块进行 tree shaking'
@@ -33,6 +41,14 @@ index:
       - '支持 [Source maps](/api/#sourcemap)'
       - '支持 [Minification](/api/#minify)'
       - '支持 [plugins](/plugins/)'
+=======
+      - 'Extreme speed without needing a cache'
+      - '[JavaScript](/content-types/#javascript), [CSS](/content-types/#css), [TypeScript](/content-types/#typescript), and [JSX](/content-types/#jsx) built-in'
+      - 'A straightforward [API](/api/) for CLI, JS, and Go'
+      - 'Bundles ESM and CommonJS modules'
+      - 'Tree shaking, [minification](/api/#minify), and [source maps](/api/#sourcemap)'
+      - '[Local server](/api/#serve), [watch mode](/api/#watch), and [plugins](/plugins/)'
+>>>>>>> b8cbbf304aad2feb999d6ddf68a68b7f3e83991f
 
     - p: >
         如想试用 esbuild，请查阅[快速入门](/getting-started/)章节。
