@@ -1,0 +1,15 @@
+#flamePanel main {
+  position: relative;
+  margin-top: 60px;
+}
+
+#flamePanel canvas {
+  position: absolute;
+  left: -50px;
+  top: 0;
+}
+
+#flamePanel section {
+  margin-top: 30px;
+  min-height: 500px;
+}
