@@ -29,11 +29,13 @@ async function checkCommon(kind, text, value, callback) {
     await fs.mkdir(testDir, { recursive: true })
     await fs.writeFile(path.join(testDir, 'package.json'), '{}')
 
-    if (value.in) {
-      for (let name in value.in) {
-        const absPath = path.join(testDir, name)
-        await fs.mkdir(path.dirname(absPath), { recursive: true })
-        await fs.writeFile(absPath, value.in[name])
+    const writeFiles = async () => {
+      if (value.in) {
+        for (let name in value.in) {
+          const absPath = path.isAbsolute(name) ? name : path.join(testDir, name)
+          await fs.mkdir(path.dirname(absPath), { recursive: true })
+          await fs.writeFile(absPath, value.in[name])
+        }
       }
     }
 
@@ -44,7 +46,7 @@ async function checkCommon(kind, text, value, callback) {
       }
     }
 
-    if (!await callback({ testDir })) {
+    if (!await callback({ testDir, writeFiles })) {
       return false
     }
   } catch (e) {
@@ -60,8 +62,9 @@ async function checkCommon(kind, text, value, callback) {
 }
 
 async function checkCli(text, value) {
-  return await checkCommon('cli', text, value, async ({ testDir }) => {
+  return await checkCommon('cli', text, value, async ({ testDir, writeFiles }) => {
     await execAsync(`npm i --prefer-offline esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
+    await writeFiles()
 
     if (!Array.isArray(value.cli)) {
       await execAsync(value.cli, {
@@ -100,6 +103,13 @@ async function checkCli(text, value) {
             let stderrTail = stderr.slice(Math.max(0, stderr.length - expect.length))
             if (stderrTail !== expect) assert.strictEqual(stdoutTail + stderrTail, expect)
           }
+        } else if (item.expect.endsWith('...\n')) {
+          let expect = item.expect.slice(0, -4)
+          let stdoutHead = stdout.slice(0, Math.min(stdout.length, expect.length))
+          if (stdoutHead !== expect) {
+            let stderrHead = stderr.slice(0, Math.min(stderr.length, expect.length))
+            if (stderrHead !== expect) assert.strictEqual(stdoutHead + stderrHead, expect)
+          }
         } else {
           assert.strictEqual(stdout, item.expect)
         }
@@ -114,20 +124,23 @@ async function checkCli(text, value) {
   })
 }
 
-async function checkJs(text, value) {
-  return await checkCommon('js', text, value, async ({ testDir }) => {
+async function checkJs(text, value, extension) {
+  return await checkCommon('js', text, value, async ({ testDir, writeFiles }) => {
     await execAsync(`npm i --prefer-offline esbuild@${version}`, { cwd: testDir, stdio: 'pipe' })
+    await writeFiles()
 
-    if (!Array.isArray(value.js)) {
-      const mainPath = path.join(testDir, 'main.js')
-      await fs.writeFile(mainPath, value.js)
+    const items = value[extension]
+    if (!Array.isArray(items)) {
+      const mainPath = path.join(testDir, 'main.' + extension)
+      await fs.writeFile(mainPath, items)
       await execFileAsync('node', [mainPath], { cwd: testDir, stdio: 'pipe' })
       return true
     }
 
+    let didImport = false
     let js = ''
 
-    for (let items = value.js, i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
 
       if (item.$) {
@@ -139,8 +152,18 @@ async function checkJs(text, value) {
       }
 
       else if (item.expect) {
-        js += `require('assert').strictEqual(
-          require('util').inspect($, { sorted: true, breakLength: 40 }),
+        if (!didImport) {
+          didImport = true
+          if (extension === 'mjs') {
+            js += `import assert from 'node:assert';\n`
+            js += `import util from 'node:util';\n`
+          } else {
+            js += `const assert = require('assert');\n`
+            js += `const util = require('util');\n`
+          }
+        }
+        js += `assert.strictEqual(
+          util.inspect($, { sorted: true, breakLength: 40 }),
           ${JSON.stringify(item.expect.trim())});\n`
       }
 
@@ -149,7 +172,7 @@ async function checkJs(text, value) {
       }
     }
 
-    const mainPath = path.join(testDir, 'main.js')
+    const mainPath = path.join(testDir, 'main.' + extension)
     await fs.writeFile(mainPath, js)
     await execFileAsync('node', [mainPath], { cwd: testDir, stdio: 'pipe' })
     return true
@@ -157,7 +180,9 @@ async function checkJs(text, value) {
 }
 
 async function checkGo(text, value) {
-  return await checkCommon('go', text, value, async ({ testDir }) => {
+  return await checkCommon('go', text, value, async ({ testDir, writeFiles }) => {
+    await writeFiles()
+
     await fs.writeFile(path.join(testDir, 'go.mod'), `
       module main
       go 1.16
@@ -192,6 +217,9 @@ async function checkGo(text, value) {
 
 async function main() {
   child_process.execFileSync('rm', ['-fr', tempDir])
+
+  // Some tests use this directory
+  await fs.mkdir('/var/tmp/custom/working/directory', { recursive: true })
 
   const data = yaml.safeLoad(await fs.readFile(path.join(contentDir, 'index.yml'), 'utf8'))
   const pages = Object.entries(data)
@@ -238,7 +266,9 @@ async function main() {
       if (process.argv[2] && !text.includes(process.argv[2])) continue
       times[text] = 1
       if (value.cli) callbacks.push(() => checkCli(text, value))
-      if (value.js) callbacks.push(() => checkJs(text, value))
+      if (value.js) callbacks.push(() => checkJs(text, value, 'js'))
+      if (value.cjs) callbacks.push(() => checkJs(text, value, 'cjs'))
+      if (value.mjs) callbacks.push(() => checkJs(text, value, 'mjs'))
       if (value.go) callbacks.push(() => checkGo(text, value))
     }
   }

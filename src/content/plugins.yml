@@ -2,18 +2,12 @@ title: Plugins
 body:
   - h1: Plugins
 
-  - warning: >
-      The plugin API is new and still experimental. It may change in the future
-      before version 1.0.0 of esbuild as new use cases are uncovered. You can
-      follow [the tracking issue](https://github.com/evanw/esbuild/issues/111)
-      for updates about this feature.
-
   - p: >
       The plugin API allows you to inject code into various parts of the build
       process. Unlike the rest of the API, it's not available from the command
       line. You must write either JavaScript or Go code to use the plugin API.
-      Plugins can also only be used with the [build API](/api/#build-api), not
-      with the [transform API](/api/#transform-api).
+      Plugins can also only be used with the [build](/api/#build) API, not
+      with the [transform](/api/#transform) API.
 
   - h2: Finding plugins
   - p: >
@@ -37,7 +31,7 @@ body:
   - h2: Using plugins
   - p: >
       An esbuild plugin is an object with a `name` and a `setup` function. They
-      are passed in an array to the [build API](/api/#build) call. The `setup`
+      are passed in an array to the [build](/api/#build) API call. The `setup`
       function is run once for each build API call.
 
   - p: >
@@ -50,7 +44,9 @@ body:
           import { PATH } from 'env'
           console.log(`PATH is ${PATH}`)
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+
         let envPlugin = {
           name: 'env',
           setup(build) {
@@ -71,12 +67,12 @@ body:
           },
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [envPlugin],
-        }).catch(() => process.exit(1))
+        })
 
       go: |
         package main
@@ -221,12 +217,13 @@ body:
         public/images/1.png: |
           this is an image
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+        import path from 'node:path'
+
         let exampleOnResolvePlugin = {
           name: 'example',
           setup(build) {
-            let path = require('path')
-
             // Redirect all paths starting with "images/" to "./public/images/"
             build.onResolve({ filter: /^images\// }, args => {
               return { path: path.join(args.resolveDir, 'public', args.path) }
@@ -239,13 +236,13 @@ body:
           },
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [exampleOnResolvePlugin],
           loader: { '.png': 'binary' },
-        }).catch(() => process.exit(1))
+        })
 
       go: |
         package main
@@ -690,12 +687,13 @@ body:
         file.txt: |
           these are some words
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+        import fs from 'node:fs'
+
         let exampleOnLoadPlugin = {
           name: 'example',
           setup(build) {
-            let fs = require('fs')
-
             // Load ".txt" files and return an array of words
             build.onLoad({ filter: /\.txt$/ }, async (args) => {
               let text = await fs.promises.readFile(args.path, 'utf8')
@@ -707,12 +705,12 @@ body:
           },
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [exampleOnLoadPlugin],
-        }).catch(() => process.exit(1))
+        })
 
       go: |
         package main
@@ -1088,25 +1086,25 @@ body:
 
   - p: >
       The cache can either be stored in memory (beneficial for use with
-      esbuild's [incremental build API](https://esbuild.github.io/api/#incremental)),
-      on disk (beneficial for caching across separate build script invocations),
-      or even on a server (beneficial for really slow transforms that can be
-      shared between different developer machines). Where to store the cache is
-      case-specific and depends on your plugin.
+      esbuild's [rebuild](/api/#rebuild) API), on disk (beneficial for caching
+      across separate build script invocations), or even on a server (beneficial
+      for really slow transforms that can be shared between different developer
+      machines). Where to store the cache is case-specific and depends on your
+      plugin.
 
   - p: >
       Here is a simple caching example. Say we want to cache the function
       `slowTransform()` that takes as input the contents of a file in the
       `*.example` format and transforms it to JavaScript. An in-memory cache
       that avoids redundant calls to this function when used with esbuild's
-      [incremental build API](https://esbuild.github.io/api/#incremental))
-      might look something like this:
+      [rebuild](/api/#rebuild) API) might look something like this:
 
   - pre.js: |
+      import fs from 'node:fs'
+
       let examplePlugin = {
         name: 'example',
         setup(build) {
-          let fs = require('fs')
           let cache = new Map
 
           build.onLoad({ filter: /\.example$/ }, async (args) => {
@@ -1245,11 +1243,16 @@ body:
   - p: >
       Register an on-start callback to be notified when a new build starts. This
       triggers for all builds, not just the initial build, so it's especially
+<<<<<<< HEAD
       useful for [incremental builds](/api/#incremental), [watch mode](/api/#watch),
       and the [serve API](/api/#serve). Here's how to add an on-start callback:
+=======
+      useful for [rebuilds](/api/#rebuild), [watch mode](/api/#watch), and
+      [serve mode](/api/#serve). Here's how to add an on-start callback:
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
 
   - example:
-      js: |
+      mjs: |
         let examplePlugin = {
           name: 'example',
           setup(build) {
@@ -1303,11 +1306,16 @@ body:
   - p: >
       Register an on-end callback to be notified when a new build ends. This
       triggers for all builds, not just the initial build, so it's especially
+<<<<<<< HEAD
       useful for [incremental builds](/api/#incremental), [watch mode](/api/#watch),
       and the [serve API](/api/#serve). Here's how to add an on-end callback:
+=======
+      useful for [rebuilds](/api/#rebuild), [watch mode](/api/#watch),
+      and [serve mode](/api/#serve). Here's how to add an on-end callback:
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
 
   - example:
-      js: |
+      mjs: |
         let examplePlugin = {
           name: 'example',
           setup(build) {
@@ -1327,8 +1335,9 @@ body:
         var examplePlugin = api.Plugin{
           Name: "example",
           Setup: func(build api.PluginBuild) {
-            build.OnEnd(func(result *api.BuildResult) {
+            build.OnEnd(func(result *api.BuildResult) (api.OnEndResult, error) {
               fmt.Fprintf(os.Stderr, "build ended with %d errors\n", len(result.Errors))
+              return api.OnEndResult{}, nil
             })
           },
         }
@@ -1344,6 +1353,43 @@ body:
       setting on the [initial options](#build-options) and the build graph will
       be returned as the `metafile` property on the build result object.
 
+  - h2#on-dispose: On-dispose callbacks
+
+  - p: >
+      Register an on-dispose callback to perform cleanup when the plugin is no
+      longer used. It will be called after every `build()` call regardless of
+      whether the build failed or not, as well as after the first `dispose()`
+      call on a given build context. Here's how to add an on-dispose callback:
+
+  - example:
+      mjs: |
+        let examplePlugin = {
+          name: 'example',
+          setup(build) {
+            build.onDispose(() => {
+              console.log('This plugin is no longer used')
+            })
+          },
+        }
+
+      go: |
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+
+        var examplePlugin = api.Plugin{
+          Name: "example",
+          Setup: func(build api.PluginBuild) {
+            build.OnDispose(func() {
+              fmt.Println("This plugin is no longer used")
+            })
+          },
+        }
+
+        func main() {
+        }
+
   - h2#build-options: Accessing build options
 
   - p: >
@@ -1352,7 +1398,7 @@ body:
       modify the build options before the build starts. Here is an example:
 
   - example:
-      js: |
+      mjs: |
         let examplePlugin = {
           name: 'auto-node-env',
           setup(build) {
@@ -1388,7 +1434,7 @@ body:
 
   - p: >
       Note that modifications to the build options after the build starts do
-      not affect the build. In particular, [incremental rebuilds](/api/#incremental),
+      not affect the build. In particular, [rebuilds](/api/#rebuild),
       [watch mode](/api/#watch), and [serve mode](/api/#serve) do not
       update their build options if plugins mutate the build options object
       after the first build has started.
@@ -1397,7 +1443,11 @@ body:
 
   - p: >
       When a plugin returns a result from an [on-resolve callback](#on-resolve),
+<<<<<<< HEAD
       the result completely replaces esbuilds built-in path resolution. This gives
+=======
+      the result completely replaces esbuild's built-in path resolution. This gives
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
       the plugin complete control over how path resolution works, but it means
       that the plugin may have to reimplement some of the behavior that esbuild
       already has built-in if it wants to have similar behavior. For example,
@@ -1415,12 +1465,25 @@ body:
         app.js: import 'example'
         bar/foo.js: console.log(123)
 
+<<<<<<< HEAD
       js: |
+=======
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
         let examplePlugin = {
           name: 'example',
           setup(build) {
             build.onResolve({ filter: /^example$/ }, async () => {
+<<<<<<< HEAD
               const result = await build.resolve('./foo', { resolveDir: './bar' })
+=======
+              const result = await build.resolve('./foo', {
+                kind: 'import-statement',
+                resolveDir: './bar',
+              })
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
               if (result.errors.length > 0) {
                 return { errors: result.errors }
               }
@@ -1429,12 +1492,20 @@ body:
           },
         }
 
+<<<<<<< HEAD
         require('esbuild').build({
+=======
+        await esbuild.build({
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [examplePlugin],
+<<<<<<< HEAD
         }).catch(() => process.exit(1))
+=======
+        })
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
 
       go: |
         package main
@@ -1447,7 +1518,14 @@ body:
           Setup: func(build api.PluginBuild) {
             build.OnResolve(api.OnResolveOptions{Filter: `^example$`},
               func(api.OnResolveArgs) (api.OnResolveResult, error) {
+<<<<<<< HEAD
                 result := build.Resolve("./foo", api.ResolveOptions{ResolveDir: "./bar"})
+=======
+                result := build.Resolve("./foo", api.ResolveOptions{
+                  Kind:       api.ResolveJSImportStatement,
+                  ResolveDir: "./bar",
+                })
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
                 if len(result.Errors) > 0 {
                   return api.OnResolveResult{Errors: result.Errors}, nil
                 }
@@ -1536,10 +1614,17 @@ body:
 
       js: |
         interface ResolveOptions {
+<<<<<<< HEAD
           importer?: string;
           namespace?: string;
           resolveDir?: string;
           kind?: ResolveKind;
+=======
+          kind: ResolveKind;
+          importer?: string;
+          namespace?: string;
+          resolveDir?: string;
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
           pluginData?: any;
         }
 
@@ -1554,10 +1639,17 @@ body:
 
       go: |
         type ResolveOptions struct {
+<<<<<<< HEAD
           Importer   string
           Namespace  string
           ResolveDir string
           Kind       ResolveKind
+=======
+          Kind       ResolveKind
+          Importer   string
+          Namespace  string
+          ResolveDir string
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
           PluginData interface{}
         }
 
@@ -1573,6 +1665,20 @@ body:
 
   - ul:
     - >
+<<<<<<< HEAD
+=======
+      `kind`
+      <p>
+      This tells esbuild how the path was imported, which can affect path
+      resolution. For example, [node's path resolution rules](https://nodejs.org/api/packages.html#conditional-exports)
+      say that paths imported using `'require-call'` should respect [conditional
+      package imports](/api/#conditions) in the `"require"` section in `package.json` while paths
+      imported using `'import-statement'` should respect conditional package
+      imports in the `"import"` section instead.
+      </p>
+
+    - >
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
       `importer`
       <p>
       If set, this is interpreted as the path of the module containing this
@@ -1600,6 +1706,7 @@ body:
       </p>
 
     - >
+<<<<<<< HEAD
       `kind`
       <p>
       This tells esbuild how the path was imported, which can affect path
@@ -1611,6 +1718,8 @@ body:
       </p>
 
     - >
+=======
+>>>>>>> d405aa5f06ef359430344ca7fcbbc9bc8acf620e
       `pluginData`
       <p>
       This property can be used to pass custom data to whatever [on-resolve callbacks](#on-resolve)
@@ -1780,13 +1889,14 @@ body:
           import { pick } from 'https://unpkg.com/remeda@0.0.23/dist/es/pick.js'
           console.log(pick({a: 1, b: 2}, ['a']))
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+        import https from 'node:https'
+        import http from 'node:http'
+
         let httpPlugin = {
           name: 'http',
           setup(build) {
-            let https = require('https')
-            let http = require('http')
-
             // Intercept import paths starting with "http:" and "https:" so
             // esbuild doesn't attempt to map them to a file system location.
             // Tag them with the "http-url" namespace to associate them with
@@ -1835,12 +1945,12 @@ body:
           },
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [httpPlugin],
-        }).catch(() => process.exit(1))
+        })
 
       go: |
         package main
@@ -1936,7 +2046,7 @@ body:
 
   - p: >
       _This example demonstrates: working with binary data, creating
-      virtual; modules using import statements, re-using the same path with
+      virtual modules using import statements, re-using the same path with
       different namespaces._
 
   - p: >
@@ -1976,13 +2086,14 @@ body:
         example.wasm: |
           this is an example wasm file
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+        import path from 'node:path'
+        import fs from 'node:fs'
+
         let wasmPlugin = {
           name: 'wasm',
           setup(build) {
-            let path = require('path')
-            let fs = require('fs')
-
             // Resolve ".wasm" files to a path with a namespace
             build.onResolve({ filter: /\.wasm$/ }, args => {
               // If this is the import inside the stub module, import the
@@ -2032,12 +2143,12 @@ body:
           },
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [wasmPlugin],
-        }).catch(() => process.exit(1))
+        })
 
       go: |
         package main
@@ -2195,14 +2306,15 @@ body:
           <input type="number" bind:value={b}>
           <p>{a} + {b} = {a + b}</p>
 
-      js: |
+      mjs: |
+        import * as esbuild from 'esbuild'
+        import * as svelte from 'svelte/compiler.mjs'
+        import path from 'node:path'
+        import fs from 'node:fs'
+
         let sveltePlugin = {
           name: 'svelte',
           setup(build) {
-            let svelte = require('svelte/compiler')
-            let path = require('path')
-            let fs = require('fs')
-
             build.onLoad({ filter: /\.svelte$/ }, async (args) => {
               // This converts a message in Svelte's format to esbuild's format
               let convertMessage = ({ message, start, end }) => {
@@ -2237,12 +2349,12 @@ body:
           }
         }
 
-        require('esbuild').build({
+        await esbuild.build({
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [sveltePlugin],
-        }).catch(() => process.exit(1))
+        })
 
   - p: >
       This plugin only needs a load callback, not a resolve callback, because
