@@ -3,338 +3,403 @@ body:
   - h1: FAQ
 
   - p: >
-      本文是 esbuild 常见问题的集合。
-      你也可以在 [GitHub issue 上提问](https://github.com/evanw/esbuild/issues)。
+      This is a collection of common questions about esbuild. You can also
+      ask questions on the [GitHub issue tracker](https://github.com/evanw/esbuild/issues).
 
   - toc: true
 
-  - h2: 为何 esbuild 如此之快？<#why-is-esbuild-fast>
+  - h2: Why is esbuild fast?
 
   - p: >
-      若干原因：
+      Several reasons:
 
   - ul:
     - >
       <p>
-<<<<<<< HEAD
-      它由 [Go](https://golang.org/) 编写，并被编译成原生代码。
-=======
       It's written in [Go](https://go.dev/) and compiles to native code.
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
       </p>
       <p>
-      大多数构建工具都是用 JavaScript 编写的，
-      但对于需要 JIT（即时）编译的语言来说，命令行程序的性能是他们的噩梦。
-      每次运行你的构建工具时，对于 JavaScript 虚拟机来说，都是第一次运行你的代码，
-      没有任何优化提示。
-      当 esbuild 忙着解析你代码的 JavaScript 时，
-      Node 可能还忙着解析你构建工具的 JavaScript。
-      当 Node 解析完你构建工具的代码时，esbuild 可能已经退出了，
-      而你的构建工具还未开始构建。
+      Most other bundlers are written in JavaScript, but a command-line
+      application is a worst-case performance situation for a JIT-compiled
+      language. Every time you run your bundler, the JavaScript VM is seeing
+      your bundler's code for the first time without any optimization hints.
+      While esbuild is busy parsing your JavaScript, node is busy parsing
+      your bundler's JavaScript. By the time node has finished parsing your
+      bundler's code, esbuild might have already exited and your bundler
+      hasn't even started bundling yet.
       </p>
       <p>
-      此外，Go 在核心设计上就采用了并行性，而 JavaScript 却没有。
-      Go 在线程间共享内存，
-      而 JavaScript 必须在线程间对数据进行序列化。
-      尽管 Go 和 JavaScript 都有并行的垃圾收集器，
-      但 Go 的堆是所有线程之间共享的，
-      而 JavaScript 则是每个线程都拥有一个单独的堆。
-      根据[我的测试](https://github.com/evanw/esbuild/issues/111#issuecomment-719910381)，
-      这似乎将 JavaScript 工作线程可能的并行量减少了一半。
-      这大概是因为一半 CPU 的核在忙着帮另一半进行垃圾回收。
-      </p>
-
-    - >
-      <p>
-      极大的利用了并行性。
-      </p>
-      <p>
-      esbuild 内部的算法经过了精心设计，在可能的情况下，
-      使得所有可用的 CPU 核完全饱和。
-      这过程中大概分为三个阶段：解析（parse）、链接（link）和代码生成（code generation）。
-      解析和代码生成是占据了大部分的工作，
-      并且完全是可并行的（链接在大部分情况下是一个固有的串行任务）。
-      由于所有线程间共享内存，
-      因此当构建引入相同 JavaScript 库的不同入口点时，可以很容易地共享内存。
-      大多数现代计算机都有许多核，所以并行性是 esbuild 的最大优势之一。
+      In addition, Go is designed from the core for parallelism while JavaScript
+      is not. Go has shared memory between threads while JavaScript has to
+      serialize data between threads. Both Go and JavaScript have parallel
+      garbage collectors, but Go's heap is shared between all threads while
+      JavaScript has a separate heap per JavaScript thread. This seems to cut
+      the amount of parallelism that's possible with JavaScript worker threads
+      in half [according to my testing](https://github.com/evanw/esbuild/issues/111#issuecomment-719910381),
+      presumably since half of your CPU cores are busy collecting garbage for
+      the other half.
       </p>
 
     - >
       <p>
-      esbuild 中的所有内容都是从 0 开始编写的。
+      Parallelism is used heavily.
       </p>
       <p>
-      完全自己编写而不使用第三方库，
-      会带来很多性能上的好处。
-      从 0 开始就考虑到性能，
-      可以确保所有东西都采用一致的数据结构以避免昂贵的转换过程，
-      在必要时进行完全地架构变更。
-      当然，最大缺点就是相当的耗时。
-      </p>
-      <p>
-      例如，许多构建工具均使用官方的 TypeScript 编译器作为解析器。
-      但它是为了服务于 TypeScript 编译器团队的目标而被建立，
-      他们并没有将性能作为首要指标。
-      他们的代码中大量使用了 [megamorphic object shapes](https://mrale.ph/blog/2015/01/11/whats-up-with-monomorphism.html) 
-      以及不必要的[动态属性访问](https://github.com/microsoft/TypeScript/issues/39247)
-      (这些都是众所周知的 JavaScript 性能杀手)。
-      而 TypeScript 解析器即便在类型检查被禁用的情况下，
-      仍会运行类型检查器。而使用 esbuild 自定义的 TypeScript 解析器，就不会遇到上述问题。
+      The algorithms inside esbuild are carefully designed to fully saturate
+      all available CPU cores when possible. There are roughly three phases:
+      parsing, linking, and code generation. Parsing and code generation are
+      most of the work and are fully parallelizable (linking is an inherently
+      serial task for the most part). Since all threads share memory, work
+      can easily be shared when bundling different entry points that import
+      the same JavaScript libraries. Most modern computers have many cores
+      so parallelism is a big win.
       </p>
 
     - >
       <p>
-      内存得到有效的利用。
+      Everything in esbuild is written from scratch.
       </p>
       <p>
-      理想情况下的编译器，输入内容的长度大多为 O(n) 的复杂度。
-      所以如果要处理大量的数据，
-      内存访问速度很可能会严重影响性能。
-      在数据上进行的访问次数越少（同时数据转化成的不同表现形式也要越少），
-      这样你的编译器就会越快。
+      There are a lot of performance benefits with writing everything yourself
+      instead of using 3rd-party libraries. You can have performance in mind
+      from the beginning, you can make sure everything uses consistent data
+      structures to avoid expensive conversions, and you can make wide
+      architectural changes whenever necessary. The drawback is of course that
+      it's a lot of work.
       </p>
       <p>
-      例如，esbuild 仅访问 JavaScript 的 AST 三次：
+      For example, many bundlers use the official TypeScript compiler as a
+      parser. But it was built to serve the goals of the TypeScript compiler team
+      and they do not have performance as a top priority. Their code makes pretty
+      heavy use of [megamorphic object shapes](https://mrale.ph/blog/2015/01/11/whats-up-with-monomorphism.html)
+      and unnecessary [dynamic property accesses](https://github.com/microsoft/TypeScript/issues/39247)
+      (both well-known JavaScript speed bumps). And the TypeScript parser
+      appears to still run the type checker even when type checking is disabled.
+      None of these are an issue with esbuild's custom TypeScript parser.
+      </p>
+
+    - >
+      <p>
+      Memory is used efficiently.
+      </p>
+      <p>
+      Compilers are ideally mostly O(n) complexity in the length of the input.
+      So if you are processing a lot of data, memory access speed is likely going
+      to heavily affect performance. The fewer passes you have to make over your
+      data (and also the fewer different representations you need to transform
+      your data into), the faster your compiler will go.
+      </p>
+      <p>
+      For example, esbuild only touches the whole JavaScript AST three times:
       </p>
       <ol>
-      <li>第一次用于词法、解析、作用域设置以及声明符号；</li>
-      <li>第二次用于绑定符号、压缩语法、将 JSX/TS 转为 JS 以及将 ESNext 转为 ES2015；</li>
-      <li>最后一次则用于对标识符进行压缩、压缩空格、生成代码以及生成 source map。</li>
+      <li>A pass for lexing, parsing, scope setup, and declaring symbols</li>
+      <li>A pass for binding symbols, minifying syntax, JSX/TS to JS, and ESNext-to-ES2015</li>
+      <li>A pass for minifying identifiers, minifying whitespace, generating code, and generating source maps</li>
       </ol>
       <p>
-      当 AST 的数据仍在 CPU 热缓存（译注：术语，CPU 缓存策略分为热缓存和冷缓存）中时，
-      可以最大限度地重复使用 AST 的数据。
-      其他构建工具会将这些步骤分开执行，而不会交错进行。
-      他们还可能会在数据的表现形式间进行转换，将多个库一同使用
-      （例如 string→TS→JS→string，然后 string→JS→older JS→string，
-      再然后 string→JS→minified JS→string）这将使用大量内存并使得构建变慢。
+      This maximizes reuse of AST data while it's still hot in the CPU cache.
+      Other bundlers do these steps in separate passes instead of interleaving
+      them. They may also convert between data representations to glue multiple
+      libraries together (e.g. string→TS→JS→string, then string→JS→older JS→string,
+      then string→JS→minified JS→string) which uses more memory and slows
+      things down.
       </p>
       <p>
-      而 Go 的另外一个好处是，它可以将内容紧密的存储在内存中，
-      这使得它可以使用更少的内存，更适合 CPU 缓存。
-      所有的对象字段的类型和字段都紧密的包裹在一起，
-      例如，几个布尔类型的标志每个只占一个字节。
-      Go 还具有值语义，可以把一个对象直接嵌入到另一个对象中，
-      而不需要额外分配空间。
-      JavaScript 则没有这些特性，而且还有其他的缺点，
-      比如 JIT 的开销（比如 hidden class slots）
-      和低效的表示方式（比如非整数使用指针进行堆分配）
+      Another benefit of Go is that it can store things compactly in memory,
+      which enables it to use less memory and fit more in the CPU cache. All
+      object fields have types and fields are packed tightly together so e.g.
+      several boolean flags only take one byte each. Go also has value semantics
+      and can embed one object directly in another so it comes "for free"
+      without another allocation. JavaScript doesn't have these features and
+      also has other drawbacks such as JIT overhead (e.g. hidden class slots)
+      and inefficient representations (e.g. non-integer numbers are
+      heap-allocated with pointers).
       </p>
 
   - p: >
-      这些因素中每一点都只是有显著的提速，
-      但综合起来，
-      它们可以使得构建工具的速度比目前其他常用的构建工具快好几个数量级。
+      Each one of these factors is only a somewhat significant speedup, but
+      together they can result in a bundler that is multiple orders of
+      magnitude faster than other bundlers commonly in use today.
 
-  - h2: Benchmark 详情 <#benchmark-details>
+  - h2: Benchmark details
 
   - p: >
-      以下是每个 benchmark 的详细信息：
+      Here are the details about each benchmark:
 
   - figcaption: JavaScript benchmark
   - benchmark:
-      '[esbuild](https://esbuild.github.io/)': 0.33
-      '[parcel 2](https://parceljs.org/)': 32.48
-      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 34.95
-      '[webpack 5](https://webpack.js.org/)': 41.53
+      '[esbuild](https://esbuild.github.io/)': 0.37
+      '[parcel 2](https://parceljs.org/)': 30.50
+      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 32.07
+      '[webpack 5](https://webpack.js.org/)': 39.70
 
   - p: >
-      此 benchmark 通过复制 [three.js](https://github.com/mrdoob/three.js) 库 10 次，
-      来模拟构建一个大型 JavaScript 代码库的情况，
-      并从 0 开始构建了一个单一 bundle，且未使用任何缓存。
-      你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，
-      使用 `make bench-three`。
+      This benchmark approximates a large JavaScript codebase by duplicating
+      the [three.js](https://github.com/mrdoob/three.js) library 10 times
+      and building a single bundle from scratch, without any caches. The
+      benchmark can be run with `make bench-three` in the
+      [esbuild repo](https://github.com/evanw/esbuild).
 
   - table: |
       | Bundler         |    Time | Relative slowdown | Absolute speed | Output size |
       | :-------------- | ------: | ----------------: | -------------: | ----------: |
-      | esbuild         |   0.33s |                1x |  1658.9 kloc/s |      5.80mb |
-      | parcel 2        |  32.48s |               98x |    16.9 kloc/s |      5.87mb |
-      | rollup + terser |  34.95s |              106x |    15.7 kloc/s |      5.81mb |
-      | webpack 5       |  41.53s |              126x |    13.2 kloc/s |      5.84mb |
+      | esbuild         |   0.37s |                1x |  1479.6 kloc/s |      5.80mb |
+      | parcel 2        |  30.50s |               80x |    17.9 kloc/s |      5.87mb |
+      | rollup + terser |  32.07s |               84x |    17.1 kloc/s |      5.81mb |
+      | webpack 5       |  39.70s |              104x |    13.8 kloc/s |      5.84mb |
 
   - p: >
-      每次报告的数据均为三次中最好的一次。
-      我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap</code> 来运行 esbuild
-      （单线程时则使用 `GOMAXPROCS=1`）。
-      在运行 Rollup 时，我使用了 <code>rollup-<wbr>plugin-<wbr>terser</code> 的 plugin，
-      因为 Rollup 本身并不支持压缩。而在运行 webpack 时，则使用了
-      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code> 的选项。
-      Parcel 则相对简单，使用默认选项即可。数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
-      目前为 547,441 行。
-      测试环境为一台 6 核，16gb 内存，[macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) 禁用的 2019 款 MacBook Pro。
+      Each time reported is the best of three runs. I'm running esbuild with
+      <code>--bundle <wbr>--minify <wbr>--sourcemap</code>. I used the
+      <a href="https://github.com/rollup/plugins/tree/master/packages/terser"><code>@rollup/<wbr>plugin-<wbr>terser</code></a>
+      plugin because Rollup itself doesn't support minification. Webpack 5 uses
+      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>.
+      Parcel 2 uses the default options. Absolute speed is based on the total
+      line count including comments and blank lines, which is currently 547,441.
+      The tests were done on a 6-core 2019 MacBook Pro with 16gb of RAM and with
+      [macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) disabled.
 
   - figcaption: TypeScript benchmark
   - benchmark:
       '[esbuild](https://esbuild.github.io/)': 0.10
-      '[parcel 2](https://parceljs.org/)': 8.73
-      '[webpack 5](https://webpack.js.org/)': 18.89
+      '[parcel 2](https://parceljs.org/)': 8.18
+      '[webpack 5](https://webpack.js.org/)': 15.96
 
   - p: >
-      此 benchmark 则选用 [Rome](https://github.com/facebookexperimental/rome)，
-      来模拟构建一个大型的 TypeScript 代码库。
-      所有代码必须合并成一个带有 source map，
-      且被压缩过的 bundle，并且此 bundle 必须正常运行。
-      你可以在 [esbuild 仓库](https://github.com/evanw/esbuild)中运行此 benchmark，使用 `make bench-rome`。
+      This benchmark uses the old [Rome](https://github.com/rome/tools) code base
+      (prior to their Rust rewrite) to approximate a large TypeScript codebase. All
+      code must be combined into a single minified bundle with source maps and the
+      resulting bundle must work correctly. The benchmark can be run with
+      `make bench-rome` in the [esbuild repo](https://github.com/evanw/esbuild).
 
   - table: |
       | Bundler   |    Time | Relative slowdown | Absolute speed | Output size |
       | :-------- | ------: | ----------------: | -------------: | ----------: |
       | esbuild   |   0.10s |                1x |  1318.4 kloc/s |      0.97mb |
-      | parcel 2  |   8.73s |               87x |    15.1 kloc/s |      0.97mb |
-      | webpack 5 |  18.89s |              189x |     7.0 kloc/s |      1.27mb |
+      | parcel 2  |   8.18s |               82x |    16.1 kloc/s |      0.97mb |
+      | webpack 5 |  15.96s |              160x |     8.3 kloc/s |      1.27mb |
 
   - p: >
-      每次报告的数据均为三次中最好的一次。
-      我通过 <code>--bundle <wbr>--minify <wbr>--sourcemap
-      <wbr>--platform=<wbr>node</code> 来运行 esbuild（单线程时则使用
-      `GOMAXPROCS=1`）。在运行 webpack 时，则使用了 `ts-loader`，并设置 <code>transpileOnly:
-      <wbr>true</code> 以及其他配置项 <code>--mode=<wbr>production
-      <wbr>--devtool=<wbr>sourcemap</code>。在运行 Parcel 1 时，使用了 <code>--target
-      <wbr>node --bundle-<wbr>node-<wbr>modules</code> 选项。
-      运行 Parcel 2 时，在 <code>package.json</code>
-      中设置了 <code>"engines": <wbr>"node"</code>，同时还需要使用
-      <code>@parcel/<wbr>transformer-<wbr>typescript-<wbr>tsc</code>
-      转换器来处理 benchmark 中使用的 TypeScript 代码。
-      数据中的绝对速度是基于包括注释和空白行在内的总行数计算的，
-      目前为 131,836 行。测试环境为一台 6 核，16gb 内存的 2019 款 MacBook Pro。
+      Each time reported is the best of three runs. I'm running esbuild with
+      <code>--bundle <wbr>--minify <wbr>--sourcemap <wbr>--platform=<wbr>node</code>.
+      Webpack 5 uses [`ts-loader`](https://github.com/TypeStrong/ts-loader) with <code>transpileOnly: <wbr>true</code> and
+      <code>--mode=<wbr>production <wbr>--devtool=<wbr>sourcemap</code>. Parcel 2 uses
+      <code>"engines": <wbr>"node"</code> in <code>package.json</code>. Absolute
+      speed is based on the total line count including comments and blank lines,
+      which is currently 131,836. The tests were done on a 6-core 2019 MacBook Pro
+      with 16gb of RAM and with [macOS Spotlight](https://en.wikipedia.org/wiki/Spotlight_(software)) disabled.
 
   - p: >
-      此结果集并未包含 Rollup，因为我没办法让其正常工作。
-      我尝试了 <code>rollup-<wbr>plugin-<wbr>typescript</code>，
-      <code>@rollup/<wbr>plugin-<wbr>typescript</code>，以及
-      <code>@rollup/<wbr>plugin-<wbr>sucrase</code>，
-      但他们都因为与 TypeScript 编译相关的原因而无法正常工作。
+      The results don't include Rollup because I couldn't get it to work for
+      reasons relating to TypeScript compilation. I tried
+      <a href="https://github.com/rollup/plugins/tree/master/packages/typescript"><code>@rollup/<wbr>plugin-<wbr>typescript</code></a>
+      but you can't disable type checking, and I tried
+      <a href="https://github.com/rollup/plugins/tree/master/packages/sucrase"><code>@rollup/<wbr>plugin-<wbr>sucrase</code></a>
+      but there's no way to provide a `tsconfig.json` file (which is required
+      for correct path resolution).
 
-  - h2: 即将发布的路线图 <#upcoming-roadmap>
+  - h2: Upcoming roadmap
 
   - p: >
-      这些特性已在进行中，处于第一优先级：
+      These features are already in progress and are first priority:
 
   - ul:
-    - '代码分割（Code splitting）([#16](https://github.com/evanw/esbuild/issues/16)，[docs](/api/#splitting))'
-    - 'CSS content type ([#20](https://github.com/evanw/esbuild/issues/20)，[docs](/content-types/#css))'
+    - 'Code splitting ([#16](https://github.com/evanw/esbuild/issues/16), [docs](/api/#splitting))'
+    - 'CSS content type ([#20](https://github.com/evanw/esbuild/issues/20), [docs](/content-types/#css))'
     - 'Plugin API ([#111](https://github.com/evanw/esbuild/issues/111))'
 
   - p: >
-      下面这些是未来可能会开发的特性，但也可能不会，
-      亦或是会进行开发，但开发的程度有限：
+      These are potential future features but may not happen or may happen
+      to a more limited extent:
 
   - ul:
     - 'HTML content type ([#31](https://github.com/evanw/esbuild/issues/31))'
-    - '降级至 ES5 ([#297](https://github.com/evanw/esbuild/issues/297))'
-    - '支持构建 top-level await ([#253](https://github.com/evanw/esbuild/issues/253))'
+    - 'Lowering to ES5 ([#297](https://github.com/evanw/esbuild/issues/297))'
+    - 'Bundling top-level await ([#253](https://github.com/evanw/esbuild/issues/253))'
 
   - p: >
-      在这之后，我认为 esbuild 已相对完善。
-      我计划让 esbuild 达到一个基本稳定的状态，
-      然后停止增加更多的特性。
-      这将拒绝对 esbuild 本身增加主要特性的请求。
-      我不认为 esbuild 应该成为满足一切前端需求的一体化解决方案。
-      特别是，我希望避免 ”webpack config“ 模式的麻烦和问题，
-      因为该模式的底层过于灵活，
-      其易用性会受到影响。
+      After that point, I will consider esbuild to be relatively complete.
+      I'm planning for esbuild to reach a mostly stable state and then stop
+      accumulating more features. This will involve saying "no" to requests
+      for adding major features to esbuild itself. I don't think esbuild
+      should become an all-in-one solution for all frontend needs. In
+      particular, I want to avoid the pain and problems of the "webpack
+      config" model where the underlying tool is too flexible and usability
+      suffers.
 
   - p: >
-      例如，我并**不打算**在 esbuild 中加入如下特性：
+      For example, I am _not_ planning to include these features in esbuild's
+      core itself:
 
   - ul:
-    - '支持其他前端语言（例如 [Elm](https://elm-lang.org/)，
-      [Svelte](https://svelte.dev/)，[Vue](https://vuejs.org/) 以及
-      [Angular](https://angular.io/) 等）'
-    - TypeScript 的类型检查（单独运行 `tsc` 即可）
-    - 用于自定义 AST 操作的 API
-    - 热更新
-    - 模块联邦（module federation)
+    - 'Support for other frontend languages (e.g. [Elm](https://elm-lang.org/),
+      [Svelte](https://svelte.dev/), [Vue](https://vuejs.org/),
+      [Angular](https://angular.io/))'
+    - TypeScript type checking (just run `tsc` separately)
+    - An API for custom AST manipulation
+    - Hot-module reloading
+    - Module federation
 
   - p: >
-      我希望我添加到 esbuild 中的扩展点（[plugins](/plugins/) 和 [API](/api/)）
-      能让 esbuild 成为更多定制化构建工作流的一部分，
-      但我并未期望这些扩展点能覆盖所有的用例。
-      如果你有非常强烈的自定义需求，那么你应使用其他工具。
-      我也希望 esbuild 能激励其他的构建工具，
-      通过彻底改变他们的底层实现来大幅提高他们的性能
-      让每个人都能受益，
-      而不仅仅是那些使用 esbuild 的人。
+      I hope that the extensibility points I'm adding to esbuild
+      ([plugins](/plugins/) and the [API](/api/)) will make esbuild useful to
+      include as part of more customized build workflows, but I'm not
+      intending or expecting these extensibility points to cover all use
+      cases. If you have very custom requirements then you should be using
+      other tools. I also hope esbuild inspires other build tools to
+      dramatically improve performance by overhauling their implementations
+      so that everyone can benefit, not just those that use esbuild.
 
   - p: >
-      我计划在 esbuild 达到稳定后，
-      继续维持其现有范围内的一切特性。
-      这意味着将继续实现对后续新增的 JavaScript 语法和 TypeScript 语法特性的支持。
+      I am planning to continue to maintain everything in esbuild's existing
+      scope even after esbuild reaches stability. This means implementing
+      support for newly-released JavaScript and TypeScript syntax features,
+      for example.
 
-  - h2: 投入生产环境的准备情况 <#production-readiness>
-
-  - p: >
-      此项目尚未达到 1.0.0 版本，仍处于积极开发阶段。
-      就目前而言，它已早已达到 alpha 阶段，并且非常稳定。
-      我认为这是一个后期测试版本。
-      对于早期的参与者来说，它足以用于生产环境。
-      当然还有一些开发者认为 esbuild 还未准备好。
-      本章节并不试图改变你的观点，
-      只是试图给你足够多的信息，
-      让你自行决定是否使用 esbuild 作为你的构建工具。
+  - h2: Production readiness
 
   - p: >
-      一些其他信息：
+      This project has not yet hit version 1.0.0 and is still in active
+      development. That said, it is far beyond the alpha stage and is pretty
+      stable. I think of it as a late-stage beta. For some early-adopters
+      that means it's good enough to use for real things. Some other people
+      think this means esbuild isn't ready yet. This section doesn't try to
+      convince you either way. It just tries to give you enough information
+      so you can decide for yourself whether you want to use esbuild as your
+      bundler.
+
+  - p: >
+      Some data points:
 
   - ul:
     - >
-      **被其他项目所使用**
+      **Used by other projects**
       <p>
-      esbuild 的 API 已被其他开发者工具使用。例如，[Vite](https://github.com/vitejs/vite)
-      和 [Snowpack](https://github.com/pikapkg/snowpack) 使用了
-      esbuild 的 [transform API](/api/#transform-api)，用于将
-      TypeScript 转换为 JavaScript。而 [Hugo](https://github.com/gohugoio/hugo)
-      则在构建过程中使用 esbuild 的构建工具来构建 JavaScript 代码。
-      我也听到有些小伙伴在生产环境成功使用它的消息，但我并不知道细节。
-      一旦 esbuild 有足够的功能，
-      我也会将 esbuild 投入生产中使用，
-      但目前来说，还未这样做。
+      The API is already being used as a library within many other
+      developer tools. For example, [Vite](https://vitejs.dev/)
+      and [Snowpack](https://www.snowpack.dev/) are using
+      esbuild to transform TypeScript into JavaScript and
+      [Amazon CDK](https://aws.amazon.com/cdk/) (Cloud Development Kit)
+      and [Phoenix](https://www.phoenixframework.org/) are using
+      esbuild to bundle code.
       </p>
 
     - >
-      **API 稳定性**
+      **API stability**
       <p>
-      尽管 esbuild 的版本尚未达到 1.0.0，
-      但我们仍然努力保持着 API 的稳定性。
-      补丁版本的目的是为了向后兼容变化，
-      次要版本的目的是为了向后不兼容的变化
-      （正如 [npm 所推荐的](https://docs.npmjs.com/misc/semver)那样）。
-      如果你计划使用 esbuild 投入生产使用，
-      你应该锁住确切的版本（最安全的方式）或者锁住主要版本和次要版本（只接受向后兼容的升级）。
+      Even though esbuild's version is not yet 1.0.0, effort is still made to
+      keep the API stable. Patch versions are intended for backwards-compatible
+      changes and minor versions are intended for backwards-incompatible changes.
+      If you plan to use esbuild for something real, you should either pin the
+      exact version (maximum safety) or pin the major and minor versions (only
+      accept backwards-compatible upgrades).
       </p>
 
     - >
-      **仅有一位主要开发者**
+      **Only one main developer**
       <p>
-      本工具主要由 [evanw](https://github.com/evanw) 搭建。
-      对于一些人来说，这很友好，
-      但是对另外一些人来说，这意味着 esbuid 可能不是一个适合他们组织的工具。
-      这些对我来说都无所谓。我构建 esbuild 是因为我觉得构建它很有趣，
-      也是因为它是我想要使用的工具。
-      我把它与大家共享，是因为也有其他人想要使用它，
-      并且反馈会让工具本身变得更加美好，
-      而且我认为它将激励生态系统做出更好的工具。
+      This tool is primarily built by [me](https://github.com/evanw). For
+      some people this is fine, but for others this means esbuild is not a
+      suitable tool for their organization. That's ok with me. I'm building
+      esbuild because I find it fun to build and because it's the tool I'd
+      want to use. I'm sharing it with the world because there are others
+      that want to use it too, because the feedback makes the tool itself
+      better, and because I think it will inspire the ecosystem to make
+      better tools.
       </p>
 
     - >
-      **并不会一直扩大项目的作用范围**
+      **Not always open to scope expansion**
       <p>
-      我不打算引入我对构建/维护不感兴趣的主要特性。
-      无论是从架构的角度、测试和正确性的角度，还是从可用性的角度，
-      我都想限制项目的范围，
-      使它不至于看起来太复杂，或太笨重。
-      你可以把 esbuild 看作是 web 的 "链接器（linker）"
-      它只知道如何转换和构建 JavaScript 和 CSS。
-      但是，你的源码如何成为普通的 JavaScript 或 CSS 代码的细节
-      可能还需要第三方代码来做。
+      I'm not planning on including major features that I'm not interested
+      in building and/or maintaining. I also want to limit the project's
+      scope so it doesn't get too complex and unwieldy, both from an
+      architectural perspective, a testing and correctness perspective, and
+      from a usability perspective. Think of esbuild as a "linker" for the
+      web. It knows how to transform and bundle JavaScript and CSS. But the
+      details of how your source code ends up as plain JavaScript or CSS
+      may need to be 3rd-party code.
       </p>
       <p>
-      我希望 [plugins](/plugins/) 系统可以在不对 esbuild 本身做出任何修改的情况下，
-      添加主要功能（例如 WebAssembly 的引入）。
-      然而，并非所有内容都会在 plugin 中暴露出来，
-      可能会出现无法向 esbuild 中添加你所想添加特定功能的情况。
-      这是有意而为，
-      请谨记 esbuild 并不是一个能满足所有前端需求的
-      一体化解决方案。
+      I'm hoping that [plugins](/plugins/) will allow the community to add
+      major features (e.g. WebAssembly import) without needing to contribute
+      to esbuild itself. However, not everything is exposed in the plugin
+      API and it may be the case that it's not possible to add a particular
+      feature to esbuild that you may want to add. This is intentional;
+      esbuild is not meant to be an all-in-one solution for all frontend
+      needs.
       </p>
+
+  - h2: Anti-virus software
+
+  - p: >
+      Since esbuild is written in native code, anti-virus software can sometimes
+      incorrectly flag it as a virus. _This does not mean esbuild is a virus._ I
+      do not publish malicious code and I take supply chain security very seriously.
+
+  - p: >
+      Virtually all of esbuild's code is first-party code except for [one dependency](https://github.com/evanw/esbuild/blob/main/go.mod)
+      on Google's set of supplemental Go packages. My development work is done
+      on different machine that is isolated from the one I use to publish builds.
+      I have done additional work to ensure that esbuild's published builds are
+      completely reproducible and after every release, published builds are
+      [automatically compared](https://github.com/evanw/esbuild/blob/main/.github/workflows/validate.yml)
+      to ones locally-built in an unrelated environment to ensure that they are
+      bitwise identical (i.e. that the Go compiler itself has not been compromised).
+      You can also build esbuild from source yourself and compare your build artifacts
+      to the published ones to independently verify this.
+
+  - p: >
+      Having to deal with false-positives is an unfortunate reality of using
+      anti-virus software. Here are some possible workarounds if your anti-virus
+      won't let you use esbuild:
+
+  - ul:
+    - >
+      Ignore your anti-virus software and remove esbuild from quarantine
+
+    - >
+      Report the specific esbuild native executable as a false-positive to your
+      anti-virus software vendor
+
+    - >
+      Use [`esbuild-wasm`](/getting-started/#wasm) instead of `esbuild` to
+      bypass your anti-virus software (which likely won't flag WebAssembly
+      files the same way it flags native executables)
+
+    - >
+      Use another build tool instead of esbuild
+
+  - h2: Minified newlines
+
+  - p: >
+      People are sometimes surprised that esbuild's minifier typically changes
+      the character escape sequence `\n` within JavaScript strings into a
+      newline character in a template literal. But this is intentional.
+      **This is not a bug with esbuild**. The job of a minifier is to generate as
+      compact an output as possible that's equivalent to the input. The character
+      escape sequence `\n` is two bytes long while a newline character is one
+      byte long.
+
+  - p: >
+      For example, this code is 21 bytes long:
+
+  - pre.js: |
+      var text="a\nb\nc\n";
+
+  - p: >
+      While this code is 18 bytes long:
+
+  - pre.js: |
+      var text=`a
+      b
+      c
+      `;
+
+  - p: >
+      So the second code is fully minified while the first one isn't. Minifying
+      code does not mean putting it all on one line. Instead, minifying code
+      means generating equivalent code that uses as few bytes as possible. In
+      JavaScript, an untagged template literal is equivalent to a string literal,
+      so esbuild is doing the correct thing here.
