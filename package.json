@@ -1,10 +1,19 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "esbuild": "0.14.27",
     "fast-watch": "1.0.0",
     "highlight.js": "10.4.1",
     "js-yaml": "3.14.0",
     "markdown-it": "12.3.2"
+=======
+    "esbuild": "0.17.18",
+    "fast-watch": "1.0.0",
+    "highlight.js": "10.4.1",
+    "js-yaml": "3.14.0",
+    "markdown-it": "12.3.2",
+    "polywasm": "0.1.1"
+>>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
   },
   "scripts": {
     "watch": "watch src node src/scripts/render.js",
