@@ -486,24 +486,10 @@ async function generateMain(key, main) {
     }
 
     if (/^h[234]$/.test(tag)) {
-<<<<<<< HEAD
-      if (tag === 'h2') h2 = toID(value)
-      if (tag === 'h3') h3 = toID(value)
-      let dataset = ''
-      if (tag !== 'h2' && h2) dataset += ` data-h2="${escapeAttribute(h2)}"`
-      if (tag === 'h4' && h3) dataset += ` data-h3="${escapeAttribute(h3)}"`
-      // 过滤掉多余的锚点内容
-      let newValue = escapeHTML(value)
-      let html = `      <${tag} id="${escapeAttribute(toID(cssID || value))}"${dataset}>
-        <a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>
-        ${md.renderInline(newValue)}
-      </${tag}>`
-=======
       if (tag === 'h3') h3 = toID(value)
       let html = `<${tag} id="${escapeAttribute(toID(cssID || value))}">` +
         `<a class="permalink" href="#${escapeAttribute(toID(cssID || value))}">#</a>` +
         `${md.renderInline(value)}</${tag}>`
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       let calls = apiCallsForOption[value]
       if (calls) {
         html += `<p><i>Supported by: ${calls.map(call => {

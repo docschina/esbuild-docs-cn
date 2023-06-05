@@ -327,18 +327,11 @@ body:
       code in the ESM format that has a `default` export is converted to the
       CommonJS format, and then that CommonJS code is imported into another
       module in ESM format, there are two different interpretations of what
-<<<<<<< HEAD
-      should happen that are both widely-used (the [Babel](babeljs.io/) way
-      and the [Node](nodejs.org/) way). This is very unfortunate because it
-      causes endless compatibility headaches, especially since JavaScript
-      libraries are often authored in ESM and published as CommonJS.
-=======
       should happen that are both widely-used (the [Babel](https://babeljs.io/)
       way and the [Node](https://nodejs.org/) way). This is very unfortunate
       because it causes endless compatibility headaches, especially since
       JavaScript libraries are often authored in ESM and published as
       CommonJS.
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - p: >
       When esbuild [bundles](/api/#bundle) code that does this, it has to
@@ -464,19 +457,6 @@ body:
       converted to JavaScript (a non-exhaustive list):
 
   - table: |
-<<<<<<< HEAD
-      | Syntax feature          | Example                    | Notes |
-      |-------------------------|----------------------------|-------|
-      | Namespaces              | `namespace Foo {}`         | |
-      | Enums                   | `enum Foo { A, B }`        | |
-      | Const enums             | `const enum Foo { A, B }`  | |
-      | Generic type parameters | `<T>(a: T): T => a`        | Not available with the `tsx` loader |
-      | JSX with types          | `<Element<T>/>`            | |
-      | Type casts              | `a as B` and `<B>a`        | |
-      | Type imports            | `import {Type} from 'foo'` | Handled by removing all unused imports |
-      | Type exports            | `export {Type} from 'foo'` | Handled by ignoring missing exports in TypeScript files |
-      | Experimental decorators | `@sealed class Foo {}`     | The `emitDecoratorMetadata` flag is not supported |
-=======
       | Syntax feature            | Example                    | Notes |
       |---------------------------|----------------------------|-------|
       | Namespaces                | `namespace Foo {}`         | |
@@ -493,7 +473,6 @@ body:
       | Variance annotations      | `type A<out B> = () => B`  | TypeScript 4.7+ |
       | The `satisfies` operator  | `a satisfies T`            | TypeScript 4.9+ |
       | `const` type parameters   | `class Foo<const T> {}`    | TypeScript 5.0+ |
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - h3: TypeScript caveats
 
@@ -947,8 +926,6 @@ body:
           <script src="app.js"></script>
         </head>
       </html>
-<<<<<<< HEAD
-=======
 
   - p: >
       If the generated output names are not straightforward (for example if you
@@ -1059,7 +1036,6 @@ body:
       implementation detail and only really matters when there are import
       cycles.
       </footer>
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - h2: Text
   - p: 'Loader: `text`'

@@ -1243,13 +1243,8 @@ body:
   - p: >
       Register an on-start callback to be notified when a new build starts. This
       triggers for all builds, not just the initial build, so it's especially
-<<<<<<< HEAD
-      useful for [incremental builds](/api/#incremental), [watch mode](/api/#watch),
-      and the [serve API](/api/#serve). Here's how to add an on-start callback:
-=======
       useful for [rebuilds](/api/#rebuild), [watch mode](/api/#watch), and
       [serve mode](/api/#serve). Here's how to add an on-start callback:
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       mjs: |
@@ -1306,13 +1301,8 @@ body:
   - p: >
       Register an on-end callback to be notified when a new build ends. This
       triggers for all builds, not just the initial build, so it's especially
-<<<<<<< HEAD
-      useful for [incremental builds](/api/#incremental), [watch mode](/api/#watch),
-      and the [serve API](/api/#serve). Here's how to add an on-end callback:
-=======
       useful for [rebuilds](/api/#rebuild), [watch mode](/api/#watch),
       and [serve mode](/api/#serve). Here's how to add an on-end callback:
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       mjs: |
@@ -1443,11 +1433,7 @@ body:
 
   - p: >
       When a plugin returns a result from an [on-resolve callback](#on-resolve),
-<<<<<<< HEAD
-      the result completely replaces esbuilds built-in path resolution. This gives
-=======
       the result completely replaces esbuild's built-in path resolution. This gives
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       the plugin complete control over how path resolution works, but it means
       that the plugin may have to reimplement some of the behavior that esbuild
       already has built-in if it wants to have similar behavior. For example,
@@ -1465,25 +1451,17 @@ body:
         app.js: import 'example'
         bar/foo.js: console.log(123)
 
-<<<<<<< HEAD
-      js: |
-=======
       mjs: |
         import * as esbuild from 'esbuild'
 
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
         let examplePlugin = {
           name: 'example',
           setup(build) {
             build.onResolve({ filter: /^example$/ }, async () => {
-<<<<<<< HEAD
-              const result = await build.resolve('./foo', { resolveDir: './bar' })
-=======
               const result = await build.resolve('./foo', {
                 kind: 'import-statement',
                 resolveDir: './bar',
               })
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
               if (result.errors.length > 0) {
                 return { errors: result.errors }
               }
@@ -1492,20 +1470,12 @@ body:
           },
         }
 
-<<<<<<< HEAD
-        require('esbuild').build({
-=======
         await esbuild.build({
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
           entryPoints: ['app.js'],
           bundle: true,
           outfile: 'out.js',
           plugins: [examplePlugin],
-<<<<<<< HEAD
-        }).catch(() => process.exit(1))
-=======
         })
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
       go: |
         package main
@@ -1518,14 +1488,10 @@ body:
           Setup: func(build api.PluginBuild) {
             build.OnResolve(api.OnResolveOptions{Filter: `^example$`},
               func(api.OnResolveArgs) (api.OnResolveResult, error) {
-<<<<<<< HEAD
-                result := build.Resolve("./foo", api.ResolveOptions{ResolveDir: "./bar"})
-=======
                 result := build.Resolve("./foo", api.ResolveOptions{
                   Kind:       api.ResolveJSImportStatement,
                   ResolveDir: "./bar",
                 })
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
                 if len(result.Errors) > 0 {
                   return api.OnResolveResult{Errors: result.Errors}, nil
                 }
@@ -1614,17 +1580,10 @@ body:
 
       js: |
         interface ResolveOptions {
-<<<<<<< HEAD
-          importer?: string;
-          namespace?: string;
-          resolveDir?: string;
-          kind?: ResolveKind;
-=======
           kind: ResolveKind;
           importer?: string;
           namespace?: string;
           resolveDir?: string;
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
           pluginData?: any;
         }
 
@@ -1639,17 +1598,10 @@ body:
 
       go: |
         type ResolveOptions struct {
-<<<<<<< HEAD
-          Importer   string
-          Namespace  string
-          ResolveDir string
-          Kind       ResolveKind
-=======
           Kind       ResolveKind
           Importer   string
           Namespace  string
           ResolveDir string
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
           PluginData interface{}
         }
 
@@ -1665,8 +1617,6 @@ body:
 
   - ul:
     - >
-<<<<<<< HEAD
-=======
       `kind`
       <p>
       This tells esbuild how the path was imported, which can affect path
@@ -1678,7 +1628,6 @@ body:
       </p>
 
     - >
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       `importer`
       <p>
       If set, this is interpreted as the path of the module containing this
@@ -1706,20 +1655,6 @@ body:
       </p>
 
     - >
-<<<<<<< HEAD
-      `kind`
-      <p>
-      This tells esbuild how the path was imported, which can affect path
-      resolution. For example, [node's path resolution rules](https://nodejs.org/api/packages.html#conditional-exports)
-      say that paths imported using `'require-call'` should respect [conditional
-      package imports](/api/#conditions) in the `"require"` section in `package.json` while paths
-      imported using `'import-statement'` should respect conditional package
-      imports in the `"import"` section instead.
-      </p>
-
-    - >
-=======
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       `pluginData`
       <p>
       This property can be used to pass custom data to whatever [on-resolve callbacks](#on-resolve)

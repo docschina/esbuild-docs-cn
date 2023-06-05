@@ -73,14 +73,11 @@ a {
   color: inherit;
 }
 
-<<<<<<< HEAD
-=======
 b,
 strong {
   color: var(--fg-on);
 }
 
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 footer {
   font-size: 80%;
   line-height: 140%;
@@ -94,14 +91,11 @@ sup {
   font-style: normal;
 }
 
-<<<<<<< HEAD
-=======
 footer>sup[id] {
   position: relative;
   padding-top: 20px;
 }
 
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 code {
   font-family: 'Noto Sans Mono', monospace;
   background: rgba(159, 159, 159, 0.15);
@@ -420,14 +414,11 @@ body[data-os2=windows] pre.windows2 {
   display: none;
 }
 
-<<<<<<< HEAD
-=======
 .color-bold {
   font-weight: bold;
   color: var(--fg-on);
 }
 
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 .bg-red {
   background: #e24834;
 }

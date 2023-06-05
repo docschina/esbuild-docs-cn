@@ -1,30 +1,22 @@
-title: 快速入门
+title: Getting Started
 body:
-  - h1: 快速入门
+  - h1: Getting Started
 
-  - h2: 安装 esbuild <#install-esbuild>
+  - h2: Install esbuild
 
   - p: >
-<<<<<<< HEAD
-      首先，下载并本地安装 esbuild，
-      可以通过 npm 安装预编译的原生可执行文件：
-=======
       First, download and install the esbuild command locally. A prebuilt
       native executable can be installed using [npm](https://docs.npmjs.com/cli/v8/commands/npm-install)
       (which is automatically installed when you install the [node](https://nodejs.org/)
       JavaScript runtime):
-<<<<<<< HEAD
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
-=======
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - pre: |
       npm install --save-exact esbuild
 
   - p: >
-      此命令应该会将 esbuild 安装到你本地的 `node_modules` 中。
-      你可以运行如下命令，来检测 esbuild 的原生可执行文件
-      是否正常：
+      This should have installed esbuild in your local `node_modules` folder.
+      You can run the esbuild executable to verify that everything is working
+      correctly:
 
   - example:
       unix: |
@@ -34,21 +26,21 @@ body:
         .\node_modules\.bin\esbuild --version
 
   - p: >
-      推荐安装 esbuild 的做法是通过 npm 安装原生可执行文件。
-      但是如果你不想这么做，
-      这里也有一些[其他的安装方式](#other-ways-to-install)。
+      The recommended way to install esbuild is to install the native executable
+      using npm. But if you don't want to do that, there are also some
+      [other ways to install](#other-ways-to-install).
 
-  - h2: 首次构建 <#your-first-bundle>
+  - h2: Your first bundle
 
   - p: >
-      这是一个简易的真实案例，用于说明 esbuild 的能力以及如何使用它。
-      首先，请安装 `react` 和 `react-dom` 的 package：
+      This is a quick real-world example of what esbuild is capable of and
+      how to use it. First, install the `react` and `react-dom` packages:
 
   - pre: |
       npm install react react-dom
 
   - p: >
-      接下来，创建名为 `app.jsx` 的文件并包含如下代码：
+      Then create a file called `app.jsx` containing the following code:
 
   - pre.js: |
       import * as React from 'react'
@@ -58,7 +50,7 @@ body:
       console.log(Server.renderToString(<Greet />))
 
   - p: >
-      最后，运行 esbuild 打包此文件：
+      Finally, tell esbuild to bundle the file:
 
   - example:
       unix: |
@@ -68,30 +60,30 @@ body:
         .\node_modules\.bin\esbuild app.jsx --bundle --outfile=out.js
 
   - p: >
-      不出意外的话，上述命令执行后会创建一个名为 `out.js` 的文件，
-      其中包含你的代码以及 React 库的代码。
-      代码完全独立，无需再依赖你的 `node_modules`。
-      如果你使用 `node out.js` 运行代码，你应该能看到如下内容：
-
+      This should have created a file called `out.js` containing your code
+      and the React library bundled together. The code is completely
+      self-contained and no longer depends on your `node_modules` directory.
+      If you run the code using `node out.js`, you should see something like
+      this:
 
   - pre.html: |
       <h1 data-reactroot="">Hello, world!</h1>
 
   - p: >
-      注意，esbuild 除了 `jsx` 扩展名，
-      无需任何配置就能够将 JSX 语法转换为 JavaScript。
-      尽管 esbuild 可以进行配置，
-      但它试图提供合理的默认值，以便在常见的情况下自动完成构建。
-      如果你想在 `.js` 文件中使用 JSX 语法，你可以通过设置 `--loader:.js=jsx` 选项，
-      来告诉 esbuild 对 js 文件进行 JSX 的编译。
-      更多关于可用配置项的说明，请参阅 [API 文档](/api/)。
+      Notice that esbuild also converted JSX syntax to JavaScript without any
+      configuration other than the `.jsx` extension. While esbuild can be
+      configured, it attempts to have reasonable defaults so that many common
+      situations work automatically. If you would like to use JSX syntax in
+      `.js` files instead, you can tell esbuild to allow this using the
+      `--loader:.js=jsx` flag. You can read more about the available
+      configuration options in the [API documentation](/api/).
 
-  - h2: 构建脚本 <#build-scripts>
+  - h2: Build scripts
 
   - p: >
-      构建命令会反复执行，因此，通常我们会简化它。
-      常见的做法是在 `package.json` 中添加构建脚本，
-      具体代码如下：
+      Your build command is something you will be running repeatedly, so you
+      will want to automate it. A natural way of doing this is to add a build
+      script to your `package.json` file like this:
 
   - pre.json: |
       {
@@ -101,31 +93,24 @@ body:
       }
 
   - p: >
-      注意，这里直接使用 `esbuild`，没用相对路径。
-      这能够生效的原因是 "scripts" 中执行的内容
-      会去寻找当前环境下的 `esbuild` 命令并执行。
-      （前提是，你已经安装了 [esbuild](#install-esbuild)）
+      Notice that this uses the `esbuild` command directly without a relative
+      path. This works because everything in the `scripts` section is run with
+      the `esbuild` command already in the path (as long as you have
+      [installed the package](#install-esbuild)).
 
   - p: >
-      使用方式如下：
+      The build script can be invoked like this:
 
   - pre: |
       npm run build
 
   - p: >
-<<<<<<< HEAD
-      但是，如果需要向 esbuild 传递许多选项，
-      这会使得命令看起来非常笨重。如果将 esbuild 用于较为复杂的情况，
-      你可能会用到 esbuild 的 JavaScript API，
-      即在 JavaScript 中编写构建脚本。具体代码如下：
-=======
       However, using the command-line interface can become unwieldy if you
       need to pass many options to esbuild. For more sophisticated uses
       you will likely want to write a build script in JavaScript using
       esbuild's JavaScript API. That might look something like this (note that
       this code must be saved in a file with the `.mjs` extension because it
       uses the `import` keyword):
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       in:
@@ -141,38 +126,16 @@ body:
         })
 
   - p: >
-<<<<<<< HEAD
-      `build` 函数会在子进程中运行 esbuild 的可执行文件，并返回一个 Promise，
-      当构建完成后，该 Promise 将被 resolve。
-      上述代码并未打印捕获的异常，
-      因为异常中的任何错误信息默认会被打印到控制台（你
-      可以通过修改 [日志级别](/api/#log-level) 来按需关闭此功能）。
-
-  - p: >
-      尽管有个同步的 `buildSync` API，
-      但异步 API 对于构建脚本来说更为合适，
-      因为[插件](/plugins/)只与异步 API 协同工作。
-      你可以在 [API 文档](/api/#build-api) 中了解更多关于构建 API 的配置项。
-=======
       The `build` function runs the esbuild executable in a child process and
       returns a promise that resolves when the build is complete. There is also
       a `buildSync` API that is not asynchronous, but the asynchronous API is
       better for build scripts because [plugins](/plugins/) only work with the
       asynchronous API. You can read more about the configuration options for
       the build API in the [API documentation](/api/#build).
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
-  - h2: 针对浏览器环境的构建 <#bundling-for-the-browser>
+  - h2: Bundling for the browser
 
   - p: >
-<<<<<<< HEAD
-      构建工具默认为浏览器输出代码，
-      所以无需额外配置就可以完成构建。
-      对于开发版本，你可能需要使用 `--sourcemap` 以启用 source map，
-      对于生产版本，你可能需要使用 `--minify` 启用压缩。
-      有时，你可能还需要为你支持的浏览器配置目标环境。
-      所以具体命令会像如下所示：
-=======
       The bundler outputs code for the browser by default, so no additional
       configuration is necessary to get started. For development builds you
       probably want to enable [source maps](/api/#sourcemap) with `--sourcemap`,
@@ -181,7 +144,6 @@ body:
       environment for the browsers you support so that JavaScript syntax which is
       too new will be transformed into older JavaScript syntax. All of that might
       looks something like this:
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       in:
@@ -230,62 +192,38 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
-      有时，你使用的包可能会引入另一个只能在 node 上运行的包，
-      例如 node 内置的 `path` 包。
-      当发生这种情况时，你可以通过在 `package.json` 中使用 
-      [browser 字段](https://github.com/defunctzombie/package-browser-field-spec)
-      来将此包替换成对浏览器友好的包，具体如下：
-
-  - pre.json: |
-      {
-        "browser": {
-          "path": "path-browserify"
-        }
-      }
-
-  - p: >
-      有些你想使用的 npm 包可能并不是为在浏览器中运行设计的。
-      有时你可以使用 esbuild 的配置项来解决这些问题，
-      并成功打包。
-      未定义的全局变量在简单情况下可以用 [define](/api/#define) 功能代替，
-      如遇到更复杂的情况，可以用 [inject](/api/#inject) 功能代替。
-=======
       Some npm packages you want to use may not be designed to be run in the
       browser. Sometimes you can use esbuild's configuration options to
       work around certain issues and successfully bundle the package anyway.
       Undefined globals can be replaced with either the [define](/api/#define)
       feature in simple cases or the [inject](/api/#inject) feature in more
       complex cases.
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
-  - h2: 针对 Node 环境的打包 <#bundling-for-node>
-
-  - p: >
-      尽管在使用 Node 时，无需打包，但有时在 Node 代码运行前，
-      用 esbuild 处理下代码还是有好处的。
-      通过打包可以自动剥离 TypeScript 的类型，
-      将 ECMAScript 模块语法转换为 CommonJS 语法，
-      同时将 JavaScript 语法转换为特定版本 Node 的旧语法。
-      在包发布前打包也是有好处的，
-      它可以让包的下载体积更小，从而保证加载时文件系统读取它的时间更少。
+  - h2: Bundling for node
 
   - p: >
-      如果你要打包运行在 node 环境的代码，
-      你需要配置 [platform](/api/#platform) 设置，将 <code>--platform=<wbr>node</code> 传递给 esbuild。
-      这会将几个配置同时改为对 node 友好的默认值。
-      例如，所有 node 的内置包，如 `fs`，都会自动标记为外部（external）包，这样 esbuild 就不会尝试对它们打包。
-      此设置也会禁用 `package.json` 中的 browser 字段。
+      Even though a bundler is not necessary when using node, sometimes it
+      can still be beneficial to process your code with esbuild before running
+      it in node. Bundling can automatically strip TypeScript types, convert
+      ECMAScript module syntax to CommonJS, and transform newer JavaScript
+      syntax into older syntax for a specific version of node. And it may be
+      beneficial to bundle your package before publishing it so that it's
+      a smaller download and so it spends less time reading from the file
+      system when being loaded.
 
   - p: >
-<<<<<<< HEAD
-      如果你在代码中使用了较新的 JavaScript 语法，而这些语法在你的 node 版本中无法运行，
-      你会需要配置 node 的目标版本：
-=======
+      If you are bundling code that will be run in node, you should configure
+      the [platform](/api/#platform) setting by passing <code>--platform=<wbr>node</code>
+      to esbuild. This simultaneously changes a few different settings to
+      node-friendly default values. For example, all packages that are
+      built-in to node such as `fs` are automatically marked as external so
+      esbuild doesn't try to bundle them. This setting also disables the
+      interpretation of the browser field in `package.json`.
+
+  - p: >
       If your code uses newer JavaScript syntax that doesn't work in your
       version of node, you will want to configure the [target](/api/#target)
       version of node:
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       in:
@@ -328,48 +266,26 @@ body:
         }
 
   - p: >
-<<<<<<< HEAD
-<<<<<<< HEAD
-      有时由于某些原因，你所使用的包中的代码无法被打包。
-      一种常见的情况是如 `fsevents` 这种使用原生扩展的包。
-      或者，你可能因为某些原因想把一个包从构建中剔除。
-      此时可以通过将该包设置为外部 [external](/api/#external) 包来实现：
-=======
-=======
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       You also may not want to bundle your dependencies with esbuild. There
       are many node-specific features that esbuild doesn't support while
       bundling such as `__dirname`, `import.meta.url`, `fs.readFileSync`,
       and `*.node` native binary modules. You can exclude all of your
-<<<<<<< HEAD
-      dependencies from the bundle by marking them as [external](/api/#external):
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
-=======
       dependencies from the bundle by setting [packages](/api/#packages)
       to external:
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - example:
       in:
         app.jsx: '<div/>'
 
       cli: |
-<<<<<<< HEAD
-        esbuild app.jsx --bundle --platform=node --external:./node_modules/*
-=======
         esbuild app.jsx --bundle --platform=node --packages=external
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
       js: |
         require('esbuild').buildSync({
           entryPoints: ['app.jsx'],
           bundle: true,
           platform: 'node',
-<<<<<<< HEAD
-          external: ['./node_modules/*'],
-=======
           packages: 'external',
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
           outfile: 'out.js',
         })
 
@@ -384,11 +300,7 @@ body:
             EntryPoints: []string{"app.jsx"},
             Bundle:      true,
             Platform:    api.PlatformNode,
-<<<<<<< HEAD
-            External:    []string{"./node_modules/*"},
-=======
             Packages:    api.PackagesExternal,
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
             Write:       true,
           })
 
@@ -397,12 +309,6 @@ body:
           }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  - h2: 其他安装方式 <#other-ways-to-install>
-=======
-=======
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
   - p: >
       If you do this, your dependencies must still be present on the file
       system at run-time since they are no longer included in the bundle.
@@ -448,8 +354,6 @@ body:
         </p>
 
   - p: >
-<<<<<<< HEAD
-=======
       You can also get into this situation on a macOS computer with an ARM
       processor if you install esbuild using the ARM version of npm but then
       try to run esbuild with the x86-64 version of node running inside of
@@ -458,14 +362,11 @@ body:
       instead, which can be downloaded here: [https://nodejs.org/en/download/](https://nodejs.org/en/download/).
 
   - p: >
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
       Another alternative is to [use the `esbuild-wasm` package instead](#wasm),
       which works the same way on all platforms. But it comes with a heavy
       performance cost and can sometimes be 10x slower than the `esbuild` package,
       so you may also not want to do that.
 
-<<<<<<< HEAD
-=======
   - h2#yarn-pnp: Using Yarn Plug'n'Play
 
   - p: >
@@ -488,17 +389,12 @@ body:
       you may want to consider running esbuild without using Yarn's CLI (i.e.
       not using `yarn esbuild`). This can result in esbuild running 10x faster.
 
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
   - h2: Other ways to install
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
 
   - p: >
-      推荐安装 esbuild 的方式是[使用 npm 安装原生可执行文件](#install-esbuild)。
-      但你也可以通过如下几种方式安装 esbuild：
+      The recommended way to install esbuild is to [install the native executable using npm](#install-esbuild).
+      But you can also install esbuild in these ways:
 
-<<<<<<< HEAD
-  - h3#wasm: 安装 WASM 版本
-=======
   - h3: Download a build
 
   - p: >
@@ -598,30 +494,16 @@ body:
       </footer>
 
   - h3#wasm: Install the WASM version
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - p: >
-      除了 `esbuild` 的 npm 包，还有一个 `esbuild-wasm` 包，
-      这个包与 `esbuild` 功能相同，但是使用了 WebAssembly 代替原生代码。
-      安装它也会安装一个叫做 `esbuild` 的可执行文件：
+      In addition to the `esbuild` npm package, there is also an `esbuild-wasm`
+      package that functions similarly but that uses WebAssembly instead of
+      native code. Installing it will also install an executable called `esbuild`:
 
   - pre: |
       npm install --save-exact esbuild-wasm
 
   - p: >
-<<<<<<< HEAD
-      **为什么不推荐这种方式：**
-      WebAssembly 的版本比原生的版本慢很多。
-      在很多情况下会慢一个数量级（10 倍）。
-      这有很多原因，包括：
-      a) Node 会在每次运行事从头开始编译 WebAssembly 代码，
-      b) Go 的 WebAssembly 编译方式是单线程的，
-      c) Node 的 WebAssembly 存在缺陷，该缺陷会导致延迟数秒退出进程。
-      WebAssembly 版本还移除了一些功能，如本地文件服务器。
-      除非别无选择，请不要使用 WebAssembly 版本，
-      比如当你想要在一个不支持的平台使用 esbuild 时。
-      WebAssembly 包应该仅使在[浏览器里](/api/#running-in-the-browser)。
-=======
       **Why this is not recommended:**
       The WebAssembly version is much, much slower than the native version. In
       many cases it is an order of magnitude (i.e. 10x) slower. This is for
@@ -633,7 +515,6 @@ body:
       use the WebAssembly package like this if there is no other option, such
       as when you want to use esbuild on an unsupported platform. The WebAssembly
       package is primarily intended to only be used [in the browser](/api/#browser).
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
   - h3#deno: Deno instead of node
 
@@ -694,159 +575,38 @@ body:
       use esbuild with Deno, but you will need a plugin if you would like to
       be able to bundle HTTP URLs.
 
-  - h3: 从源码构建 <#build-from-source>
+  - h3: Build from source
 
   - p: >
-      从源码构建 esbuild：
+      To build esbuild from source:
 
   - ol:
     - |
-<<<<<<< HEAD
-<<<<<<< HEAD
-      安装 Go 编译器：
-      <p>[https://golang.org/dl/](https://golang.org/dl/)</p>
-=======
       Install the Go compiler:
       <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
-=======
-      Install the Go compiler:
-      <p>[https://go.dev/dl/](https://go.dev/dl/)</p>
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
 
     - |
-      下载源码：
+      Download the source code for esbuild:
       <pre>
       git clone --depth 1 --branch vCURRENT_ESBUILD_VERSION https://github.com/evanw/esbuild.git
       cd esbuild
       </pre>
 
     - |
-      构建 `esbuild` 可执行文件（在 Windows 中会生成 `esbuild.exe` 文件）：
+      Build the `esbuild` executable (it will be `esbuild.exe` on Windows):
       <pre>go build ./cmd/esbuild</pre>
 
   - p: >
-      如果你想要构建其他平台的版本，
-      可以在构建命令前添加平台信息。
-      比如，你可以使用如下命令构建 32 位 Linux 版本：
+      If you want to build for other platforms, you can just prefix the build
+      command with the platform information. For example, you can build the
+      32-bit Linux version using this command:
 
   - pre: |
       GOOS=linux GOARCH=386 go build ./cmd/esbuild
 
   - p: >
-<<<<<<< HEAD
-      **为什么不推荐这种方式：**
-      原生的版本只能在命令行界面里使用，
-      而且在复杂场景下会比较难用，并且还不支持[插件](/plugins/)。
-      你需要编写 JavaScript 或者 Go 代码，
-      利用 [esbuild 的 API](/api/) 来使用插件。
-
-  - h3: 下载构建版本 <#download-a-build>
-
-  - p: >
-      尽管预编译的原生可执行文件托管在 npm 上，
-      你实际可以不需要安装 npm 也能下载它们。
-      Npm 包管理器（registry）实际上就是一个普通的 HTTP 服务器，而包就是普通的 tar 压缩文件。
-
-  - p: >
-      此处是可直接下载二进制可执行文件的示例：
-
-  - example:
-      noCheck: true
-
-      cli:
-        - $: |
-            curl -O https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-CURRENT_ESBUILD_VERSION.tgz
-        - $: |
-            tar xf ./esbuild-darwin-64-CURRENT_ESBUILD_VERSION.tgz
-        - $: |
-            ./package/bin/esbuild
-        - expect: |
-            Usage:
-              esbuild [options] [entry points]
-
-            ...
-
-  - p: >
-      在 `esbuild-darwin-64` 包里的原生可执行文件可以用在 macOS 操作系统和 x86-64 架构上。
-      在编写此文章时，我将原生可执行文件包 esbuild 所支持的平台整理成了表格，
-      完整表格如下：
-
-  - table: |
-<<<<<<< HEAD
-      | 包名                      | 操作系统   | 架构            |
-      |--------------------------|-----------|----------------|
-      | `esbuild-android-arm64`  | `android` | `arm64`        |
-      | `esbuild-darwin-64`      | `darwin`  | `x64`          |
-      | `esbuild-darwin-arm64`   | `darwin`  | `arm64`        |
-      | `esbuild-freebsd-64`     | `freebsd` | `x64`          |
-      | `esbuild-freebsd-arm64`  | `freebsd` | `arm64`        |
-      | `esbuild-linux-32`       | `linux`   | `ia32`         |
-      | `esbuild-linux-64`       | `linux`   | `x64`          |
-      | `esbuild-linux-arm`      | `linux`   | `arm`          |
-      | `esbuild-linux-arm64`    | `linux`   | `arm64`        |
-      | `esbuild-linux-mips64le` | `linux`   | `mips64el`     |
-      | `esbuild-linux-ppc64le`  | `linux`   | `ppc64`        |
-      | `esbuild-netbsd-64`      | `netbsd`  | `x64`          |
-      | `esbuild-openbsd-64`     | `openbsd` | `x64`          |
-      | `esbuild-sunos-64`       | `sunos`   | `x64`          |
-      | `esbuild-windows-32`     | `win32`   | `ia32`         |
-      | `esbuild-windows-64`     | `win32`   | `x64`          |
-      | `esbuild-windows-arm64`  | `win32`   | `arm64`        |
-
-  - p: >
-      **为什么不推荐这种方式：**
-      这个方式依赖 esbuild 的原生可执行文件安装器的内部实现细节。
-      这些细节可能会在某些情况改变，
-      这些情况会导致新版本 esbuild 无法运行。
-      这是个小缺点，
-      因为这种方式对现有的 esbuild 版本永久有效，
-      因为发布到 npm 的包是不可变的。
-      另一个缺点是你没法使用原生版本的[插件](/plugins/)。
-=======
-      | Package name                                                                     | OS                   | Architecture           | Download                                                                                                                         |
-      |----------------------------------------------------------------------------------|----------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-      | [`esbuild-android-arm64`](https://www.npmjs.org/package/esbuild-android-arm64)   | `android`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-android-arm64/-/esbuild-android-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
-      | [`esbuild-darwin-64`](https://www.npmjs.org/package/esbuild-darwin-64)           | `darwin`             | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-64/-/esbuild-darwin-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
-      | [`esbuild-darwin-arm64`](https://www.npmjs.org/package/esbuild-darwin-arm64)     | `darwin`             | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-darwin-arm64/-/esbuild-darwin-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>     |
-      | [`esbuild-freebsd-64`](https://www.npmjs.org/package/esbuild-freebsd-64)         | `freebsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-64/-/esbuild-freebsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
-      | [`esbuild-freebsd-arm64`](https://www.npmjs.org/package/esbuild-freebsd-arm64)   | `freebsd`            | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-freebsd-arm64/-/esbuild-freebsd-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
-      | [`esbuild-linux-32`](https://www.npmjs.org/package/esbuild-linux-32)             | `linux`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-32/-/esbuild-linux-32-CURRENT_ESBUILD_VERSION.tgz"></a>             |
-      | [`esbuild-linux-64`](https://www.npmjs.org/package/esbuild-linux-64)             | `linux`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-64/-/esbuild-linux-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
-      | [`esbuild-linux-arm`](https://www.npmjs.org/package/esbuild-linux-arm)           | `linux`              | `arm`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm/-/esbuild-linux-arm-CURRENT_ESBUILD_VERSION.tgz"></a>           |
-      | [`esbuild-linux-arm64`](https://www.npmjs.org/package/esbuild-linux-arm64)       | `linux`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-arm64/-/esbuild-linux-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>       |
-      | [`esbuild-linux-mips64le`](https://www.npmjs.org/package/esbuild-linux-mips64le) | `linux`              | `mips64el`<sup>2</sup> | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-mips64le/-/esbuild-linux-mips64le-CURRENT_ESBUILD_VERSION.tgz"></a> |
-      | [`esbuild-linux-ppc64le`](https://www.npmjs.org/package/esbuild-linux-ppc64le)   | `linux`              | `ppc64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-ppc64le/-/esbuild-linux-ppc64le-CURRENT_ESBUILD_VERSION.tgz"></a>   |
-      | [`esbuild-linux-riscv64`](https://www.npmjs.org/package/esbuild-linux-riscv64)   | `linux`              | `riscv64`<sup>2</sup>  | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-riscv64/-/esbuild-linux-riscv64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
-      | [`esbuild-linux-s390x`](https://www.npmjs.org/package/esbuild-linux-s390x)       | `linux`              | `s390x`                | <a class="dl" href="https://registry.npmjs.org/esbuild-linux-s390x/-/esbuild-linux-s390x-CURRENT_ESBUILD_VERSION.tgz"></a>       |
-      | [`esbuild-netbsd-64`](https://www.npmjs.org/package/esbuild-netbsd-64)           | `netbsd`<sup>1</sup> | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-netbsd-64/-/esbuild-netbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>           |
-      | [`esbuild-openbsd-64`](https://www.npmjs.org/package/esbuild-openbsd-64)         | `openbsd`            | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-openbsd-64/-/esbuild-openbsd-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
-      | [`esbuild-sunos-64`](https://www.npmjs.org/package/esbuild-sunos-64)             | `sunos`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-sunos-64/-/esbuild-sunos-64-CURRENT_ESBUILD_VERSION.tgz"></a>             |
-      | [`esbuild-windows-32`](https://www.npmjs.org/package/esbuild-windows-32)         | `win32`              | `ia32`                 | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-32/-/esbuild-windows-32-CURRENT_ESBUILD_VERSION.tgz"></a>         |
-      | [`esbuild-windows-64`](https://www.npmjs.org/package/esbuild-windows-64)         | `win32`              | `x64`                  | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-CURRENT_ESBUILD_VERSION.tgz"></a>         |
-      | [`esbuild-windows-arm64`](https://www.npmjs.org/package/esbuild-windows-arm64)   | `win32`              | `arm64`                | <a class="dl" href="https://registry.npmjs.org/esbuild-windows-arm64/-/esbuild-windows-arm64-CURRENT_ESBUILD_VERSION.tgz"></a>   |
-
-  - p: >
-      **Why this is not recommended:**
-      This relies on internal implementation details of esbuild's native
-      executable installer. These details may change at some point, in which
-      case this approach will no longer work for new esbuild versions. This
-      is only a minor drawback though since the approach should still work
-      forever for existing esbuild versions since packages published to npm
-      are immutable. An additional drawback is that you cannot use [plugins](/plugins/)
-      with the native version.
-
-  - p: >
-      <footer>
-      <sup>1</sup> This operating system is not on [node's list of supported platforms](https://nodejs.org/api/process.html#process_process_platform)
-      <br>
-      <sup>2</sup> This architecture is not on [node's list of supported architectures](https://nodejs.org/api/process.html#processarch)
-      </footer>
->>>>>>> 2e131b091e6a1dd99b9a331f6f3c75534bf796be
-=======
       **Why this is not recommended:**
       The native version can only be used via the command-line interface, which
       can be unergonomic for complex use cases and which does not support [plugins](/plugins/).
       You will need to write JavaScript or Go code and use [esbuild's API](/api/)
       to use plugins.
->>>>>>> 097c63f684b2d27476cfa152cad0f69cba67d454
