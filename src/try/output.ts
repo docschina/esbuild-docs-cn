@@ -66,20 +66,47 @@ export interface Location {
 }
 
 function prettyPrintLocationAsStderr({ file_, line_, column_, length_, lineText_, suggestion_ }: Location): string {
+  const maxWidth = 80
+  const n = lineText_.length
   let last = length_ < 2 ? '^' : '~'.repeat(length_)
   let result = `\n\n    ${file_}:${line_}:${column_}:\n`
+
+  if (n > maxWidth) {
+    // Try to center the error
+    const sliceStart = Math.max(0, Math.min((column_ * 2 + length_ - maxWidth) >> 1, column_ - maxWidth / 5, n - maxWidth))
+
+    // Slice the line
+    let slicedLine = lineText_.slice(sliceStart, sliceStart + maxWidth)
+    column_ = Math.max(0, column_ - sliceStart)
+    length_ = Math.min(length_, slicedLine.length - column_)
+
+    // Truncate the ends with "..."
+    if (slicedLine.length > 3 && sliceStart > 0) {
+      slicedLine = '...' + slicedLine.slice(3)
+      column_ = Math.max(column_, 3)
+    }
+    if (slicedLine.length > 3 && sliceStart + maxWidth < n) {
+      slicedLine = slicedLine.slice(0, slicedLine.length - 3) + '...'
+      length_ = Math.max(0, Math.min(length_, slicedLine.length - 3 - column_))
+    }
+
+    lineText_ = slicedLine
+  }
+
   result += `\x1B[37m${line_.toString().padStart(7)} │ ${lineText_.slice(0, column_)}` +
     `\x1B[32m${lineText_.slice(column_, column_ + length_)}` +
     `\x1B[37m${lineText_.slice(column_ + length_)}\n`
+
   if (suggestion_) {
     result += `        │ ${' '.repeat(column_)}\x1B[32m${last}\x1B[37m\n`
     last = suggestion_
   }
+
   result += `        ╵ ${' '.repeat(column_)}\x1B[32m${last}\x1B[0m\n`
   return result
 }
 
-function appendTextarea(textarea: HTMLTextAreaElement, id: string, text: string | undefined): void {
+function appendTextarea(textarea: HTMLTextAreaElement, id: string, text: string | undefined): HTMLDivElement | undefined {
   if (text !== undefined) {
     const div = document.createElement('div')
     textarea.textContent = text.replace(/\n$/, '')
@@ -88,6 +115,7 @@ function appendTextarea(textarea: HTMLTextAreaElement, id: string, text: string 
     div.append(textarea)
     outputResultEl.append(div)
     resetHeight(textarea)
+    return div
   }
 }
 
@@ -187,7 +215,21 @@ export function updateBuildOutput({ outputFiles_, metafile_, mangleCache_, stder
   }
 
   if (mangleCache_) appendTextarea(mangleCacheEl, 'mangleCache', JSON.stringify(mangleCache_, null, 2))
-  if (metafile_) appendTextarea(metafileEl, 'metafile', JSON.stringify(metafile_, null, 2))
+  if (metafile_) {
+    const div = appendTextarea(metafileEl, 'metafile', JSON.stringify(metafile_, null, 2))!
+
+    // The metafile gets an analyze link
+    const a = document.createElement('a')
+    a.className = 'underLink'
+    a.href = 'javascript:void 0'
+    a.target = '_blank'
+    a.textContent = 'Analyze this metafile'
+    a.onclick = () => {
+      a.href = '/analyze/#' + btoa(JSON.stringify(metafile_))
+      setTimeout(() => a.href = 'javascript:void 0')
+    }
+    div.append(a)
+  }
 }
 
 export function showLoadingMessage(version: string | null): void {
