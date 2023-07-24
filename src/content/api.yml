@@ -232,6 +232,7 @@ body:
     - Conditions
     - Define
     - Drop
+    - Drop labels
     - Entry names
     - Entry points
     - External
@@ -249,6 +250,7 @@ body:
     - JSX side effects
     - Keep names
     - Legal comments
+    - Line limit
     - Live reload
     - Loader
     - Log level
@@ -344,6 +346,7 @@ body:
     - Color
     - Define
     - Drop
+    - Drop labels
     - Footer
     - Format
     - Format messages
@@ -357,6 +360,7 @@ body:
     - JSX side effects
     - Keep names
     - Legal comments
+    - Line limit
     - Loader
     - Log level
     - Log limit
@@ -1270,6 +1274,9 @@ body:
         # Enable HTTPS
         --keyfile=your.key --certfile=your.cert
 
+        # Specify a fallback HTML file
+        --serve-fallback=some-file.html
+
       js: |
         interface ServeOptions {
           port?: number
@@ -1277,6 +1284,7 @@ body:
           servedir?: string
           keyfile?: string
           certfile?: string
+          fallback?: string
           onRequest?: (args: ServeOnRequestArgs) => void
         }
 
@@ -1295,6 +1303,7 @@ body:
           Servedir  string
           Keyfile   string
           Certfile  string
+          Fallback  string
           OnRequest func(ServeOnRequestArgs)
         }
 
@@ -1353,6 +1362,17 @@ body:
       `certfile`, then esbuild's web server will use the `https://` protocol
       instead of the `http://` protocol. See [enabling HTTPS](#https) for more
       information.
+      </p>
+
+    - >
+      `fallback`
+      <p>
+      This is a HTML file for esbuild's HTTP server to serve instead of a 404
+      when incoming requests don't match any of the generated output file
+      paths. You can use this for a custom "not found" page. You can also use
+      this as the entry point of a [single-page application](https://en.wikipedia.org/wiki/Single-page_application)
+      that mutates the current URL and therefore needs to be served from many
+      different URLs simultaneously.
       </p>
 
     - >
@@ -2708,6 +2728,60 @@ body:
       are allowed such as in the top-level scope or in a statement or rule
       block. So comments inside expressions or at the declaration level are
       not considered legal comments.
+
+  - h3: Line limit
+
+  - p: >
+      This setting is a way to prevent esbuild from generating output files
+      with really long lines, which can help editing performance in
+      poorly-implemented text editors. Set this to a positive integer to tell
+      esbuild to end a given line soon after it passes that number of bytes.
+      For example, this wraps long lines soon after they pass ~80 characters:
+
+  - example:
+      in:
+        app.ts: '1 + 2'
+
+      cli: |
+        esbuild app.ts --line-limit=80
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        await esbuild.build({
+          entryPoints: ['app.ts'],
+          lineLimit: 80,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.ts"},
+            LineLimit:   80,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Lines are truncated after they pass the limit instead of before because
+      it's simpler to check when the limit is passed then to predict when the
+      limit is about to be passed, and because it's faster to avoid backing up
+      and rewriting things when generating an output file. So the limit is only
+      approximate.
+
+  - p: >
+      This setting applies to both JavaScript and CSS, and works even when
+      minification is disabled. Note that turning this setting on will make
+      your files bigger, as the extra newlines take up additional space in
+      the file (even after gzip compression).
 
   - h3: Splitting
 
@@ -4801,6 +4875,7 @@ body:
       <li>`async-await`</li>
       <li>`async-generator`</li>
       <li>`bigint`</li>
+      <li>`class`</li>
       <li>`class-field`</li>
       <li>`class-private-accessor`</li>
       <li>`class-private-brand-check`</li>
@@ -4811,8 +4886,8 @@ body:
       <li>`class-private-static-method`</li>
       <li>`class-static-blocks`</li>
       <li>`class-static-field`</li>
-      <li>`class`</li>
       <li>`const-and-let`</li>
+      <li>`decorators`</li>
       <li>`default-argument`</li>
       <li>`destructuring`</li>
       <li>`dynamic-import`</li>
@@ -4820,6 +4895,7 @@ body:
       <li>`export-star-as`</li>
       <li>`for-await`</li>
       <li>`for-of`</li>
+      <li>`function-or-class-property-access`</li>
       <li>`generator`</li>
       <li>`hashbang`</li>
       <li>`import-assertions`</li>
@@ -4840,6 +4916,7 @@ body:
       <li>`regexp-lookbehind-assertions`</li>
       <li>`regexp-match-indices`</li>
       <li>`regexp-named-capture-groups`</li>
+      <li>`regexp-set-notation`</li>
       <li>`regexp-sticky-and-unicode-flags`</li>
       <li>`regexp-unicode-property-escapes`</li>
       <li>`rest-argument`</li>
@@ -4847,6 +4924,7 @@ body:
       <li>`top-level-await`</li>
       <li>`typeof-exotic-object-is-object`</li>
       <li>`unicode-escapes`</li>
+      <li>`using`</li>
       </ul>
 
       <p>**CSS:**</p>
@@ -4854,6 +4932,7 @@ body:
       <li>`hex-rgba`</li>
       <li>`inline-style`</li>
       <li>`inset-property`</li>
+      <li>`is-pseudo-class`</li>
       <li>`modern-rgb-hsl`</li>
       <li>`nesting`</li>
       <li>`rebecca-purple`</li>
@@ -5038,19 +5117,22 @@ body:
         }
 
   - p: >
-      Replacement expressions must either be a JSON object (null, boolean,
-      number, string, array, or object) or a single identifier. Replacement
-      expressions other than arrays and objects are substituted inline, which
-      means that they can participate in constant folding. Array and object
-      replacement expressions are stored in a variable and then referenced
-      using an identifier instead of being substituted inline, which avoids
-      substituting repeated copies of the value but means that the values don't
-      participate in constant folding.
+      Each `define` entry maps an identifier to a string of code containing
+      an expression. The expression in the string must either be a JSON object
+      (null, boolean, number, string, array, or object) or a single identifier.
+      Replacement expressions other than arrays and objects are substituted
+      inline, which means that they can participate in constant folding. Array
+      and object replacement expressions are stored in a variable and then
+      referenced using an identifier instead of being substituted inline, which
+      avoids substituting repeated copies of the value but means that the values
+      don't participate in constant folding.
 
   - p: >
       If you want to replace something with a string literal, keep in mind that
-      the replacement value passed to esbuild must itself contain quotes.
-      Omitting the quotes means the replacement value is an identifier instead:
+      the replacement value passed to esbuild must itself contain quotes because
+      each `define` entry maps to a string containing code. Omitting the quotes
+      means the replacement value is an identifier instead. This is demonstrated
+      in the example below:
 
   - example:
       cli:
@@ -5235,6 +5317,97 @@ body:
             os.Exit(1)
           }
         }
+
+  - h3: Drop labels
+
+  - p: >
+      This tells esbuild to edit your source code before building to drop
+      [labeled statements](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/label)
+      with specific label names. For example, consider the following code:
+
+  - pre.js: |
+      function example() {
+        DEV: doAnExpensiveCheck()
+        return normalCodePath()
+      }
+
+  - p: >
+      If you use this option to drop all labels named `DEV`, then esbuild will
+      give you this:
+
+  - pre.js: |
+      function example() {
+        return normalCodePath();
+      }
+
+  - p: >
+      You can configure this feature like this (which will drop both the `DEV`
+      and `TEST` labels):
+
+  - example:
+      in:
+        app.js: |
+          DEV: dev()
+          TEST: test()
+          PROD: prod()
+
+      cli: |
+        esbuild app.js --drop-labels=DEV,TEST
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        await esbuild.build({
+          entryPoints: ['app.js'],
+          dropLabels: ['DEV', 'TEST'],
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            DropLabels:  []string{"DEV", "TEST"},
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Note that this is not the only way to conditionally remove code. Another
+      more common way is to use the [define](#define) feature to replace
+      specific global variables with a boolean value. For example, consider the
+      following code:
+
+  - pre.js: |
+      function example() {
+        DEV && doAnExpensiveCheck()
+        return normalCodePath()
+      }
+
+  - p: >
+      If you define `DEV` to `false`, then esbuild will give you this:
+
+  - pre.js: |
+      function example() {
+        return normalCodePath();
+      }
+
+  - p: >
+      This is pretty much the same thing as using a label. However, an advantage
+      of using a label instead of a global variable to conditionally remove code
+      is that you don't have to worry about the global variable not being defined
+      because someone forgot to configure esbuild to replace it with something.
+      Some drawbacks of using the label approach are that it makes conditionally
+      removing code when the label is *not* dropped slightly harder to read,
+      and it doesn't work for code embedded within nested expressions. Which
+      approach to use for a given project comes down to personal preference.
 
   - h3: Ignore annotations
 
@@ -5678,6 +5851,33 @@ body:
       | Quoted object destructuring bindings    | `let { 'foo_': x } = y`   |
       | Quoted object destructuring assignments | `({ 'foo_': x } = y)`     |
       | String literals to the left of `in`     | `'foo_' in x`             |
+
+  - h4#mangle-key: >
+      Mangling other strings
+
+  - p: >
+      Mangling [quoted properties](#mangle-quoted) still only mangles strings
+      in property name position. Sometimes you may also need to mangle property
+      names in strings at arbitrary other locations in your code. To do that,
+      you can prefix the string with a `/* @__KEY__ */` comment to tell esbuild
+      that the contents of a string should be treated as a property name that
+      can be mangled. For example:
+
+  - pre.js: |
+      let obj = {}
+      Object.defineProperty(
+        obj,
+        /* @__KEY__ */ 'foo_',
+        { get: () => 123 },
+      )
+      console.log(obj.foo_)
+
+  - p: >
+      This will cause the contents of the string `'foo_'` to be mangled as a
+      property name (assuming [property mangling](#mangle-props) is enabled
+      and `foo_` is eligible for renaming). The `/* @__KEY__ */` comment is a
+      convention from [Terser](https://github.com/terser/terser), a popular
+      JavaScript minifier with a similar property mangling feature.
 
   - h4#reserve-props: >
       Preventing renaming
@@ -7532,7 +7732,7 @@ body:
             <li><details><summary>`unsupported-@charset`</summary><pre>{{ FORMAT_MESSAGES('@charset "ASCII";', { sourcefile: 'example.css', loader: 'css' }) }}</pre></details></li>
             <li><details><summary>`unsupported-@namespace`</summary><pre>{{ FORMAT_MESSAGES('@namespace "ns";', { sourcefile: 'example.css', loader: 'css' }) }}</pre></details></li>
             <li><details><summary>`unsupported-css-property`</summary><pre>{{ FORMAT_MESSAGES('div { widht: 1px }', { sourcefile: 'example.css', loader: 'css' }) }}</pre></details></li>
-            <li><details><summary>`unsupported-css-nesting`</summary><pre>{{ FORMAT_MESSAGES('div {\n&:hover {\n}\n}', { sourcefile: 'example.css', loader: 'css', target: 'chrome50' }) }}</pre></details></li>
+            <li><details><summary>`unsupported-css-nesting`</summary><pre>{{ FORMAT_MESSAGES('a b {\n.foo & {\n}\n}', { sourcefile: 'example.css', loader: 'css', target: 'chrome50' }) }}</pre></details></li>
           </ul>
           <br>
         </li>
