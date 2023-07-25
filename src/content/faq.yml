@@ -402,9 +402,6 @@ body:
       code does not mean putting it all on one line. Instead, minifying code
       means generating equivalent code that uses as few bytes as possible. In
       JavaScript, an untagged template literal is equivalent to a string literal,
-<<<<<<< HEAD
-      so esbuild is doing the correct thing here.
-=======
       so esbuild is doing the correct thing here.
 
   - h2: Top-level `var`
@@ -495,4 +492,3 @@ body:
       what a real JavaScript VM would do). However, this seems like an
       excessive overhead for both code size and run time, and does not seem
       like something that a production-oriented bundler should do.
->>>>>>> 451952b1444246bd5354cffe1c15eedf30a07106
