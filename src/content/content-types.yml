@@ -75,11 +75,23 @@ body:
   - table: |
       | Syntax transform                                                                                                       | Unsupported when `--target` is below | Example                     |
       |------------------------------------------------------------------------------------------------------------------------|--------------------------------------|-----------------------------|
+      | [RegExp `dotAll` flag](https://github.com/tc39/proposal-regexp-dotall-flag)                                            | `es2018`                             | `/./s`<sup>1</sup>          |
+      | [RegExp lookbehind assertions](https://github.com/tc39/proposal-regexp-lookbehind)                                     | `es2018`                             | `/(?<=x)y/`<sup>1</sup>     |
+      | [RegExp named capture groups](https://github.com/tc39/proposal-regexp-named-groups)                                    | `es2018`                             | `/(?<foo>\d+)/`<sup>1</sup> |
+      | [RegExp unicode property escapes](https://github.com/tc39/proposal-regexp-unicode-property-escapes)                    | `es2018`                             | `/\p{ASCII}/u`<sup>1</sup>  |
       | [BigInt](https://github.com/tc39/proposal-bigint)                                                                      | `es2020`                             | `123n`                      |
       | [Top-level await](https://github.com/tc39/proposal-top-level-await)                                                    | `es2022`                             | `await import(x)`           |
       | [Arbitrary module namespace identifiers](https://github.com/bmeck/proposal-arbitrary-module-namespace-identifiers)     | `es2022`                             | `export {foo as 'f o o'}`   |
+      | [RegExp match indices](https://github.com/tc39/proposal-regexp-match-indices)                                          | `es2022`                             | `/x(.+)y/d`<sup>1</sup>     |
       | [Hashbang grammar](https://github.com/tc39/proposal-hashbang)                                                          | `esnext`                             | `#!/usr/bin/env node`       |
       | [Decorators](https://github.com/tc39/proposal-decorators)                                                              | `esnext`                             | `@foo class Bar {}`         |
+      | [RegExp set notation](https://github.com/tc39/proposal-regexp-v-flag)                                                  | `esnext`                             | `/[\w--\d]/`<sup>1</sup>    |
+
+  - p: >
+      <footer>
+      <sup>1</sup> Unsupported regular expression literals are transformed into a `new RegExp()`
+      constructor call so you can bring your own polyfill library to get them to work anyway.
+      </footer>
 
   - p: >
       See also [the list of finished ECMAScript proposals](https://github.com/tc39/proposals/blob/main/finished-proposals.md)
@@ -921,10 +933,12 @@ body:
       Loader: `css` (also `global-css` and `local-css` for [CSS modules](#local-css))
 
   - p: >
-      This loader is enabled by default for `.css` files. It loads the file
-      as CSS syntax. CSS is a first-class content type in esbuild, which means
-      esbuild can [bundle](/api/#bundle) CSS files directly without needing to
-      import your CSS from JavaScript code:
+      The `css` loader is enabled by default for `.css` files and the
+      [`local-css`](#local-css) loader is enabled by default for `.module.css`
+      files. These loaders load the file as CSS syntax. CSS is a first-class
+      content type in esbuild, which means esbuild can [bundle](/api/#bundle)
+      CSS files directly without needing to import your CSS from JavaScript
+      code:
 
   - example:
       in:
@@ -1071,35 +1085,34 @@ body:
 
   - p: >
       There is support for bundling with CSS modules in esbuild. To use it,
-      you need to enable [bundling](/api/#bundle), set the loader to
-      `local-css` (e.g. <code>--loader:<wbr>.module.css=<wbr>local-css</code>
-      will enable this for `.module.css` files), and then import your CSS
-      module code into a JS file. Each local CSS name in that file can be
-      imported into JS to get the name that esbuild renamed it to. Here's an
-      example:
+      you need to enable [bundling](/api/#bundle), use the `local-css` loader
+      for your CSS file (e.g. by using the `.module.css` file extension), and
+      then import your CSS module code into a JS file. Each local CSS name in
+      that file can be imported into JS to get the name that esbuild renamed
+      it to. Here's an example:
 
   - pre.js: |
       // app.js
-      import { outerShell } from './app.css'
+      import { outerShell } from './app.module.css'
       const div = document.createElement('div')
       div.className = outerShell
       document.body.appendChild(div)
 
   - pre.css: |
-      /* app.css */
+      /* app.module.css */
       .outerShell {
         position: absolute;
         inset: 0;
       }
 
   - p: >
-      When you bundle this with <code>esbuild app.js <wbr>--bundle <wbr>--loader:<wbr>.css=<wbr>local-css <wbr>--outdir=out</code>
+      When you bundle this with <code>esbuild app.js <wbr>--bundle <wbr>--outdir=out</code>
       you'll get this (notice how the local CSS name `outerShell` has been renamed):
 
   - pre.js: |
       // out/app.js
       (() => {
-        // app.css
+        // app.module.css
         var outerShell = "app_outerShell";
 
         // app.js
@@ -1314,9 +1327,8 @@ body:
       that to white text on a black background. _**This is not what happens.**_
       Instead, the body will be entirely black (both the foreground and the
       background). This is because `@import` is supposed to behave as if the
-      import rule was replaced by the imported file<sup id="footnote-use-1"><a href="#footnote-def-1">1</a></sup>
-      (sort of like `#include` in C/C++), which leads to the browser seeing
-      the following code:
+      import rule was replaced by the imported file (sort of like `#include`
+      in C/C++), which leads to the browser seeing the following code:
 
   - pre.css: |
       /* reset.css */
@@ -1360,21 +1372,6 @@ body:
       just switching over to running your CSS code natively in the browser),
       you may have appearance changes if your code depends on the incorrect
       import order.
-
-  - p: >
-      <footer>
-      <sup id="footnote-def-1"><a href="#footnote-use-1">1</a></sup>
-      [The specification says](https://www.w3.org/TR/css-cascade-3/#at-import)
-      "user agents must treat the contents of the stylesheet as if they were
-      written in place of the @import rule" but that's not actually how CSS works.
-      If CSS worked that way, then cyclic imports would cause a hang due to
-      infinite expansion. The way it actually works is that an imported CSS
-      file is evaluated once at the **last** duplicate `@import` rule (as
-      compared to JavaScript where an imported JS file is evaluated once at
-      the **first** duplicate `import` statement). This is considered an
-      implementation detail and only really matters when there are import
-      cycles.
-      </footer>
 
   - h2: Text
   - p: 'Loader: `text`'
