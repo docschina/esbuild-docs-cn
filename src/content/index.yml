@@ -25,16 +25,6 @@ index:
 
     - p: '主要特性：'
     - ul:
-<<<<<<< HEAD
-      - '极快的速度，无需缓存'
-      - '支持 ES6 和 CommonJS 模块'
-      - '支持对 ES6 模块进行 tree shaking'
-      - '[API](/api/) 可同时用于 JavaScript 和 Go'
-      - '兼容 [TypeScript](/content-types/#typescript) 和 [JSX](/content-types/#jsx) 语法'
-      - '支持 [Source maps](/api/#sourcemap)'
-      - '支持 [Minification](/api/#minify)'
-      - '支持 [plugins](/plugins/)'
-=======
       - 'Extreme speed without needing a cache'
       - '[JavaScript](/content-types/#javascript), [CSS](/content-types/#css), [TypeScript](/content-types/#typescript), and [JSX](/content-types/#jsx) built-in'
       - 'A straightforward [API](/api/) for CLI, JS, and Go'
@@ -42,7 +32,6 @@ index:
       - 'Bundles CSS including [CSS modules](https://github.com/css-modules/css-modules)'
       - 'Tree shaking, [minification](/api/#minify), and [source maps](/api/#sourcemap)'
       - '[Local server](/api/#serve), [watch mode](/api/#watch), and [plugins](/plugins/)'
->>>>>>> ff8f27d03af318856d03918265d695796413a5cc
 
     - p: >
         如想试用 esbuild，请查阅[快速入门](/getting-started/)章节。
