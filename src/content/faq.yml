@@ -129,10 +129,10 @@ body:
 
   - figcaption: JavaScript benchmark
   - benchmark:
-      '[esbuild](https://esbuild.github.io/)': 0.37
-      '[parcel 2](https://parceljs.org/)': 30.50
-      '[rollup](https://rollupjs.org/) + [terser](https://terser.org/)': 32.07
-      '[webpack 5](https://webpack.js.org/)': 39.70
+      '[esbuild](https://esbuild.github.io/)': 0.39
+      '[parcel 2](https://parceljs.org/)': 14.91
+      '[rollup 4](https://rollupjs.org/) + [terser](https://terser.org/)': 34.10
+      '[webpack 5](https://webpack.js.org/)': 41.21
 
   - p: >
       This benchmark approximates a large JavaScript codebase by duplicating
@@ -142,12 +142,12 @@ body:
       [esbuild repo](https://github.com/evanw/esbuild).
 
   - table: |
-      | Bundler         |    Time | Relative slowdown | Absolute speed | Output size |
-      | :-------------- | ------: | ----------------: | -------------: | ----------: |
-      | esbuild         |   0.37s |                1x |  1479.6 kloc/s |      5.80mb |
-      | parcel 2        |  30.50s |               80x |    17.9 kloc/s |      5.87mb |
-      | rollup + terser |  32.07s |               84x |    17.1 kloc/s |      5.81mb |
-      | webpack 5       |  39.70s |              104x |    13.8 kloc/s |      5.84mb |
+      | Bundler           |    Time | Relative slowdown | Absolute speed | Output size |
+      | :---------------- | ------: | ----------------: | -------------: | ----------: |
+      | esbuild           |   0.39s |                1x |  1403.7 kloc/s |      5.80mb |
+      | parcel 2          |  14.91s |               38x |    36.7 kloc/s |      5.78mb |
+      | rollup 4 + terser |  34.10s |               87x |    16.1 kloc/s |      5.82mb |
+      | webpack 5         |  41.21s |              106x |    13.3 kloc/s |      5.84mb |
 
   - p: >
       Each time reported is the best of three runs. I'm running esbuild with
@@ -163,8 +163,8 @@ body:
   - figcaption: TypeScript benchmark
   - benchmark:
       '[esbuild](https://esbuild.github.io/)': 0.10
-      '[parcel 2](https://parceljs.org/)': 8.18
-      '[webpack 5](https://webpack.js.org/)': 15.96
+      '[parcel 2](https://parceljs.org/)': 6.91
+      '[webpack 5](https://webpack.js.org/)': 16.69
 
   - p: >
       This benchmark uses the old [Rome](https://github.com/rome/tools) code base
@@ -177,8 +177,8 @@ body:
       | Bundler   |    Time | Relative slowdown | Absolute speed | Output size |
       | :-------- | ------: | ----------------: | -------------: | ----------: |
       | esbuild   |   0.10s |                1x |  1318.4 kloc/s |      0.97mb |
-      | parcel 2  |   8.18s |               82x |    16.1 kloc/s |      0.97mb |
-      | webpack 5 |  15.96s |              160x |     8.3 kloc/s |      1.27mb |
+      | parcel 2  |   6.91ѕ |               69x |    16.1 kloc/s |      0.96mb |
+      | webpack 5 |  16.69ѕ |              167x |     8.3 kloc/s |      1.27mb |
 
   - p: >
       Each time reported is the best of three runs. I'm running esbuild with
@@ -366,6 +366,52 @@ body:
 
     - >
       Use another build tool instead of esbuild
+
+  - h2#old-go-version: Outdated version of Go
+
+  - p: >
+      If you use an automated dependency vulnerability scanner, you may get a
+      report that the version of the Go compiler that esbuild uses and/or the
+      version of `golang.org/x/sys` (esbuild's only dependency) is outdated.
+      These reports are benign and should be ignored.
+
+  - p: >
+      This happens because esbuild's code is deliberately intended to be
+      compilable with Go 1.13. Later versions of Go have dropped support for
+      certain older platforms that I want esbuild to be able to run on (e.g.
+      older versions of macOS). While esbuild's published binaries are compiled
+      with a much newer version of the Go compiler (and therefore don't work
+      on older versions of macOS), you are currently still able to compile the
+      latest version of esbuild for yourself with Go 1.13 and use it on older
+      versions of macOS because esbuild's code can still be compiled with Go
+      as far back as 1.13.
+
+  - p: >
+      People and/or automated tools sometimes see the `go 1.13` line in [`go.mod`](https://github.com/evanw/esbuild/blob/main/go.mod)
+      and complain that esbuild's published binaries are built with Go 1.13, which
+      is a really old version of Go. However, that's not true. That line in `go.mod`
+      only specifies the minimum compiler version. It has nothing to do with the
+      version of Go that esbuild's published binaries are built with, which is a
+      much newer version of Go. [Please read the documentation.](https://go.dev/ref/mod#go-mod-file-go)
+
+  - p: >
+      People also sometimes want esbuild to update the `golang.org/x/sys` dependency
+      because there is a known vulnerability in the version that esbuild uses
+      (specifically [GO-2022-0493](https://pkg.go.dev/vuln/GO-2022-0493)
+      about the `Faccessat` function). The problem that prevents esbuild from
+      updating to a newer version of the `golang.org/x/sys` dependency is that
+      newer versions have started using the `unsafe.Slice` function, which was
+      first introduced in Go 1.17 (and therefore doesn't compile in older
+      versions of Go). However, this vulnerability report is irrelevant because
+      a) esbuild doesn't ever call that function in the first place and b)
+      esbuild is a build tool, not a sandbox, and esbuild's file system access
+      is not security-sensitive.
+
+  - p: >
+      I'm not going to drop compatibility with older platforms and prevent some
+      people from being able to use esbuild just to work around irrelevant
+      vulnerability reports. Please ignore any reports about the issues described
+      above.
 
   - h2: Minified newlines
 

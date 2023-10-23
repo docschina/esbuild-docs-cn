@@ -86,8 +86,36 @@ export let createSpanWithClass = (className: string, text: string): HTMLSpanElem
   return span
 }
 
+export let shortenDataURLForDisplay = (path: string): string => {
+  // Data URLs can be really long. This shortens them to something suitable for
+  // display in a tooltip. This shortening behavior is also what esbuild does.
+  if (path.startsWith('data:') && path.indexOf(',') >= 0) {
+    path = path.slice(0, 65).replace(/\n/g, '\\n')
+    return '<' + (path.length > 64 ? path.slice(0, 64) + '...' : path) + '>'
+  }
+  return path
+}
+
+export let splitPathBySlash = (path: string): string[] => {
+  // Treat data URLs (e.g. "data:text/plain;base64,ABCD") as a single path element
+  if (path.startsWith('data:') && path.indexOf(',') >= 0) {
+    return [path]
+  }
+
+  const parts = path.split('/')
+
+  // Replace ['a:', '', 'b'] at the start of the path with ['a://b']. This
+  // handles paths that look like a URL scheme such as "https://example.com".
+  if (parts.length >= 3 && parts[1] === '' && parts[0].endsWith(':')) {
+    parts.splice(0, 3, parts.slice(0, 3).join('/'))
+  }
+
+  return parts
+}
+
 export let commonPrefixFinder = (path: string, commonPrefix: string[] | undefined): string[] => {
-  let parts = path.split('/')
+  if (path === '') return []
+  let parts = splitPathBySlash(path)
   if (!commonPrefix) return parts
 
   // Note: This deliberately loops one past the end of the array so it can compare against "undefined"
@@ -102,7 +130,7 @@ export let commonPrefixFinder = (path: string, commonPrefix: string[] | undefine
 }
 
 export let commonPostfixFinder = (path: string, commonPostfix: string[] | undefined): string[] => {
-  let parts = path.split('/')
+  let parts = splitPathBySlash(path)
   if (!commonPostfix) return parts.reverse()
 
   // Note: This deliberately loops one past the end of the array so it can compare against "undefined"
@@ -138,7 +166,7 @@ export let posixRelPath = (path: string, relToDir: string): string => {
 }
 
 export let nodeModulesPackagePathOrNull = (path: string): string | null => {
-  let parts = path.split('/')
+  let parts = splitPathBySlash(path)
   for (let i = parts.length - 1; i >= 0; i--) {
     if (parts[i] === 'node_modules') {
       parts = parts.slice(i + 1)
