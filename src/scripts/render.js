@@ -503,15 +503,8 @@ async function generateMain(key, main) {
     if (tag === 'toc') {
       let toc = `<ul>\n`
       for (let { tag: t, value: v } of main.body) {
-<<<<<<< HEAD
-        if (t === 'h2') {
-          let newValue = escapeHTML(v)
-          toc += `        <li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(newValue.trim())}</a></li>\n`
-        }
-=======
         if (t === 'h2') toc += `<li><a href="#${escapeAttribute(toID(v))}">${md.renderInline(v.trim())}</a></li>\n`
         else if (t.startsWith('h2#')) toc += `<li><a href="#${escapeAttribute(toID(t.slice(3) || v))}">${md.renderInline(v.trim())}</a></li>\n`
->>>>>>> be81b00dabbaedbe30e5f0b8ac6b4a7dc7b0e4c5
       }
       return toc + `</ul>`
     }
