@@ -13,6 +13,8 @@ import {
   setDarkModeListener,
   setResizeEventListener,
   setWheelEventListener,
+  shortenDataURLForDisplay,
+  splitPathBySlash,
   stripDisabledPathPrefix,
   textToHTML,
 } from './helpers'
@@ -71,7 +73,7 @@ let analyzeDirectoryTree = (metafile: Metafile): Tree => {
 
   for (let o in outputs) {
     // Find the common directory prefix, not including the file name
-    let parts = o.split('/')
+    let parts = splitPathBySlash(o)
     parts.pop()
     commonPrefix = commonPrefixFinder(parts.join('/'), commonPrefix)
   }
@@ -79,7 +81,7 @@ let analyzeDirectoryTree = (metafile: Metafile): Tree => {
   for (let o in outputs) {
     if (isSourceMapPath(o)) continue
 
-    let name = commonPrefix ? o.split('/').slice(commonPrefix.length).join('/') : o
+    let name = commonPrefix ? splitPathBySlash(o).slice(commonPrefix.length).join('/') : o
     let node: TreeNodeInProgress = { name_: name, inputPath_: '', bytesInOutput_: 0, children_: {} }
     let output = outputs[o]
     let inputs = output.inputs
@@ -425,7 +427,7 @@ export let createFlame = (metafile: Metafile): HTMLDivElement => {
 
     // Show a tooltip for hovered nodes
     if (node) {
-      let tooltip = node.inputPath_
+      let tooltip = node.name_ === node.inputPath_ ? shortenDataURLForDisplay(node.inputPath_) : node.inputPath_
       let nameSplit = tooltip.length - node.name_.length
       tooltip = textToHTML(tooltip.slice(0, nameSplit)) + '<b>' + textToHTML(tooltip.slice(nameSplit)) + '</b>'
       if (colorMode === COLOR.FORMAT) tooltip += textToHTML(formatColorToText(cssBackgroundForInputPath(node.inputPath_), ' – '))

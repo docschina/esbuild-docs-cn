@@ -13,6 +13,8 @@ import {
   setDarkModeListener,
   setResizeEventListener,
   setWheelEventListener,
+  shortenDataURLForDisplay,
+  splitPathBySlash,
   stripDisabledPathPrefix,
   textToHTML,
 } from './helpers'
@@ -382,11 +384,11 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
       // Show a tooltip for hovered nodes
       if (node && node !== animatedNode.parent_) {
         let tooltip = node.inputPath_
-        if (node.parent_) {
+        if (node.parent_ && node.parent_.inputPath_ !== '') {
           let i = node.parent_.inputPath_.length
           tooltip = textToHTML(tooltip.slice(0, i)) + '<b>' + textToHTML(tooltip.slice(i)) + '</b>'
         } else {
-          tooltip = '<b>' + textToHTML(tooltip) + '</b>'
+          tooltip = '<b>' + textToHTML(shortenDataURLForDisplay(tooltip)) + '</b>'
         }
         if (colorMode === COLOR.FORMAT) tooltip += textToHTML(formatColorToText(cssBackgroundForInputPath(node.inputPath_), ' – '))
         else tooltip += ' – ' + textToHTML(bytesToText(node.bytesInOutput_))
@@ -549,10 +551,9 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
         rowEl.tabIndex = 0
         barsEl.appendChild(rowEl)
 
-        let prefix = /^[^/]*\/?/.exec(name)![0]
         let nameEl = document.createElement('div')
         nameEl.className = styles.name
-        nameEl.innerHTML = textToHTML(prefix) + '<span>' + name.slice(prefix.length) + '</span>'
+        nameEl.innerHTML = textToHTML(name === child.inputPath_ ? shortenDataURLForDisplay(name) : name)
         rowEl.appendChild(nameEl)
 
         let sizeEl = document.createElement('div')
