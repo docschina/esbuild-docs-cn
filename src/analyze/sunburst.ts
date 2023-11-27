@@ -1,10 +1,17 @@
 import * as indexStyles from './index.css'
 import * as styles from './sunburst.css'
 import { Metafile } from './metafile'
-import { showWhyFile } from './whyfile'
+import { isWhyFileVisible, showWhyFile } from './whyfile'
 import { accumulatePath, orderChildrenBySize, TreeNodeInProgress } from './tree'
-import { canvasFillStyleForInputPath, COLOR, colorLegendEl, formatColorToText, cssBackgroundForInputPath, setAfterColorMappingUpdate } from './color'
 import { colorMode } from './index'
+import {
+  canvasFillStyleForInputPath,
+  COLOR,
+  colorLegendEl,
+  cssBackgroundForInputPath,
+  moduleTypeLabelInputPath,
+  setAfterColorMappingUpdate,
+} from './color'
 import {
   bytesToText,
   isSourceMapPath,
@@ -14,7 +21,6 @@ import {
   setResizeEventListener,
   setWheelEventListener,
   shortenDataURLForDisplay,
-  splitPathBySlash,
   stripDisabledPathPrefix,
   textToHTML,
 } from './helpers'
@@ -372,12 +378,7 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
     let previousHoveredNode: TreeNode | null = null
     let historyStack: TreeNode[] = []
 
-    resize()
-    setDarkModeListener(draw)
-    setResizeEventListener(resize)
-    setWheelEventListener(null)
-
-    canvas.onmousemove = e => {
+    let handleMouseMove = (e: MouseEvent): void => {
       let node = hitTestNode(e)
       changeHoveredNode(node)
 
@@ -390,13 +391,26 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
         } else {
           tooltip = '<b>' + textToHTML(shortenDataURLForDisplay(tooltip)) + '</b>'
         }
-        if (colorMode === COLOR.FORMAT) tooltip += textToHTML(formatColorToText(cssBackgroundForInputPath(node.inputPath_), ' – '))
+        if (colorMode === COLOR.FORMAT) tooltip += textToHTML(moduleTypeLabelInputPath(node.inputPath_, ' – '))
         else tooltip += ' – ' + textToHTML(bytesToText(node.bytesInOutput_))
         showTooltip(e.pageX, e.pageY + 20, tooltip)
         canvas.style.cursor = 'pointer'
       } else {
         hideTooltip()
       }
+    }
+
+    resize()
+    setDarkModeListener(draw)
+    setResizeEventListener(resize)
+
+    setWheelEventListener(e => {
+      if (isWhyFileVisible()) return
+      handleMouseMove(e)
+    })
+
+    canvas.onmousemove = e => {
+      handleMouseMove(e)
     }
 
     canvas.onmouseout = () => {
@@ -429,12 +443,10 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
     }
 
     leftEl.className = styles.left
-    leftEl.appendChild(canvas)
-    leftEl.appendChild(colorLegendEl)
+    leftEl.append(canvas, colorLegendEl)
 
     tooltipEl.className = indexStyles.tooltip
-    mainEl.appendChild(tooltipEl)
-    mainEl.appendChild(leftEl)
+    mainEl.append(tooltipEl, leftEl)
 
     return [draw, () => {
       if (previousHoveredNode !== hoveredNode) {
@@ -517,15 +529,15 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
         let rowEl = document.createElement('a')
         rowEl.className = styles.row
         rowEl.tabIndex = 0
-        barsEl.appendChild(rowEl)
+        barsEl.append(rowEl)
 
         let nameEl = document.createElement('div')
         nameEl.className = styles.name
-        rowEl.appendChild(nameEl)
+        rowEl.append(nameEl)
 
         let sizeEl = document.createElement('div')
         sizeEl.className = styles.size
-        rowEl.appendChild(sizeEl)
+        rowEl.append(sizeEl)
 
         // Use a link so we get keyboard support
         rowEl.href = 'javascript:void 0'
@@ -549,28 +561,28 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
         let rowEl = document.createElement('a')
         rowEl.className = styles.row
         rowEl.tabIndex = 0
-        barsEl.appendChild(rowEl)
+        barsEl.append(rowEl)
 
         let nameEl = document.createElement('div')
         nameEl.className = styles.name
         nameEl.innerHTML = textToHTML(name === child.inputPath_ ? shortenDataURLForDisplay(name) : name)
-        rowEl.appendChild(nameEl)
+        rowEl.append(nameEl)
 
         let sizeEl = document.createElement('div')
         sizeEl.className = styles.size
-        rowEl.appendChild(sizeEl)
+        rowEl.append(sizeEl)
 
         let barEl = document.createElement('div')
         let bgColor = cssBackgroundForInputPath(child.inputPath_)
         barEl.className = styles.bar + (child.bytesInOutput_ ? '' : ' ' + styles.empty)
         barEl.style.background = bgColor
         barEl.style.width = 100 * child.bytesInOutput_ / maxBytesInOutput + '%'
-        sizeEl.appendChild(barEl)
+        sizeEl.append(barEl)
 
         let bytesEl = document.createElement('div')
         bytesEl.className = styles.last
-        bytesEl.textContent = colorMode === COLOR.FORMAT ? formatColorToText(bgColor, '') : size
-        barEl.appendChild(bytesEl)
+        bytesEl.textContent = colorMode === COLOR.FORMAT ? moduleTypeLabelInputPath(child.inputPath_, '') : size
+        barEl.append(bytesEl)
 
         // Use a link so we get keyboard support
         rowEl.href = 'javascript:void 0'
@@ -597,7 +609,7 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
 
       let segmentsEl = document.createElement('div')
       segmentsEl.className = styles.segments
-      directoryEl.appendChild(segmentsEl)
+      directoryEl.append(segmentsEl)
 
       for (let node: TreeNode | null = currentNode; node; node = node.parent_) {
         let text = node.inputPath_ || '/'
@@ -629,8 +641,7 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
       }
 
       detailsEl.innerHTML = ''
-      detailsEl.appendChild(directoryEl)
-      detailsEl.appendChild(barsEl)
+      detailsEl.append(directoryEl, barsEl)
     }
 
     let generatedNodes: (TreeNode | null)[] = []
@@ -640,7 +651,7 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
     let previousHoveredElement: HTMLAnchorElement | null = null
 
     detailsEl.className = styles.details
-    mainEl.appendChild(detailsEl)
+    mainEl.append(detailsEl)
     regenerate()
 
     return [regenerate, () => {
@@ -684,7 +695,10 @@ export let createSunburst = (metafile: Metafile): HTMLDivElement => {
     + 'This visualization shows how much space each input file takes up in the final bundle. '
     + 'Input files that take up 0 bytes have been completely eliminated by tree-shaking.'
     + '</p>'
+    + '<p>'
+    + '<b>Benefit of this chart type:</b> Can be navigated with the keyboard.'
+    + '</p>'
     + '</div>'
-  componentEl.appendChild(mainEl)
+  componentEl.append(mainEl)
   return componentEl
 }
