@@ -7,7 +7,7 @@ import { Mode } from './mode'
 import { RichError } from './output'
 
 const enum Kind {
-  // These must be in the order "-,:[]{}+"
+  // These must be in the order "-,:[]{}()+"
   Minus,
   Comma,
   Colon,
@@ -15,12 +15,21 @@ const enum Kind {
   CloseBracket,
   OpenBrace,
   CloseBrace,
+  OpenParen,
+  CloseParen,
   Plus,
 
   // The order doesn't matter for these
   Identifier,
+  Function,
   Literal,
   String,
+}
+
+const enum Flags {
+  None = 0,
+  KeywordsAreIdentifiers = 1 << 0,
+  ExpectEndOfFile = 1 << 1,
 }
 
 interface Token {
@@ -390,7 +399,7 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
       token.line_, token.column_ + token.text_.length, 0, '', 0, 0, 0, expected)
   }
 
-  const nextToken = (expectEndOfFile = false): void => {
+  const nextToken = (flags = Flags.None): void => {
     while (i < n) {
       const tokenLine = line
       const tokenColumn = i - lineStart
@@ -472,12 +481,12 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
       }
 
       // End of file
-      if (expectEndOfFile) {
+      if (flags & Flags.ExpectEndOfFile) {
         throwRichError(input, `Expected end of file after ${where}`, line, i - lineStart, 0)
       }
 
       // Punctuation
-      const index = '-,:[]{}+'.indexOf(c)
+      const index = '-,:[]{}()+'.indexOf(c)
       if (index >= 0) {
         i++
         token = { line_: tokenLine, column_: tokenColumn, kind_: index as Kind, text_: c, value_: c }
@@ -510,12 +519,14 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
         const text = input.slice(start, i)
         let kind = Kind.Literal
         let value: any = text
-        if (text === 'null') value = null
+        if (flags & Flags.KeywordsAreIdentifiers) kind = Kind.Identifier
+        else if (text === 'null') value = null
         else if (text === 'true') value = true
         else if (text === 'false') value = false
         else if (text === 'undefined') value = undefined
         else if (text === 'Infinity') value = Infinity
         else if (text === 'NaN') value = NaN
+        else if (text === 'function') kind = Kind.Function
         else kind = Kind.Identifier
         token = { line_: tokenLine, column_: tokenColumn, kind_: kind, text_: text, value_: value }
         return
@@ -549,9 +560,28 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
       throwRichError(input, `Unexpected ${JSON.stringify(c)} in ${where}`, line, i - lineStart, 1)
     }
 
-    if (!expectEndOfFile) {
+    if (!(flags & Flags.ExpectEndOfFile)) {
       throwRichError(input, `Unexpected end of file in ${where}`, line, i - lineStart, 0)
     }
+  }
+
+  // Hack: Parse function literals by repeatedly using the browser's parser after each '}' character
+  const scanForFunctionLiteral = (name: string, from: number): Function => {
+    let closeBrace = /\}/g
+    let error = ''
+    closeBrace.lastIndex = from
+
+    for (let match: RegExpExecArray | null; match = closeBrace.exec(input);) {
+      try {
+        const code = new Function('return {' + name + input.slice(from, match.index + 1) + '}.' + name)
+        i = match.index + 1
+        return code()
+      } catch (err) {
+        error = ': ' + err.message
+      }
+    }
+
+    throwRichError(input, 'Invalid function literal' + error, token.line_, token.column_, token.text_.length)
   }
 
   const parseExpression = (): any => {
@@ -559,7 +589,7 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
       const object: Record<string, any> = Object.create(null)
       const originals: Record<string, Token> = Object.create(null)
       while (true) {
-        nextToken()
+        nextToken(Flags.KeywordsAreIdentifiers)
         if (token.kind_ === Kind.CloseBrace) break
         if (token.kind_ !== Kind.String && token.kind_ !== Kind.Identifier) throwUnexpectedToken()
         const original = originals[token.value_]
@@ -568,10 +598,17 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
             `The original key ${JSON.stringify(token.value_)} is here:`, original.line_, original.column_, original.text_.length)
         }
         const key = token
+        const endOfKey = i
+        let value: any
         nextToken()
-        if (token.kind_ !== Kind.Colon) throwExpectedAfter(key, ':', 'property ' + JSON.stringify(key.value_))
-        nextToken()
-        object[key.value_] = parseExpression()
+        if (token.kind_ === Kind.OpenParen) value = scanForFunctionLiteral(key.value_, endOfKey)
+        else {
+          if (token.kind_ !== Kind.Colon) throwExpectedAfter(key, ':', 'property ' + JSON.stringify(key.value_))
+          nextToken()
+          if (token.kind_ === Kind.Function) value = scanForFunctionLiteral(key.value_, endOfKey)
+          else value = parseExpression()
+        }
+        object[key.value_] = value
         originals[key.value_] = key
         const beforeComma = token
         nextToken()
@@ -617,7 +654,7 @@ function parseOptionsAsLooseJSON(input: string): Record<string, any> {
 
   nextToken()
   const root = parseExpression()
-  nextToken(true)
+  nextToken(Flags.ExpectEndOfFile)
   return root
 }
 
