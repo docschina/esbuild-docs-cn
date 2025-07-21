@@ -170,7 +170,7 @@ body:
           outdir: 'dist',
         })
 
-        let { host, port } = await ctx.serve()
+        let { hosts, port } = await ctx.serve()
 
       go: |
         ctx, err := api.Context(api.BuildOptions{
@@ -821,7 +821,7 @@ body:
 
         await ctx.watch()
 
-        let { host, port } = await ctx.serve({
+        let { hosts, port } = await ctx.serve({
           servedir: 'www',
         })
 
@@ -1064,7 +1064,7 @@ body:
       If no custom [conditions](#conditions) are configured, the Webpack-specific
       `module` condition is also included. The `module` condition is used by
       package authors to provide a tree-shakable ESM alternative to a CommonJS
-      file without creating a [dual package hazard](https://nodejs.org/api/packages.html#dual-package-hazard).
+      file without creating a [dual package hazard](https://github.com/nodejs/package-examples?tab=readme-ov-file#dual-package-hazard).
       You can prevent the `module` condition from being included by explicitly
       configuring some custom conditions (even an empty list).
       </p>
@@ -1128,7 +1128,7 @@ body:
       If no custom [conditions](#conditions) are configured, the Webpack-specific
       `module` condition is also included. The `module` condition is used by
       package authors to provide a tree-shakable ESM alternative to a CommonJS
-      file without creating a [dual package hazard](https://nodejs.org/api/packages.html#dual-package-hazard).
+      file without creating a [dual package hazard](https://github.com/nodejs/package-examples?tab=readme-ov-file#dual-package-hazard).
       You can prevent the `module` condition from being included by explicitly
       configuring some custom conditions (even an empty list).
       </p>
@@ -1287,7 +1287,7 @@ body:
           bundle: true,
         })
 
-        let { host, port } = await ctx.serve({
+        let { hosts, port } = await ctx.serve({
           servedir: 'www',
         })
 
@@ -3114,7 +3114,7 @@ body:
 
   - p: >
       Lines are truncated after they pass the limit instead of before because
-      it's simpler to check when the limit is passed then to predict when the
+      it's simpler to check when the limit is passed than to predict when the
       limit is about to be passed, and because it's faster to avoid backing up
       and rewriting things when generating an output file. So the limit is only
       approximate.
@@ -7791,7 +7791,79 @@ body:
         }
       }
 
+  - p: >
+      All paths in the metafile are relative by default. If you would like them
+      to be absolute paths instead, you can configure that with the
+      [abs paths](#abs-paths) setting.
+
   - h2: Logging
+
+  - h3: Abs paths
+
+  - p: >
+      Use this feature to tell esbuild to refer to files by absolute paths
+      instead of relative paths. By default, esbuild uses relative paths
+      instead of absolute paths because they are necessary for build output to
+      be reproducible across different machines and operating systems.
+
+  - p: >
+      Absolute paths can be useful with certain terminal emulators that
+      automatically turn absolute paths in the terminal text into clickable
+      links. They can also be useful when esbuild is being automatically
+      invoked from several different directories by another script and the log
+      messages are all merged together.
+
+  - p: >
+      There are currently three supported situations where absolute paths can
+      be configured:
+
+  - ul:
+    - >
+      `code` controls paths in comments and string literals
+    - >
+      `log` controls paths in log messages
+    - >
+      `metafile` controls paths in [JSON build metadata](#metafile)
+
+  - p: >
+      Here is an example of configuring absolute paths in log messages and
+      build metadata:
+
+  - example:
+      in:
+        app.js: 'x = typeof y === "null"'
+
+      cli: |
+        esbuild app.js --abs-paths=log,metafile --outfile=out.js --metafile=meta.json
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        let result = await esbuild.build({
+          entryPoints: ['app.js'],
+          absPaths: ['log', 'metafile'],
+          outfile: 'out.js',
+          metafile: true,
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            AbsPaths:    api.LogAbsPath | api.MetafileAbsPath,
+            Outfile:     "out.js",
+            Metafile:    true,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
 
   - h3: Color
 
@@ -7840,6 +7912,14 @@ body:
 
   - p: >
       Colored output can also be set to `false` to disable colors.
+
+  - p: >
+      In addition, esbuild respects the informally-standard `NO_COLOR`
+      environment variable. So if you want esbuild (and many other CLI
+      programs) to have color output disabled by default without needing
+      to explicitly disable it on the command line, you should export the
+      `NO_COLOR=1` environment variable in your shell's configuration file.
+      You can read more about this convention at [https://no-color.org/](https://no-color.org/).
 
   - h3: Format messages
 
