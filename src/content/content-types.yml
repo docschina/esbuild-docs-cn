@@ -935,6 +935,22 @@ body:
       import { version } from './package.json'
       console.log(version)
 
+  - h3#with-type-json: Import Attribute
+
+  - p: >
+      The `json` loader can also be accessed without needing to change
+      esbuild's configuration by adding <code>with { <wbr>type: <wbr>'json' }</code>
+      after the import statement. That looks like this:
+
+  - pre.js: |
+      import object from './example.data' with { type: 'json' }
+      console.log(object)
+
+  - p: >
+      This is from the JavaScript [JSON modules](https://github.com/tc39/proposal-json-modules)
+      proposal. Support for this syntax has also been added to many other
+      JavaScript tools so code written this way will be more portable across tools.
+
   - h2: CSS
   - p: >
       Loader: `css` (also `global-css` and `local-css` for [CSS modules](#local-css))
@@ -1424,6 +1440,22 @@ body:
       some programs such as Notepad on Windows sometimes insert when saving
       a file.
 
+  - h3#with-type-text: Import Attribute
+
+  - p: >
+      The `text` loader can also be accessed without needing to change
+      esbuild's configuration by adding <code>with { <wbr>type: <wbr>'text' }</code>
+      after the import statement. That looks like this:
+
+  - pre.js: |
+      import string from './example.data' with { type: 'text' }
+      console.log(string)
+
+  - p: >
+      This is from the JavaScript [import text](https://github.com/tc39/proposal-import-text)
+      proposal. Support for this syntax has also been added to many other
+      JavaScript tools so code written this way will be more portable across tools.
+
   - h2: Binary
   - p: 'Loader: `binary`'
 
@@ -1482,6 +1514,8 @@ body:
             os.Exit(1)
           }
         }
+
+  - h3#with-type-bytes: Import Attribute
 
   - p: >
       The `binary` loader can also be accessed without needing to change
