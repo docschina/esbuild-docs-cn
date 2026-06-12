@@ -202,17 +202,17 @@ body:
   - h2: Upcoming roadmap
 
   - p: >
-      These features are already in progress and are first priority:
-
-  - ul:
-    - 'Code splitting ([#16](https://github.com/evanw/esbuild/issues/16), [docs](/api/#splitting))'
+      I'm not doing active feature development for esbuild at the moment. This
+      is mainly because my current projects no longer involve a large web
+      codebase. I'm still actively maintaining esbuild and doing periodic esbuild
+      releases.
 
   - p: >
-      These are potential future features but may not happen or may happen
-      to a more limited extent:
-
-  - ul:
-    - 'HTML content type ([#31](https://github.com/evanw/esbuild/issues/31))'
+      I intend to get back to working on larger-scale esbuild feature development
+      at some point. The primary issue at hand is improving esbuild's code splitting
+      support (issue [#16](https://github.com/evanw/esbuild/issues/16), [docs](/api/#splitting))
+      which is currently pretty primitive. I may also look into adding an HTML
+      content type (issue [#31](https://github.com/evanw/esbuild/issues/31)).
 
   - p: >
       After that point, I will consider esbuild to be relatively complete.
@@ -256,25 +256,24 @@ body:
   - h2: Production readiness
 
   - p: >
-      This project has not yet hit version 1.0.0 and is still in active
-      development. That said, it is far beyond the alpha stage and is pretty
-      stable. I think of it as a late-stage beta. For some early-adopters
-      that means it's good enough to use for real things. Some other people
-      think this means esbuild isn't ready yet. This section doesn't try to
-      convince you either way. It just tries to give you enough information
-      so you can decide for yourself whether you want to use esbuild as your
-      bundler.
+      I think of esbuild as a late-stage beta. While it's pretty stable at
+      this point, it has not yet hit version 1.0 and is still missing some
+      significant features that you may find important depending on your use
+      case (mainly that code splitting is still pretty primitive). It also
+      doesn't have as large or as active of a community as other JavaScript
+      tools have. That said, it has been around for quite a while and is
+      pretty widely-used.
 
   - p: >
-      Some data points:
+      Here's some more information to consider as you evaluate esbuild:
 
   - ul:
     - >
-      **Used by other projects**
+      **Used by other major projects**
       <p>
-      The API is already being used as a library within many other
-      developer tools. For example, [Vite](https://vitejs.dev/) is using
-      esbuild to transform TypeScript into JavaScript and
+      The API has already been used as a library within many other
+      developer tools. For example, [Vite](https://vitejs.dev/) was using
+      esbuild to transform TypeScript into JavaScript for quite a while, and
       [Amazon CDK](https://aws.amazon.com/cdk/) (Cloud Development Kit)
       and [Phoenix](https://www.phoenixframework.org/) are using
       esbuild to bundle code.
@@ -300,8 +299,7 @@ body:
       esbuild because I find it fun to build and because it's the tool I'd
       want to use. I'm sharing it with the world because there are others
       that want to use it too, because the feedback makes the tool itself
-      better, and because I think it will inspire the ecosystem to make
-      better tools.
+      better, and because it has inspired the ecosystem to make better tools.
       </p>
 
     - >
@@ -335,15 +333,16 @@ body:
 
   - p: >
       Virtually all of esbuild's code is first-party code except for [one dependency](https://github.com/evanw/esbuild/blob/main/go.mod)
-      on Google's set of supplemental Go packages. My development work is done
-      on different machine that is isolated from the one I use to publish builds.
+      on Google's set of supplemental Go packages. Packages are built and published
+      using [trusted publishing](https://docs.npmjs.com/trusted-publishers) via
+      GitHub Actions. This means that even if my development machine were to be
+      compromised, esbuild's published packages can still be verified to have
+      been built in one of GitHub's sandboxed VMs at a specific commit (look
+      for the green checkmark on [esbuild's npm's package](https://www.npmjs.com/package/esbuild)).
       I have done additional work to ensure that esbuild's published builds are
-      completely reproducible and after every release, published builds are
-      [automatically compared](https://github.com/evanw/esbuild/blob/main/.github/workflows/validate.yml)
-      to ones locally-built in an unrelated environment to ensure that they are
-      bitwise identical (i.e. that the Go compiler itself has not been compromised).
-      You can also build esbuild from source yourself and compare your build artifacts
-      to the published ones to independently verify this.
+      completely reproducible so you can also build esbuild from source yourself
+      and compare your build artifacts to the published ones to independently
+      verify this.
 
   - p: >
       Having to deal with false-positives is an unfortunate reality of using
@@ -365,6 +364,49 @@ body:
 
     - >
       Use another build tool instead of esbuild
+
+  - h2: Not a sandbox
+
+  - p: >
+      Some people expect esbuild's bundler to somehow guard against malicious
+      input. This is not something that esbuild does, and doing this is out of
+      scope. The esbuild API is meant to be run on your own code to build your
+      own software. It is assumed that the inputs to esbuild (build commands,
+      files, and plugins) are all intentional.
+
+  - p: >
+      For example, I don't consider these to be security issues with esbuild:
+
+  - ul:
+    - >
+      <p>
+      Your input to esbuild may be really big or really weird and cause esbuild
+      to hang or crash. This is not a denial of service attack as esbuild is
+      supposed to be for you to build your own software. If you need esbuild
+      to have strict resource limits, then you need to enforce them on the
+      esbuild process yourself.
+      </p>
+
+    - >
+      <p>
+      All input files and any other files that those files reference are assumed
+      to be a part of your project, and are therefore trusted. That includes
+      files in `node_modules` and files outside of the entry point folder. If you
+      consider the inputs to esbuild to be malicious and you want to sandbox
+      esbuild from sensitive files, you should do that yourself.
+      </p>
+      <p>
+      This also goes for the contents of everything in the directory served by
+      the development server (if you're using esbuild's development server that
+      way). For example, it's not a security issue if you tell esbuild to serve
+      a directory that contains malicious code, or that contains a symlink
+      pointing to a sensitive file.
+      </p>
+
+  - p: >
+      Note that esbuild's [development server](/api/#serve) is also not written
+      with production in mind. It is intended to be only for development. _Do not
+      use it in production._
 
   - h2#old-go-version: Outdated version of Go
 

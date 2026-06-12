@@ -328,7 +328,7 @@ p {
 
 .info:before {
   content: 'ⓘ';
-  font: bold 43px/43px serif;
+  font: bold 33px/43px serif;
   margin-left: -43px;
   display: block;
   float: left;
