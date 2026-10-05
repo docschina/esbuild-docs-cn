@@ -266,6 +266,7 @@ body:
     - Log level
     - Log limit
     - Log override
+    - Log style
     - Main fields
     - Mangle props
     - Metafile
@@ -375,6 +376,7 @@ body:
     - Log level
     - Log limit
     - Log override
+    - Log style
     - Mangle props
     - Minify
     - Platform
@@ -2517,7 +2519,8 @@ body:
 
   - p: >
       Use this to insert an arbitrary string at the beginning of generated
-      JavaScript and CSS files. This is commonly used to insert comments:
+      JavaScript and CSS files. This is typically used to insert comments.
+      Here is an example using the [build](#build) API:
 
   - example:
       in:
@@ -2567,6 +2570,44 @@ body:
       that CSS ignores all `@import` rules that come after a non-`@import` rule
       (other than a `@charset` rule), so using a banner to inject CSS rules may
       accidentally disable imports of external stylesheets.
+
+  - p: >
+      Unlike the build API, the banner for the [transform](#transform) API is
+      just a single string. There is no need to specify a separate banner for
+      JS and CSS files since the content type for the transform API is already
+      unambiguously specified via the [loader](#loader) setting. Here is an
+      example using the transform API:
+
+  - example:
+      cli:
+        - $: |
+            echo '1+2' | esbuild --banner=//comment
+        - expect: |
+            //comment
+            1 + 2;
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        let result = await esbuild.transform('1+2', {
+          banner: '//comment',
+        })
+        console.log(result.code)
+
+      go: |
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+
+        func main() {
+          result := api.Transform("1+2", api.TransformOptions{
+            Banner: "//comment",
+          })
+          if len(result.Errors) == 0 {
+            fmt.Printf("%s", result.Code)
+          }
+        }
 
   - h3: Charset
 
@@ -2672,7 +2713,8 @@ body:
 
   - p: >
       Use this to insert an arbitrary string at the end of generated JavaScript
-      and CSS files. This is commonly used to insert comments:
+      and CSS files. This is typically used to insert comments. Here is an
+      example using the [build](#build) API:
 
   - example:
       in:
@@ -2716,6 +2758,44 @@ body:
   - p: >
       This is similar to [banner](#banner) which inserts at the beginning
       instead of the end.
+
+  - p: >
+      Unlike the build API, the footer for the [transform](#transform) API is
+      just a single string. There is no need to specify a separate footer for
+      JS and CSS files since the content type for the transform API is already
+      unambiguously specified via the [loader](#loader) setting. Here is an
+      example using the transform API:
+
+  - example:
+      cli:
+        - $: |
+            echo '1+2' | esbuild --footer=//comment
+        - expect: |
+            1 + 2;
+            //comment
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        let result = await esbuild.transform('1+2', {
+          footer: '//comment',
+        })
+        console.log(result.code)
+
+      go: |
+        package main
+
+        import "fmt"
+        import "github.com/evanw/esbuild/pkg/api"
+
+        func main() {
+          result := api.Transform("1+2", api.TransformOptions{
+            Footer: "//comment",
+          })
+          if len(result.Errors) == 0 {
+            fmt.Printf("%s", result.Code)
+          }
+        }
 
   - h3: Format
 
@@ -8006,6 +8086,7 @@ body:
           kind: 'error' | 'warning';
           color?: boolean;
           terminalWidth?: number;
+          logStyle?: LogStyle;
         }
 
       go: |
@@ -8013,6 +8094,7 @@ body:
           Kind          MessageKind
           Color         bool
           TerminalWidth int
+          LogStyle      LogStyle
         }
 
   - ul:
@@ -8027,6 +8109,11 @@ body:
       `terminalWidth`
       <p>Provide a positive value to wrap long lines so that they don't overflow
       past the provided column width. Provide `0` to disable word wrapping.</p>
+    - >
+      `logStyle`
+      <p>Can be used to change the style of log message to adapt esbuild's output
+      for different tools. See the [log style](#log-style) setting for the available
+      style options.</p>
 
   - h3: Log level
 
@@ -8212,6 +8299,7 @@ body:
             <li><details><summary>`call-import-namespace`</summary><pre>{{ FORMAT_MESSAGES('import * as foo from "foo"; foo()', { sourcefile: 'example.js', format: 'esm' }) }}</pre></details></li>
             <li><details><summary>`class-name-will-throw`</summary><pre>{{ FORMAT_MESSAGES('class Foo { static key = "foo"; static [Foo.key] = 123 }', { sourcefile: 'example.js' }) }}</pre></details></li>
             <li><details><summary>`commonjs-variable-in-esm`</summary><pre>{{ FORMAT_MESSAGES('exports.foo = 1; export let bar = 2', { sourcefile: 'example.js', format: 'esm' }) }}</pre></details></li>
+            <li><details><summary>`confusing-typescript-cast`</summary><pre>{{ FORMAT_MESSAGES({ 'example.ts': '1 + 2 as number * 3' }, {}) }}</pre></details></li>
             <li><details><summary>`delete-super-property`</summary><pre>{{ FORMAT_MESSAGES('class Foo extends Object { foo() { delete super.foo } }', { sourcefile: 'example.js' }) }}</pre></details></li>
             <li><details><summary>`direct-eval`</summary><pre>{{ FORMAT_MESSAGES('let apparentlyUnused; eval("actuallyUse(apparentlyUnused)")', { sourcefile: 'example.js', logOverride: { 'direct-eval': 'warning' } }) }}</pre></details></li>
             <li><details><summary>`duplicate-case`</summary><pre>{{ FORMAT_MESSAGES('switch (foo) { case 1: return 1; case 1: return 2 }', { sourcefile: 'example.js' }) }}</pre></details></li>
@@ -8294,4 +8382,61 @@ body:
   - p: >
       These message types should be reasonably stable but new ones may be added
       and old ones may occasionally be removed in the future. If a message type
+<<<<<<< HEAD
       is removed, any overrides for that message type will just be silently ignored.
+=======
+      is removed, any overrides for that message type will just be silently ignored.
+
+  - h3: Log style
+
+  - p: >
+      This can be used to adapt esbuild's log output to different tools that expect
+      a certain style of log messages. Here is an example of configuring the log style:
+
+  - example:
+      in:
+        app.js: '1 + 2'
+
+      cli: |
+        esbuild app.js --log-style=visualstudio
+
+      mjs: |
+        import * as esbuild from 'esbuild'
+
+        await esbuild.build({
+          entryPoints: ['app.js'],
+          logStyle: 'visualstudio',
+        })
+
+      go: |
+        package main
+
+        import "github.com/evanw/esbuild/pkg/api"
+        import "os"
+
+        func main() {
+          result := api.Build(api.BuildOptions{
+            EntryPoints: []string{"app.js"},
+            LogStyle:    api.LogStyleVisualStudio,
+          })
+
+          if len(result.Errors) > 0 {
+            os.Exit(1)
+          }
+        }
+
+  - p: >
+      Available log styles:
+
+  - ul:
+    - >
+      `default`
+      <p>This is esbuild's default log style, and normally doesn't
+      need to be configured explicitly.</p>
+    - >
+      `visualstudio`
+      <p>This allows esbuild to integrate with
+      [Visual Studio](https://visualstudio.microsoft.com/)'s built-in problem matcher
+      for custom build rules. Without this, the IDE will fail to understand esbuild's
+      log output and won't show errors and/or warnigns from esbuild in the IDE.</p>
+>>>>>>> e5865297d0d78e21088b3eac57385bdd08fcca27
